@@ -268,8 +268,8 @@ protected:
   using IncrementalMarginalPDFType = Image<PDFValueType, 2>;
   using IncrementalMarginalPDFPointer = typename IncrementalMarginalPDFType::Pointer;
   
-  using JointPDFRegionType = typename JointPDFType::RegionType;
-  using JointPDFSizeType = typename JointPDFType::SizeType;
+  // using JointPDFRegionType = typename JointPDFType::RegionType;
+  // using JointPDFSizeType = typename JointPDFType::SizeType;
   using JointPDFDerivativesIndexType = JointPDFDerivativesType::IndexType;
   using JointPDFDerivativesRegionType = JointPDFDerivativesType::RegionType;
   using JointPDFDerivativesSizeType = JointPDFDerivativesType::SizeType;
