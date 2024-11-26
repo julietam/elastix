@@ -178,8 +178,6 @@ public:
    */
   itkSetClampMacro(NumberOfMovingHistogramBins, unsigned long, 4, NumericTraits<unsigned long>::max());
   itkGetConstMacro(NumberOfMovingHistogramBins, unsigned long);
-
-  void SetWeightMatrixFilenames(const std::vector<std::string> &filenames);
   
   /** The B-spline order of the fixed Parzen window; default: 0 */
   itkSetClampMacro(FixedKernelBSplineOrder, unsigned int, 0, 3);
@@ -188,6 +186,10 @@ public:
   /** The B-spline order of the moving B-spline order; default: 3 */
   itkSetClampMacro(MovingKernelBSplineOrder, unsigned int, 0, 3);
   itkGetConstMacro(MovingKernelBSplineOrder, unsigned int);
+  
+  using JointPDFType = Image<PDFValueType, 3>;
+  using JointPDFPointer = typename JointPDFType::Pointer;
+  void SetWeightMatrixFilenames(const std::vector<std::string> &filenames);
   /** Set weight matrix for fixed image bins. */
   void SetWeightMatrixFixed(const JointPDFPointer &weightMatrix)
   {
@@ -261,8 +263,6 @@ protected:
   using PDFValueType = double;
   using PDFDerivativeValueType = float;
   using MarginalPDFType = Array<PDFValueType>;
-  using JointPDFType = Image<PDFValueType, 3>;
-  using JointPDFPointer = typename JointPDFType::Pointer;
   using JointPDFDerivativesType = Image<PDFDerivativeValueType, 3>;
   using JointPDFDerivativesPointer = typename JointPDFDerivativesType::Pointer;
   using IncrementalMarginalPDFType = Image<PDFValueType, 2>;
