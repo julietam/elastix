@@ -144,7 +144,7 @@ void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetW
 
 
 template <typename TFixedImage, typename TMovingImage> // Correct prefix
-void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices(
+void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices(
     const std::vector<std::string>& weightMatrixFilenames)
 {
     // Clear existing weight matrices to avoid conflicts
@@ -212,16 +212,16 @@ void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Lo
 }
 
 template <typename TFixedImage, typename TMovingImage> // Correct prefix
-void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixFilenames(
-    const typename itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::WeightMatrixPointer& fixedWeightMatrix,
-    const typename itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::WeightMatrixPointer& movingWeightMatrix)
+void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixFilenames(
+    const typename itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::WeightMatrixPointer& fixedWeightMatrix,
+    const typename itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::WeightMatrixPointer& movingWeightMatrix)
 {
     // Call the existing LoadWeightMatrices function to load the files
     this->LoadWeightMatrices(weightMatrixFilenames);
 }
 
 template <typename TFixedImage, typename TMovingImage> // Correct prefix
-void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrices(
+void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrices(
     const WeightMatrixPointer& fixedWeightMatrix, const WeightMatrixPointer& movingWeightMatrix)
 {
     // Assign the provided weight matrices
