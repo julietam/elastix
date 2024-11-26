@@ -191,17 +191,9 @@ public:
   using JointPDFType = Image<PDFValueType, 3>;
   using JointPDFPointer = typename JointPDFType::Pointer;
   void SetWeightMatrixFilenames(const std::vector<std::string> &filenames);
-  /** Set weight matrix for fixed image bins. */
-  void SetWeightMatrixFixed(const JointPDFPointer &weightMatrix)
-  {
-      m_WeightMatrixFixed = weightMatrix;
-  }
+  void SetWeightMatrixFixed(const JointPDFPointer& weightMatrix); // Declaration 
+  void SetWeightMatrixMoving(const JointPDFPointer& weightMatrix); // Declaration 
 
-  /** Set weight matrix for moving image bins. */
-  void SetWeightMatrixMoving(const JointPDFPointer &weightMatrix)
-  {
-      m_WeightMatrixMoving = weightMatrix;
-  }
   void LoadWeightMatrices();
   using Superclass::ComputePDFs;
 
