@@ -175,7 +175,7 @@ void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Load
       movingReader->Update();
       this->m_WeightMatrixMoving = movingReader->GetOutput();
     // Optionally store in m_WeightMatrices if needed for consistency
-      m_WeightMatrices.push_back(this->m_WeightMatrixFixed)
+      m_WeightMatrices.push_back(this->m_WeightMatrixFixed);
       m_WeightMatrices.push_back(this->m_WeightMatrixMoving);
       }
       else
