@@ -237,6 +237,7 @@ public:
     return m_ImageSampler.GetPointer();
   }
 
+  
 
   /** Inheriting classes can specify whether they use the image sampler functionality;
    * This method allows the user to inspect this setting. */
@@ -327,6 +328,9 @@ protected:
   /** PrintSelf. */
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
+  
+  /** New member variable to store the image weight */
+  double m_ImageWeight;
 
   /** Protected Typedefs ******************/
 

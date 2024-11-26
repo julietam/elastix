@@ -109,11 +109,16 @@ ParzenWindowMutualInformationImageToImageMetric<TFixedImage, TMovingImage>::GetV
       const double movingImagePDFValue = *movingPDFit;
       const double fixPDFmovPDF = fixedImagePDFValue * movingImagePDFValue;
       const double jointPDFValue = jointPDFit.Get();
+       // Fetch weight values
+      const double fixedWeight = this->m_WeightMatrixFixed->GetPixel(jointPDFit.GetIndex());
+      const double movingWeight = this->m_WeightMatrixMoving->GetPixel(jointPDFit.GetIndex());
 
+      
       /** Check for non-zero bin contribution. */
-      if (jointPDFValue > 1e-16 && fixPDFmovPDF > 1e-16)
+      if (jointPDFValue > 1e-16 && fixPDFmovPDF > 1e-16 && movingPDFValue > 1e-16)
       {
-        MI += jointPDFValue * std::log(jointPDFValue / fixPDFmovPDF);
+	const double fixPDFmovPDF = fixedPDFValue * movingPDFValue;      
+        MI += jointPDFValue *fixedWeight*movingWeight* std::log(jointPDFValue / fixPDFmovPDF);
       }
       ++movingPDFit;
       ++jointPDFit;
@@ -196,6 +201,9 @@ ParzenWindowMutualInformationImageToImageMetric<TFixedImage, TMovingImage>::GetV
       const double movingImagePDFValue = *movingPDFit;
       const double fixPDFmovPDF = fixedImagePDFValue * movingImagePDFValue;
       const double jointPDFValue = jointPDFit.Get();
+      /** Fetch weight values. */
+      const double fixedWeight = this->m_WeightMatrixFixed->GetPixel(jointPDFit.GetIndex());
+      const double movingWeight = this->m_WeightMatrixMoving->GetPixel(jointPDFit.GetIndex());
 
       /** Check for non-zero bin contribution. */
       if (jointPDFValue > 1e-16 && fixPDFmovPDF > 1e-16)

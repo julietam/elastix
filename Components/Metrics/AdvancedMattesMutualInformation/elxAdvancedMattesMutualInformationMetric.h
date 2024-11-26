@@ -118,7 +118,7 @@ public:
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(AdvancedMattesMutualInformationMetric, itk::ParzenWindowMutualInformationImageToImageMetric);
+  itkOverrideGetNameOfClassMacro(AdvancedMattesMutualInformationMetric);
 
   /** Name of this class.
    * Use this name in the parameter file to select this specific metric. \n
@@ -138,7 +138,6 @@ public:
   using typename Superclass1::TransformPointer;
   using typename Superclass1::InputPointType;
   using typename Superclass1::OutputPointType;
-  using typename Superclass1::TransformParametersType;
   using typename Superclass1::TransformJacobianType;
   using typename Superclass1::InterpolatorType;
   using typename Superclass1::InterpolatorPointer;
@@ -175,6 +174,7 @@ public:
   using typename Superclass2::ElastixType;
   using typename Superclass2::RegistrationType;
   using ITKBaseType = typename Superclass2::ITKBaseType;
+  using ImageType = itk::Image<float, 3>; // or itk::Image<float, 4> if needed
 
   /** Execute stuff before each new pyramid resolution:
    * \li Set the number of histogram bins.
@@ -206,7 +206,8 @@ public:
   /** Set/Get the current iteration. For finite difference derivative estimation */
   itkSetMacro(CurrentIteration, unsigned int);
   itkGetConstMacro(CurrentIteration, unsigned int);
-
+  
+  
 protected:
   /** The constructor. */
   AdvancedMattesMutualInformationMetric();
@@ -215,6 +216,42 @@ protected:
   ~AdvancedMattesMutualInformationMetric() override = default;
 
   unsigned long m_CurrentIteration;
+  
+  using JointPDFType = itk::Image<double, 3>;
+  using JointPDFPointer = typename JointPDFType::Pointer;
+
+  mutable JointPDFPointer m_WeightMatrixFixed;  // Weight matrix for fixed image bins
+  mutable JointPDFPointer m_WeightMatrixMoving; // Weight matrix for moving image bins 
+ 
+  void InitializeWeightMatrices(const JointPDFType::SizeType &size);
+  void ValidateWeightMatrices() const
+  {
+	  if (!this->m_WeightMatrixMoving)
+	  {
+		  itkExceptionMacro("Wieght matrices are note initialized.");
+	  }
+	  if (this->m_WeightMatrixFixed->GetLargestPossibleRegion().GetSize() != this->m_FixedImage->GetLargestPossibleRegion().GetSize())
+         {
+                 itkExceptionMacro("Fixed weight matrix dimensions do not match the fixed image dimensions.");
+         }
+         if (this->m_WeightMatrixMoving->GetLargestPossibleRegion().GetSize() != this->m_MovingImage->GetLargestPossibleRegion().GetSize())
+         {     
+                itkExceptionMacro("Moving weight matrix dimensions do not match the moving image dimensions.");
+         }  
+         if (this->m_WeightMatrixFixed->GetLargestPossibleRegion().GetSize() != this->m_JointPDF->GetLargestPossibleRegion().GetSize() ||
+             this->m_WeightMatrixMoving->GetLargestPossibleRegion().GetSize() != this->m_JointPDF->GetLargestPossibleRegion().GetSize())
+         {
+                itkExceptionMacro("Weight matrices must match the dimensions of the Joint PDF.");
+         }
+  }
+  /** Update weight matrices dynamically. */
+  void UpdateWeightMatrices(const JointPDFPointer &newWeightMatrixFixed,
+                            const JointPDFPointer &newWeightMatrixMoving);
+
+  /** New method to compute PDFs with weight matrices */
+  void ComputePDFs(const ParametersType &parameters,
+                   const JointPDFPointer &weightMatrixFixed,
+                   const JointPDFPointer &weightMatrixMoving);
 
   /** A function to compute the finite difference perturbation in each iteration */
   double

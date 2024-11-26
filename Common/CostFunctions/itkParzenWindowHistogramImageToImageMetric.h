@@ -21,7 +21,8 @@
 #include "itkAdvancedImageToImageMetric.h"
 #include "itkKernelFunctionBase2.h"
 #include <vector>
-
+#include <itkImage.h>
+#include <itkArray.h>
 
 namespace itk
 {
@@ -127,7 +128,7 @@ public:
   using typename Superclass::MovingImageLimiterOutputType;
   using typename Superclass::MovingImageDerivativeScalesType;
   using typename Superclass::ThreadInfoType;
-
+  
   /** The fixed image dimension. */
   itkStaticConstMacro(FixedImageDimension, unsigned int, FixedImageType::ImageDimension);
 
@@ -178,6 +179,8 @@ public:
   itkSetClampMacro(NumberOfMovingHistogramBins, unsigned long, 4, NumericTraits<unsigned long>::max());
   itkGetConstMacro(NumberOfMovingHistogramBins, unsigned long);
 
+  void SetWeightMatrixFilenames(const std::vector<std::string> &filenames);
+  
   /** The B-spline order of the fixed Parzen window; default: 0 */
   itkSetClampMacro(FixedKernelBSplineOrder, unsigned int, 0, 3);
   itkGetConstMacro(FixedKernelBSplineOrder, unsigned int);
@@ -185,7 +188,24 @@ public:
   /** The B-spline order of the moving B-spline order; default: 3 */
   itkSetClampMacro(MovingKernelBSplineOrder, unsigned int, 0, 3);
   itkGetConstMacro(MovingKernelBSplineOrder, unsigned int);
+  /** Set weight matrix for fixed image bins. */
+  void SetWeightMatrixFixed(const JointPDFPointer &weightMatrix)
+  {
+      m_WeightMatrixFixed = weightMatrix;
+  }
 
+  /** Set weight matrix for moving image bins. */
+  void SetWeightMatrixMoving(const JointPDFPointer &weightMatrix)
+  {
+      m_WeightMatrixMoving = weightMatrix;
+  }
+  void LoadWeightMatrices();
+  using Superclass::ComputePDFs;
+
+    // Override the overloaded version with weights
+  virtual void ComputePDFs(const ParametersType &parameters,
+                           const JointPDFPointer &weightsFixed,
+                           const JointPDFPointer &weightsMoving) const override;  
   /** Option to use explicit PDF derivatives, which requires a lot
    * of memory in case of many parameters.
    */
@@ -224,7 +244,7 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
   /** Protected Typedefs ******************/
-
+  std::vector<std::string> m_WeightMatrixFilenames; // Filenames for weight matrices
   /** Typedefs inherited from superclass. */
   using typename Superclass::FixedImageIndexType;
   using typename Superclass::FixedImageIndexValueType;
@@ -241,7 +261,7 @@ protected:
   using PDFValueType = double;
   using PDFDerivativeValueType = float;
   using MarginalPDFType = Array<PDFValueType>;
-  using JointPDFType = Image<PDFValueType, 2>;
+  using JointPDFType = Image<PDFValueType, 3>;
   using JointPDFPointer = typename JointPDFType::Pointer;
   using JointPDFDerivativesType = Image<PDFDerivativeValueType, 3>;
   using JointPDFDerivativesPointer = typename JointPDFDerivativesType::Pointer;
@@ -261,9 +281,17 @@ protected:
   /** Typedefs for Parzen kernel. */
   using KernelFunctionType = KernelFunctionBase2<PDFValueType>;
   using KernelFunctionPointer = typename KernelFunctionType::Pointer;
-
+  using WeightMatrixType = itk::Image<double, 3>; // Adjust dimensions if necessary
+  using WeightMatrixPointer = typename WeightMatrixType::Pointer;
   /** Protected variables **************************** */
+  mutable JointPDFPointer m_JointPDF{ nullptr }; // Declare m_JointPDF here
+ /** Weight matrices for fixed and moving images. */
+  
+  mutable WeightMatrixPointer m_WeightMatrixFixed;  // Weight matrix for the fixed image
+  mutable WeightMatrixPointer m_WeightMatrixMoving; // Weight matrix for the moving image
 
+ 
+ 
   /** Variables for Alpha (the normalization factor of the histogram). */
   mutable double         m_Alpha{ 0.0 };
   mutable DerivativeType m_PerturbedAlphaRight{};
@@ -272,7 +300,6 @@ protected:
   /** Variables for the pdfs (actually: histograms). */
   mutable MarginalPDFType       m_FixedImageMarginalPDF{};
   mutable MarginalPDFType       m_MovingImageMarginalPDF{};
-  JointPDFPointer               m_JointPDF{ nullptr };
   JointPDFDerivativesPointer    m_JointPDFDerivatives{ nullptr };
   JointPDFDerivativesPointer    m_IncrementalJointPDFRight{};
   JointPDFDerivativesPointer    m_IncrementalJointPDFLeft{};
@@ -288,6 +315,8 @@ protected:
   double                        m_FixedParzenTermToIndexOffset{ 0.5 };
   double                        m_MovingParzenTermToIndexOffset{ -1.0 };
 
+ 
+  
   /** Kernels for computing Parzen histograms and derivatives. */
   KernelFunctionPointer m_FixedKernel{ nullptr };
   KernelFunctionPointer m_MovingKernel{ nullptr };
@@ -300,7 +329,7 @@ protected:
   /** Multi-threaded versions of the ComputePDF function. */
   void
   ThreadedComputePDFs(ThreadIdType threadId);
-
+  
   /** Single-threadedly accumulate results. */
   void
   AfterThreadedComputePDFs() const;
@@ -439,7 +468,15 @@ protected:
 
   virtual void
   ComputePDFs(const ParametersType & parameters) const;
+  
+  /** Compute the joint PDF, considering weight matrices for the fixed and moving images. */
+  void ComputePDFs(const ParametersType &parameters,
+                 const JointPDFPointer &weightsFixed = nullptr,
+                 const JointPDFPointer &weightsMoving = nullptr) const;
 
+
+  /** Validate the weight matrices to ensure compatibility with the joint PDF. */
+  void ValidateWeightMatrices() const;
   /** Some initialization functions, called by Initialize. */
   virtual void
   InitializeHistograms();

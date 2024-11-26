@@ -79,10 +79,153 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::PrintSelf(st
 
 } // end PrintSelf()
 
+/**
+ * ******************* SetWeightMatrixFilenames *******************
+ */
+
+template <typename TFixedImage, typename TMovingImage>
+void
+ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixFilenames(
+  const std::vector<std::string> &filenames)
+{
+  // Validate the input size
+  if (filenames.size() != 2)
+  {
+      itkExceptionMacro("Expected two weight matrix filenames: one for fixed and one for moving image.");
+  }
+
+  m_WeightMatrixFilenames = filenames;
+  // Load and validate the weight matrices
+  this->LoadWeightMatrices(filenames);
+}
+
+/**
+ * ******************* LoadWeightMatrices *******************
+ */
+
+template <typename TFixedImage, typename TMovingImage>
+void
+ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices()
+{
+  if (m_WeightMatrixFilenames.size() != 2)
+  {
+    itkExceptionMacro("Expected two filenames: one for fixed image weights and one for moving image weights.");
+  }
+
+  using ReaderType = itk::ImageFileReader<WeightMatrixType>;
+
+  // Load fixed weight matrix
+  auto fixedReader = ReaderType::New();
+  fixedReader->SetFileName(m_WeightMatrixFilenames[0]);
+  fixedReader->Update();
+  m_WeightMatrixFixed = fixedReader->GetOutput();
+
+  // Load moving weight matrix
+  auto movingReader = ReaderType::New();
+  movingReader->SetFileName(m_WeightMatrixFilenames[1]);
+  movingReader->Update();
+  m_WeightMatrixMoving = movingReader->GetOutput();
+}
+
+/**
+ * ******************* SetWeightMatrixFixed *******************
+ */
+
+template <typename TFixedImage, typename TMovingImage>
+void
+ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixFixed(
+  const JointPDFPointer &weightMatrix)
+{
+  m_WeightMatrixFixed = weightMatrix;
+}
+
+/**
+ * ******************* SetWeightMatrixMoving *******************
+ */
+
+template <typename TFixedImage, typename TMovingImage>
+void
+ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixMoving(
+  const JointPDFPointer &weightMatrix)
+{
+  m_WeightMatrixMoving = weightMatrix;
+}
+
+/**
+ * ******************* ValidateWeightMatrices *******************
+ */
+
+template <typename TFixedImage, typename TMovingImage>
+void
+ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ValidateWeightMatrices() const
+{
+  if (!m_WeightMatrixFixed || !m_WeightMatrixMoving)
+  {
+    itkExceptionMacro("Weight matrices must be set before using the metric.");
+  }
+
+  // Additional checks: Ensure they match the corresponding image sizes
+  const auto fixedImageRegion = this->GetFixedImage()->GetLargestPossibleRegion();
+  const auto movingImageRegion = this->GetMovingImage()->GetLargestPossibleRegion();
+
+  if (m_WeightMatrixFixed->GetLargestPossibleRegion() != fixedImageRegion) || 
+     (m_WeightMatrixMoving->GetLargestPossibleRegion() != movingImageRegion)
+  {
+      itkExceptionMacro("Fixed weight matrix size does not match the fixed image size.");
+  }
+}
+
 
 /**
  * ********************* Initialize *****************************
  */
+template <typename TFixedImage, typename TMovingImage>
+void itkParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices(
+    const std::vector<std::string>& weightMatrixFilenames)
+{
+    using WeightMatrixType = typename FixedImageType;
+    using ReaderType = itk::ImageFileReader<WeightMatrixType>;
+
+    if (weightMatrixFilenames.empty())
+    {
+        // Default to uniform weights
+        this->m_WeightMatrixFixed = WeightMatrixType::New();
+        this->m_WeightMatrixFixed->SetRegions(this->GetFixedImage()->GetLargestPossibleRegion());
+        this->m_WeightMatrixFixed->Allocate();
+        this->m_WeightMatrixFixed->FillBuffer(1.0);
+
+        this->m_WeightMatrixMoving = WeightMatrixType::New();
+        this->m_WeightMatrixMoving->SetRegions(this->GetMovingImage()->GetLargestPossibleRegion());
+        this->m_WeightMatrixMoving->Allocate();
+        this->m_WeightMatrixMoving->FillBuffer(1.0);
+    }
+    else
+    {
+        // Load weight matrices from files
+        try
+        {
+            typename ReaderType::Pointer fixedReader = ReaderType::New();
+            fixedReader->SetFileName(weightMatrixFilenames[0]);
+            fixedReader->Update();
+            this->m_WeightMatrixFixed = fixedReader->GetOutput();
+
+            typename ReaderType::Pointer movingReader = ReaderType::New();
+            movingReader->SetFileName(weightMatrixFilenames[1]);
+            movingReader->Update();
+            this->m_WeightMatrixMoving = movingReader->GetOutput();
+        }
+        catch (itk::ExceptionObject& err)
+        {
+            itkExceptionMacro("Error loading weight matrices: " << err);
+        }
+    }
+
+    // Validate the loaded weight matrices
+    this->ValidateWeightMatrices();
+}
+
+
+
 
 template <typename TFixedImage, typename TMovingImage>
 void
@@ -97,6 +240,11 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
   /** Set up the Parzen windows. */
   this->InitializeKernels();
 
+   // Load weight matrices (use an appropriate way to retrieve filenames)
+  this->LoadWeightMatrices(this->m_WeightMatrixFilenames);
+    
+  this->ValidateWeightMatrices();
+  
   /** If the user plans to use a finite difference derivative,
    * allocate some memory for the perturbed alpha variables.
    */
@@ -110,7 +258,7 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
     this->m_PerturbedAlphaRight.SetSize(0);
     this->m_PerturbedAlphaLeft.SetSize(0);
   }
-
+  
 } // end Initialize()
 
 
@@ -976,10 +1124,23 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ComputePDFsS
       /** Make sure the values fall within the histogram range. */
       fixedImageValue = this->GetFixedImageLimiter()->Evaluate(fixedImageValue);
       movingImageValue = this->GetMovingImageLimiter()->Evaluate(movingImageValue);
+      // Determine histogram bin indices
+      JointPDFIndexType fixedIndex;
+      JointPDFIndexType movingIndex;
+      // Compute bin indices for the fixed and moving images based on intensity
+      fixedIndex[0] = static_cast<OffsetValueType>(std::floor(fixedImageValue / this->m_FixedImageBinSize));
+      movingIndex[0] = static_cast<OffsetValueType>(std::floor(movingImageValue / this->m_MovingImageBinSize));
+      //
+      /** Apply weight matrices. */
+      const double fixedWeight = (m_WeightMatrixFixed) ? m_WeightMatrixFixed->GetPixel(fixedIndex) : 1.0;
+      const double movingWeight = (m_WeightMatrixMoving) ? m_WeightMatrixMoving->GetPixel(movingIndex) : 1.0;
+      
+      /** Compute weighted values. */
+      const double weightedFixedImageValue = fixedImageValue * fixedWeight;
+      const double weightedMovingImageValue = movingImageValue * movingWeight;
 
-      /** Compute this sample's contribution to the joint distributions. */
       this->UpdateJointPDFAndDerivatives(
-        fixedImageValue, movingImageValue, nullptr, nullptr, this->m_JointPDF.GetPointer());
+      weightedFixedImageValue, weightedMovingImageValue, nullptr, nullptr, this->m_JointPDF.GetPointer());
     }
 
   } // end iterating over fixed image spatial sample container for loop
@@ -999,7 +1160,7 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ComputePDFsS
 
 template <typename TFixedImage, typename TMovingImage>
 void
-ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ComputePDFs(const ParametersType & parameters) const
+ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ComputePDFs(const ParametersType & parameters, const JointPDFPointer &weightsFixed, const JointPDFPointer &weightsMoving) const
 {
   /** Option for now to still use the single threaded code. */
   if (!Superclass::m_UseMultiThread)
@@ -1021,9 +1182,40 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ComputePDFs(
    * - Now you can call GetValueAndDerivative multi-threaded.
    */
   this->BeforeThreadedGetValueAndDerivative(parameters);
+  /** Validate weight matrices before proceeding. */
+  if (weightsFixed && weightsMoving)
+  {
+      const auto fixedRegion = weightsFixed->GetLargestPossibleRegion();
+      const auto movingRegion = weightsMoving->GetLargestPossibleRegion();
+      if (fixedRegion != this->GetFixedImage()->GetLargestPossibleRegion())
+      { 
+          itkExceptionMacro("Fixed weight matrix size does not match fixed image size.");
+      }
+
+      if (movingRegion != this->GetMovingImage()->GetLargestPossibleRegion())
+      {
+          itkExceptionMacro("Moving weight matrix size does not match moving image size.");
+      }
+  }
 
   /** Launch multi-threading JointPDF computation. */
   this->LaunchComputePDFsThreaderCallback();
+  /** Incorporate weights into the PDF calculation. */
+  for (auto &threaderJointPDF : this->m_ThreaderJointPDFs)
+  { 
+      itk::ImageRegionConstIterator<JointPDFType> jointPDFIterator(
+            threaderJointPDF, threaderJointPDF->GetLargestPossibleRegion()):
+      for (jointPDFIterator.GoToBegin(); !jointPDFIterator.IsAtEnd(); ++jointPDFIterator)
+      {
+          const JointPDFIndexType index = jointPDFIterator.GetIndex();
+      
+          const double fixedWeight = weightsFixed ? weightsFixed->GetPixel(index) : 1.0;
+          const double movingWeight = weightsMoving ? weightsMoving->GetPixel(index) : 1.0;
+
+          const double jointValue = threaderJointPDF->GetPixel(index);
+          threaderJointPDF->SetPixel(index, jointValue * fixedWeight * movingWeight);
+      }
+  }
 
   /** Gather the results from all threads. */
   this->AfterThreadedComputePDFs();
@@ -1097,9 +1289,22 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ThreadedComp
       /** Make sure the values fall within the histogram range. */
       fixedImageValue = this->GetFixedImageLimiter()->Evaluate(fixedImageValue);
       movingImageValue = this->GetMovingImageLimiter()->Evaluate(movingImageValue);
+      
+      /**Determine histogram bin indices*/
+       JointPDFIndexType fixedIndex;
+       JointPDFIndexType movingIndex;
+       // Compute bin indices for the fixed and moving images based on intensity
+       fixedIndex[0] = static_cast<OffsetValueType>(std::floor(fixedImageValue / this->m_FixedImageBinSize));
+       movingIndex[1] = static_cast<OffsetValueType>(std::floor(movingImageValue / this->m_MovingImageBinSize));
+       //
+      /** Apply weights*/
+      double weightedFixedImageValue = fixedImageValue * m_WeightMatrixFixed->GetPixel(fixedIndex);
+      double weightedMovingImageValue = movingImageValue * m_WeightMatrixMoving->GetPixel(movingIndex);
 
       /** Compute this sample's contribution to the joint distributions. */
-      this->UpdateJointPDFAndDerivatives(fixedImageValue, movingImageValue, nullptr, nullptr, jointPDF.GetPointer());
+      this->UpdateJointPDFAndDerivatives(
+      weightedFixedImageValue, weightedMovingImageValue, nullptr, nullptr, jointPDF.GetPointer());
+
     }
   } // end iterating over fixed image spatial sample container for loop
 
@@ -1243,7 +1448,7 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ComputePDFsA
    * - Now you can call GetValueAndDerivative multi-threaded.
    */
   this->BeforeThreadedGetValueAndDerivative(parameters);
-
+  this->ValidateWeightMatrices();
   /** Get a handle to the sample container. */
   ImageSampleContainerPointer sampleContainer = this->GetImageSampler()->GetOutput();
 
@@ -1280,6 +1485,16 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ComputePDFsA
       /** Make sure the values fall within the histogram range. */
       fixedImageValue = this->GetFixedImageLimiter()->Evaluate(fixedImageValue);
       movingImageValue = this->GetMovingImageLimiter()->Evaluate(movingImageValue, movingImageDerivative);
+     // Calculate indices
+      JointPDFIndexType fixedIndex;
+      JointPDFIndexType movingIndex;
+      fixedIndex[0] = static_cast<OffsetValueType>(std::floor(fixedImageValue / this->m_FixedImageBinSize));
+      movingIndex[1] = static_cast<OffsetValueType>(std::floor(movingImageValue / this->m_MovingImageBinSize));
+      
+        // Get weights
+      double fixedWeight = (m_WeightMatrixFixed) ? m_WeightMatrixFixed->GetPixel(fixedIndex) : 1.0;
+      double movingWeight = (m_WeightMatrixMoving) ? m_WeightMatrixMoving->GetPixel(movingIndex) : 1.0;
+
 
       /** Get the TransformJacobian dT/dmu. */
       this->EvaluateTransformJacobian(fixedPoint, jacobian, nzji);
@@ -1288,8 +1503,13 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ComputePDFsA
       this->EvaluateTransformJacobianInnerProduct(jacobian, movingImageDerivative, imageJacobian);
 
       /** Update the joint pdf and the joint pdf derivatives. */
+      // Update joint PDF and derivatives
       this->UpdateJointPDFAndDerivatives(
-        fixedImageValue, movingImageValue, &imageJacobian, &nzji, this->m_JointPDF.GetPointer());
+            fixedImageValue * fixedWeight,
+            movingImageValue * movingWeight,
+            &imageJacobian,
+            &nzji,
+            this->m_JointPDF.GetPointer());
 
     } // end if-block check sampleOk
   }   // end iterating over fixed image spatial sample container for loop

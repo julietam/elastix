@@ -19,7 +19,10 @@
 #define itkAdvancedMeanSquaresImageToImageMetric_h
 
 #include "itkAdvancedImageToImageMetric.h"
-
+#include <itkImage.h>
+#include <itkImageFileReader.h>
+#include <vector>
+#include <string>
 namespace itk
 {
 
@@ -108,7 +111,13 @@ public:
   using typename Superclass::MovingImageLimiterOutputType;
   using typename Superclass::MovingImageDerivativeScalesType;
   using typename Superclass::ThreadInfoType;
+  //adding weight 
+ 
+  using WeightMatrixType = itk::Image<double, 3>;
+  using WeightMatrixPointer = typename WeightMatrixType::Pointer;
 
+  mutable WeightMatrixPointer m_WeightMatrixFixed;  // Weight matrix for fixed image bins
+  mutable WeightMatrixPointer m_WeightMatrixMoving; // Weight matrix for moving image bins
   /** The fixed image dimension. */
   itkStaticConstMacro(FixedImageDimension, unsigned int, FixedImageType::ImageDimension);
 
@@ -136,6 +145,16 @@ public:
   GetValueAndDerivative(const TransformParametersType & parameters,
                         MeasureType &                   value,
                         DerivativeType &                derivative) const override;
+  
+  //Functions of Weight Declarations
+  void LoadWeightMatrices(const std::vector<std::string>& weightMatrixFilenames);
+  void ValidateWeightMatrices() const;
+  /** Set weight matrix filenames. This will load the weight matrices from file. */
+  void SetWeightMatrixFilenames(const std::vector<std::string>& weightMatrixFilenames);
+
+  /** Set weight matrices directly. */
+  void SetWeightMatrices(const WeightMatrixPointer& fixedWeightMatrix, const WeightMatrixPointer& movingWeightMatrix);
+
 
   /** Initialize the Metric by making sure that all the components
    *  are present and plugged together correctly.
@@ -162,7 +181,7 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
   /** Protected Typedefs ******************/
-
+  std::vector<typename WeightMatrixType::Pointer> m_WeightMatrices;
   /** Typedefs inherited from superclass */
   using typename Superclass::FixedImageIndexType;
   using typename Superclass::FixedImageIndexValueType;
@@ -173,7 +192,12 @@ protected:
   using typename Superclass::BSplineInterpolatorType;
   using typename Superclass::MovingImageDerivativeType;
   using typename Superclass::NonZeroJacobianIndicesType;
+  using Superclass = itk::AdvancedImageToImageMetric<TFixedImage, TMovingImage>;
+  using Superclass::m_Registration;
+  using Superclass::GetCurrentLevel;
 
+    // Add your additional declarations here
+    std::vector<typename WeightMatrixType::Pointer> m_WeightMatrices;
   /** Compute a pixel's contribution to the measure and derivatives;
    * Called by GetValueAndDerivative(). */
   void

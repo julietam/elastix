@@ -139,6 +139,77 @@ AdvancedMattesMutualInformationMetric<TElastix>::BeforeEachResolution()
     this->SetParam_gamma(gamma);
     this->SetFiniteDifferencePerturbation(this->Compute_c(0));
   }
+// ---------------------------
+//     // New code: Load weight matrices
+//         // ---------------------------
+//
+//             // Step 1: Read the weight matrix filenames from the parameter file.
+  std::vector<std::string> weightMatrixFilenames;
+  configuration.ReadParameter(weightMatrixFilenames, "ImagePairMetricWeights", BaseComponent::GetComponentLabel(), level,0,true);
+  std::vector<ImageType::Pointer> weightMatrices;
+    for (const auto& filename : weightMatrixFilenames) {
+        try {
+            typedef itk::ImageFileReader<ImageType> ReaderType;
+            ReaderType::Pointer reader = ReaderType::New();
+            reader->SetFileName(filename);
+            reader->Update();
+            ImageType::Pointer weightMatrix = reader->GetOutput();
+            weightMatrices.push_back(weightMatrix);
+        }
+        catch (itk::ExceptionObject& err) {
+            std::cerr << "Error loading weight matrix: " << filename << std::endl;
+            std::cerr << err << std::endl;
+            throw;  // Halt registration if loading fails.
+        }
+    }
+    this->m_WeightMatrices = weightMatrices;
+    if (this->m_WeightMatrices.empty())
+    {
+        itkExceptionMacro("Weight matrices are not initialized. Ensure the parameter file specifies valid matrices.");
+    }
+    
+    
+
+{
+
+template <typename TElastix>
+void
+AdvancedMattesMutualInformationMetric<TElastix>::ComputePDFs(
+  const ParametersType &parameters,
+  const JointPDFPointer &weightMatrixFixed,
+  const JointPDFPointer &weightMatrixMoving)
+  {
+    this->SetTransformParameters(parameters);
+
+  // Validate weight matrices
+    this->ValidateWeightMatrices();
+  //
+  //     // Compute PDF contributions with weights
+    for (const auto &sample : *this->GetImageSampler()->GetOutput())
+   {
+      JointPDFIndexType fixedIndex;
+      JointPDFIndexType movingIndex;
+  //
+  //                     // Calculate bin indices for fixed and moving images
+      double fixedValue = static_cast<double>(sample.m_FixedValue);
+      double movingValue = static_cast<double>(sample.m_MovingValue);
+  //
+      fixedIndex[0] = static_cast<OffsetValueType>(std::floor(fixedValue / this->m_FixedImageBinSize));
+      movingIndex[1] = static_cast<OffsetValueType>(std::floor(movingValue / this->m_MovingImageBinSize));
+  //
+  //                                         // Apply weights and update joint PDF
+      this->UpdateJointPDFAndDerivatives(
+        fixedValue * weightMatrixFixed->GetPixel(fixedIndex),
+        movingValue * weightMatrixMoving->GetPixel(movingIndex),
+        nullptr, nullptr, this->m_JointPDF.GetPointer());
+   }
+  //
+  //                                                                   // Normalize PDF if required
+  this->NormalizeJointPDF(this->m_JointPDF, this->m_Alpha);
+ }
+
+} // end namespace elastix
+ 
 
 } // end BeforeEachResolution()
 

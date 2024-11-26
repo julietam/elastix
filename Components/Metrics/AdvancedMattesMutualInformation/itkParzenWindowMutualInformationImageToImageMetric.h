@@ -1,6 +1,6 @@
 /*=========================================================================
  *
- *  Copyright UMC Utrecht and contributors
+ *tkParzenWindowHistogramImageToImageMetric.h  Copyright UMC Utrecht and contributors
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,6 +21,10 @@
 #include "itkParzenWindowHistogramImageToImageMetric.h"
 
 #include "itkArray2D.h"
+
+#include "itkImageFileReader.h"
+#include "itkImage.h"
+
 
 namespace itk
 {
@@ -88,7 +92,7 @@ public:
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(ParzenWindowMutualInformationImageToImageMetric, ParzenWindowHistogramImageToImageMetric);
+  itkOverrideGetNameOfClassMacro(ParzenWindowMutualInformationImageToImageMetric);
 
   /** Typedefs from the superclass. */
   using typename Superclass::CoordinateRepresentationType;
@@ -102,7 +106,6 @@ public:
   using typename Superclass::TransformPointer;
   using typename Superclass::InputPointType;
   using typename Superclass::OutputPointType;
-  using typename Superclass::TransformParametersType;
   using typename Superclass::TransformJacobianType;
   using typename Superclass::NumberOfParametersType;
   using typename Superclass::InterpolatorType;
@@ -179,7 +182,14 @@ protected:
   using typename Superclass::ParzenValueContainerType;
   using typename Superclass::KernelFunctionType;
   using typename Superclass::NonZeroJacobianIndicesType;
+   // Define ImageType as either 3D or 4D, depending on your data
+  using ImageType = itk::Image<float, 3>; // Adjust to itk::Image<float, 4> if necessary
+  using JointPDFPointer = typename JointPDFType::Pointer;
 
+  mutable JointPDFPointer m_WeightMatrixFixed;  // Weight matrix for fixed image bins
+  mutable JointPDFPointer m_WeightMatrixMoving; // Weight matrix for moving image bins
+   // Declaration of m_WeightMatrices as a vector of ImageType pointers
+   // std::vector<ImageType::Pointer> m_WeightMatrices;
   /**  Get the value and analytic derivative.
    * Called by GetValueAndDerivative if UseFiniteDifferenceDerivative == false.
    *
@@ -192,6 +202,20 @@ protected:
                                 MeasureType &          value,
                                 DerivativeType &       derivative) const override;
 
+  void ValidateWeightMatrices() const
+  {
+    if (!m_WeightMatrixFixed || !m_WeightMatrixMoving)
+    {
+        itkExceptionMacro("Weight matrices are not initialized.");
+    }
+    if (m_WeightMatrixFixed->GetLargestPossibleRegion().GetSize() !=
+            m_JointPDF->GetLargestPossibleRegion().GetSize() ||
+        m_WeightMatrixMoving->GetLargestPossibleRegion().GetSize() !=
+            m_JointPDF->GetLargestPossibleRegion().GetSize())
+    {
+        itkExceptionMacro("Weight matrices must match the dimensions of the joint PDF.");
+    }
+  } 
   /** Get the value and analytic derivative.
    * Called by GetValueAndDerivative if UseFiniteDifferenceDerivative == false
    * and UseExplicitPDFDerivatives == false.

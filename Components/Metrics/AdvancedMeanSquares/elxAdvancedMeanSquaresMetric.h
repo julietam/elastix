@@ -20,6 +20,8 @@
 
 #include "elxIncludes.h" // include first to avoid MSVS warning
 #include "itkAdvancedMeanSquaresImageToImageMetric.h"
+#include <itkImage.h>  // For itk::Image
+#include <itkImageFileReader.h>  // For reading images
 
 namespace elastix
 {
@@ -119,12 +121,25 @@ public:
   using typename Superclass2::ElastixType;
   using typename Superclass2::RegistrationType;
   using ITKBaseType = typename Superclass2::ITKBaseType;
+  
+  /**Mod to include image weights.*/
+  using WeightMatrixType = itk::Image<double, FixedImageType::ImageDimension>;
+  using WeightMatrixPointer = typename WeightMatrixType::Pointer;
+
+  mutable WeightMatrixPointer m_WeightMatrixFixed;  // Weight matrix for fixed image bins
+  mutable WeightMatrixPointer m_WeightMatrixMoving; // Weight matrix for moving image bins
 
   /** Sets up a timer to measure the initialization time and
    * calls the Superclass' implementation.
    */
   void
   Initialize() override;
+
+  
+  /** Weight matrices functions*/
+  void LoadWeightMatrices(const std::vector<std::string> &filenames);           // Load weight matrices from configuration
+  void ValidateWeightMatrices() const; // Validate weight matrix consistency
+
 
   /**
    * Do some things before each resolution:
@@ -139,7 +154,8 @@ protected:
   AdvancedMeanSquaresMetric() = default;
   /** The destructor. */
   ~AdvancedMeanSquaresMetric() override = default;
-
+  /** Store weight matrices as a protected member variable. */
+  std::vector<typename ImageType::Pointer> m_WeightMatrices;
 private:
   elxOverrideGetSelfMacro;
 };

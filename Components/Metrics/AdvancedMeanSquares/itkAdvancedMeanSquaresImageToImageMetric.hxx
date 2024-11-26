@@ -46,6 +46,11 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
 {
   /** Initialize transform, interpolator, etc. */
   Superclass::Initialize();
+  using Superclass = itk::AdvancedImageToImageMetric<TFixedImage, TMovingImage>;
+  using Superclass::m_Registration;
+  using Superclass::GetCurrentLevel;
+  
+  unsigned int level = m_Registration->GetCurrentLevel();
 
   if (this->GetUseNormalization())
   {
@@ -100,9 +105,134 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
   {
     this->m_NormalizationFactor = 1.0;
   }
+  //Loading weights
+  std::vector<std::string> weightMatrixFilenames;
+   // Retrieve filenames from the configuration
+    if (!this->m_Configuration->ReadParameter(weightMatrixFilenames, "WeightMatrixFiles", this->GetComponentLabel(), this->GetCurrentLevel()))
+    {
+        itkExceptionMacro("Weight matrix filenames must be provided in the configuration with key 'WeightMatrixFiles'.");
+    }
+
+  
+  if (weightMatrixFilenames.empty())
+    {
+        itkExceptionMacro("Weight matrix filenames must be set before initialization. Use SetWeightMatrixFilenames.");
+    }
+   
+  this->LoadWeightMatrices(weightMatrixFilenames);
+  
+   // Ensure weight matrices are set
+  if (!this->m_WeightMatrixFixed || !this->m_WeightMatrixMoving)
+    {
+      itkExceptionMacro("Weight matrices must be set before initialization. Use SetWeightMatrixFilenames or SetWeightMatrices.");
+    }
+
+    // Validate weight matrices
+    this->ValidateWeightMatrices();
 
 } // end Initialize()
 
+
+template <typename TFixedImage, typename TMovingImage>
+void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixFilenames(
+    const std::vector<std::string> &filenames)
+{
+    if (filenames.size() != 2)
+    {
+        itkExceptionMacro("Expected two weight matrix filenames: one for fixed and one for moving image.");
+    }
+    this->LoadWeightMatrices(filenames);
+}
+
+
+template <typename TFixedImage, typename TMovingImage>
+void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices(
+    const std::vector<std::string>& weightMatrixFilenames)
+{
+    // Clear existing weight matrices to avoid conflicts
+    m_WeightMatrices.clear();
+
+    // Ensure at least one filename is provided
+    if (weightMatrixFilenames.empty())
+    {
+        itkExceptionMacro("No filenames provided to LoadWeightMatrices.");
+    }
+
+    using ReaderType = itk::ImageFileReader<WeightMatrixType>;
+    
+    try
+    {
+    
+      if (weightMatrixFilenames.size() != 2)
+      { 
+        // Load the fixed weight matrix
+      typename ReaderType::Pointer fixedReader = ReaderType::New();
+      fixedReader->SetFileName(weightMatrixFilenames[0]);
+      fixedReader->Update();
+      this->m_WeightMatrixFixed = fixedReader->GetOutput();
+
+        // Load the moving weight matrix
+      typename ReaderType::Pointer movingReader = ReaderType::New();
+      movingReader->SetFileName(weightMatrixFilenames[1]);
+      movingReader->Update();
+      this->m_WeightMatrixMoving = movingReader->GetOutput();
+    // Optionally store in m_WeightMatrices if needed for consistency
+      m_WeightMatrices.push_back(this->m_WeightMatrixFixed)
+      m_WeightMatrices.push_back(this->m_WeightMatrixMoving);
+      }
+      else
+      {
+            // Handle the case for multiple weight matrices (e.g., multilevel registration)
+        for (const auto& filename : weightMatrixFilenames)
+          {
+            typename ReaderType::Pointer reader = ReaderType::New();
+            reader->SetFileName(filename)
+            reader->Update();
+            m_WeightMatrices.push_back(reader->GetOutput());
+          }
+
+            // Optionally assign the first two matrices to fixed and moving
+         if (m_WeightMatrices.size() >= 2)
+          {
+              this->m_WeightMatrixFixed = m_WeightMatrices[0];
+              this->m_WeightMatrixMoving = m_WeightMatrices[1];
+          }
+       }
+    }
+    catch (itk::ExceptionObject& err)
+    {
+        itkExceptionMacro("Error loading weight matrices: " << err);
+    }
+    // Validation of loaded weight matrices
+    for (size_t i = 0; i < m_WeightMatrices.size(); ++i)
+    {
+        if (!m_WeightMatrices[i])
+        {
+            itkExceptionMacro("Loaded weight matrix at index " << i << " is null.");
+        }
+    }
+}
+
+template <typename TFixedImage, typename TMovingImage>
+void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixFilenames(
+    const typename itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::WeightMatrixPointer& fixedWeightMatrix,
+    const typename itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::WeightMatrixPointer& movingWeightMatrix)
+{
+    // Call the existing LoadWeightMatrices function to load the files
+    this->LoadWeightMatrices(weightMatrixFilenames);
+}
+
+template <typename TFixedImage, typename TMovingImage>
+void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrices(
+    const WeightMatrixPointer& fixedWeightMatrix, const WeightMatrixPointer& movingWeightMatrix)
+{
+    // Assign the provided weight matrices
+    this->m_WeightMatrixFixed = fixedWeightMatrix;
+    this->m_WeightMatrixMoving = movingWeightMatrix;
+
+    // Validate the matrices to ensure they match the image dimensions
+    this->ValidateWeightMatrices();
+}
 
 /**
  * ******************* PrintSelf *******************
@@ -126,7 +256,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::PrintSelf(std:
 template <typename TFixedImage, typename TMovingImage>
 auto
 AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingleThreaded(
-  const TransformParametersType & parameters) const -> MeasureType
+	      	const TransformParametersType & parameters) const -> MeasureType
 {
   /** Initialize some variables. */
   Superclass::m_NumberOfPixelsCounted = 0;
@@ -177,11 +307,11 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
 
       /** Get the fixed image value. */
       const auto fixedImageValue = static_cast<RealType>(fixedImageSample.m_ImageValue);
-
-      /** The difference squared. */
-      const RealType diff = movingImageValue - fixedImageValue;
+      // Apply weights
+      const auto fixedWeight = this->m_WeightMatrixFixed->GetPixel(fixedImageSample.m_ImageIndex);
+      const auto movingWeight = this->m_WeightMatrixMoving->GetPixel(fixedImageSample.m_ImageIndex);
+      const RealType diff = (movingWeight * movingImageValue) - (fixedWeight * fixedImageValue);
       measure += diff * diff;
-
     } // end if sampleOk
 
   } // end for loop over the image sample container
@@ -272,6 +402,9 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
   unsigned long numberOfPixelsCounted = 0;
   MeasureType   measure{};
 
+  /** Get the weight matrix for the current resolution. */
+  const auto &weightMatrix = this->m_WeightMatrices[this->m_Registration->GetCurrentLevel()];
+
   /** Loop over the fixed image to calculate the mean squares. */
   for (auto threader_fiter = threader_fbegin; threader_fiter != threader_fend; ++threader_fiter)
   {
@@ -299,9 +432,11 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
 
       /** Get the fixed image value. */
       const auto fixedImageValue = static_cast<RealType>(threader_fiter->m_ImageValue);
+      //Apply Weights
+      const auto fixedWeight = this->m_WeightMatrixFixed->GetPixel(threader_fiter->m_ImageIndex);
+      const auto movingWeight = this->m_WeightMatrixMoving->GetPixel(threader_fiter->m_ImageIndex);
 
-      /** The difference squared. */
-      const RealType diff = movingImageValue - fixedImageValue;
+      const RealType diff = (movingWeight * movingImageValue) - (fixedWeight * fixedImageValue);
       measure += diff * diff;
 
     } // end if sampleOk
@@ -691,10 +826,13 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   MeasureType &                      measure,
   DerivativeType &                   deriv) const
 {
-  /** The difference squared. */
-  const RealType diff = movingImageValue - fixedImageValue;
-  measure += diff * diff;
+  // Get the weight for the current pixel
+  // Retrieve weights directly using the image indices
+  const auto fixedWeight = this->m_WeightMatrixFixed->GetPixel(fixedIndex);
+  const auto movingWeight = this->m_WeightMatrixMoving->GetPixel(movingIndex);
 
+  const RealType diff = (movingWeight * movingImageValue) - (fixedWeight * fixedImageValue);
+  measure += diff * diff;
   /** Calculate the contributions to the derivatives with respect to each parameter. */
   const RealType diff_2 = diff * 2.0;
 

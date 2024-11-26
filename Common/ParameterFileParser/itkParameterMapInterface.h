@@ -32,6 +32,8 @@
 #include <iostream>
 #include <memory>      // For unique_ptr.
 #include <type_traits> // For is_same.
+#include <sstream>
+#include <iterator>
 
 namespace itk
 {
@@ -152,11 +154,32 @@ public:
     {
       if (produceWarningMessage && this->m_PrintErrorMessages)
       {
-        std::ostringstream outputStringStream;
-        outputStringStream << "WARNING: The parameter \"" << parameterName << "\", requested at entry number "
-                           << entry_nr << ", does not exist at all.\n"
-                           << "  The default value \"" << parameterValue << "\" is used instead.";
-        warningMessage = outputStringStream.str();
+         std::ostringstream outputStringStream;
+         if constexpr (std::is_same_v<T, std::vector<std::string>>) 
+         {
+           std::ostringstream oss;
+           for (const auto& str : parameterValue)
+           {
+             oss << str << ", ";
+           }
+           std::string parameterValueStr = oss.str();
+           if (!parameterValueStr.empty()) 
+           {
+             parameterValueStr.pop_back(); // Remove trailing ", "
+             parameterValueStr.pop_back(); // Remove trailing space
+           } 
+           outputStringStream << "WARNING: The parameter \"" << parameterName << "\", requested at entry number "
+                             << entry_nr << ", does not exist at all.\n"
+                             << "  The default value \"" << parameterValueStr << "\" is used instead.";
+         } 
+         else 
+         {
+           outputStringStream << "WARNING: The parameter \"" << parameterName << "\", requested at entry number "
+                       << entry_nr << ", does not exist at all.\n"
+                       << "  The default value \"" << parameterValue << "\" is used instead.";
+         }
+         warningMessage = outputStringStream.str();
+          
       }
 
       return false;
