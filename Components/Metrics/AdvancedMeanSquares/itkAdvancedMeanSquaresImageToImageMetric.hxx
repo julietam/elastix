@@ -46,7 +46,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
 {
   /** Initialize transform, interpolator, etc. */
   Superclass::Initialize();
-  using Superclass = itk::AdvancedImageToImageMetric<TFixedImage, TMovingImage>;
+  /** using Superclass = itk::AdvancedImageToImageMetric<TFixedImage, TMovingImage>;*/
   using Superclass::m_Registration;
   using Superclass::GetCurrentLevel;
   
