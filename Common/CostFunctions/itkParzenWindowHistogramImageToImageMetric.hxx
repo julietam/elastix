@@ -1204,7 +1204,7 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ComputePDFs(
   for (auto &threaderJointPDF : this->m_ThreaderJointPDFs)
   { 
       itk::ImageRegionConstIterator<JointPDFType> jointPDFIterator(
-            threaderJointPDF, threaderJointPDF->GetLargestPossibleRegion()):
+            threaderJointPDF, threaderJointPDF->GetLargestPossibleRegion());
       for (jointPDFIterator.GoToBegin(); !jointPDFIterator.IsAtEnd(); ++jointPDFIterator)
       {
           const JointPDFIndexType index = jointPDFIterator.GetIndex();
