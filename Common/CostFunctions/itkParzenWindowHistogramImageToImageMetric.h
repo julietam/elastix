@@ -470,10 +470,10 @@ protected:
   virtual void
   ComputePDFs(const ParametersType & parameters) const;
   
-  /** Compute the joint PDF, considering weight matrices for the fixed and moving images. */
+  /** Compute the joint PDF, considering weight matrices for the fixed and moving images.
   void ComputePDFs(const ParametersType &parameters,
                  const JointPDFPointer &weightsFixed = nullptr,
-                 const JointPDFPointer &weightsMoving = nullptr) const;
+                 const JointPDFPointer &weightsMoving = nullptr) const;*/
 
 
   /** Validate the weight matrices to ensure compatibility with the joint PDF. */
