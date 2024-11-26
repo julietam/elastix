@@ -191,9 +191,9 @@ public:
   
   using JointPDFType = typename Superclass::JointPDFType;
   using JointPDFPointer = typename Superclass::JointPDFPointer;
-  using JointPDFRegionType = JointPDFType::RegionType;
-  using JointPDFSizeType = JointPDFType::SizeType;
-  using JointPDFIndexType = JointPDFType::IndexType;
+  using JointPDFRegionType = typename JointPDFType::RegionType;
+  using JointPDFSizeType = typename JointPDFType::SizeType;
+  using JointPDFIndexType = typename JointPDFType::IndexType;
 
  
   void SetWeightMatrixFilenames(const std::vector<std::string> &filenames);
