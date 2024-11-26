@@ -180,7 +180,7 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ValidateWeig
  * ********************* Initialize *****************************
  */
 template <typename TFixedImage, typename TMovingImage>
-void itkParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices(
+void ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices(
     const std::vector<std::string>& weightMatrixFilenames)
 {
     using WeightMatrixType = typename FixedImageType;
