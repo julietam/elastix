@@ -184,7 +184,7 @@ void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Load
         for (const auto& filename : weightMatrixFilenames)
           {
             typename ReaderType::Pointer reader = ReaderType::New();
-            reader->SetFileName(filename)
+            reader->SetFileName(filename);
             reader->Update();
             m_WeightMatrices.push_back(reader->GetOutput());
           }
@@ -211,13 +211,21 @@ void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Load
     }
 }
 
-template <typename TFixedImage, typename TMovingImage> // Correct prefix
+template <typename TFixedImage, typename TMovingImage>
 void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixFilenames(
-    const typename itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::WeightMatrixPointer& fixedWeightMatrix,
-    const typename itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::WeightMatrixPointer& movingWeightMatrix)
+    const std::vector<std::string>& filenames)
 {
-    // Call the existing LoadWeightMatrices function to load the files
-    this->LoadWeightMatrices(weightMatrixFilenames);
+    // Check if we have two filenames
+    if (filenames.size() != 2)
+    {
+        itkExceptionMacro("Expected two filenames: one for fixed weight matrix and one for moving weight matrix.");
+    }
+
+    // Store the filenames for later use
+    m_WeightMatrixFilenames = filenames;
+
+    // Now load the weight matrices using the filenames
+    this->LoadWeightMatrices(m_WeightMatrixFilenames);
 }
 
 template <typename TFixedImage, typename TMovingImage> // Correct prefix

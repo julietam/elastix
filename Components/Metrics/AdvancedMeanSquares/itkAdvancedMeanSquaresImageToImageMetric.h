@@ -150,7 +150,7 @@ public:
   void LoadWeightMatrices(const std::vector<std::string>& weightMatrixFilenames);
   void ValidateWeightMatrices() const;
   /** Set weight matrix filenames. This will load the weight matrices from file. */
-  void SetWeightMatrixFilenames(const std::vector<std::string>& weightMatrixFilenames);
+  void SetWeightMatrixFilenames(const std::vector<std::string>& filenames);
 
   /** Set weight matrices directly. */
   void SetWeightMatrices(const WeightMatrixPointer& fixedWeightMatrix, const WeightMatrixPointer& movingWeightMatrix);
