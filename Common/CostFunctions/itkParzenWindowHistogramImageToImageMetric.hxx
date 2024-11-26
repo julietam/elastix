@@ -159,7 +159,8 @@ template <typename TFixedImage, typename TMovingImage>
 void ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices(
     const std::vector<std::string>& weightMatrixFilenames)
 {
-    using WeightMatrixType = typename FixedImageType;
+    // Define the WeightMatrixType as an ITK image type, for example:
+    using WeightMatrixType = itk::Image<float, TFixedImage::ImageDimension>;
     using ReaderType = itk::ImageFileReader<WeightMatrixType>;
 
     if (weightMatrixFilenames.empty())
