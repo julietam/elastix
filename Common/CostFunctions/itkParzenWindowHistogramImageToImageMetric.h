@@ -190,6 +190,8 @@ public:
   itkGetConstMacro(MovingKernelBSplineOrder, unsigned int);
   
   using PDFValueType = double;
+  using JointPDFRegionType = JointPDFType::RegionType;
+  using JointPDFSizeType = JointPDFType::SizeType;
   using JointPDFIndexType = JointPDFType::IndexType;
   using JointPDFType = typename Superclass::JointPDFType;
   using JointPDFPointer = typename Superclass::JointPDFPointer;
