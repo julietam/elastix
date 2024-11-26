@@ -40,7 +40,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::AdvancedMeanSq
  * ********************* Initialize ****************************
  */
 
-template <typename TFixedImage, typename TMovingImage>
+template <typename TFixedImage, typename TMovingImage> 
 void
 AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
 {
@@ -48,7 +48,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
   Superclass::Initialize();
   /** using Superclass = itk::AdvancedImageToImageMetric<TFixedImage, TMovingImage>;*/
   
-  const unsigned int level = (this->m_Registration->GetAsITKBaseType())->GetCurrentLeve
+  const unsigned int level = (this->m_Registration->GetAsITKBaseType())->GetCurrentLevel();
   
   if (this->GetUseNormalization())
   {
@@ -131,7 +131,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
 } // end Initialize()
 
 
-template <typename TFixedImage, typename TMovingImage>
+template <typename TFixedImage, typename TMovingImage> // Correct prefix
 void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixFilenames(
     const std::vector<std::string> &filenames)
 {
@@ -143,7 +143,7 @@ void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetW
 }
 
 
-template <typename TFixedImage, typename TMovingImage>
+template <typename TFixedImage, typename TMovingImage> // Correct prefix
 void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices(
     const std::vector<std::string>& weightMatrixFilenames)
 {
@@ -211,7 +211,7 @@ void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Lo
     }
 }
 
-template <typename TFixedImage, typename TMovingImage>
+template <typename TFixedImage, typename TMovingImage> // Correct prefix
 void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixFilenames(
     const typename itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::WeightMatrixPointer& fixedWeightMatrix,
     const typename itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::WeightMatrixPointer& movingWeightMatrix)
@@ -220,7 +220,7 @@ void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Se
     this->LoadWeightMatrices(weightMatrixFilenames);
 }
 
-template <typename TFixedImage, typename TMovingImage>
+template <typename TFixedImage, typename TMovingImage> // Correct prefix
 void itkParzenWindowMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrices(
     const WeightMatrixPointer& fixedWeightMatrix, const WeightMatrixPointer& movingWeightMatrix)
 {
@@ -826,8 +826,9 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
 {
   // Get the weight for the current pixel
   // Retrieve weights directly using the image indices
-  const auto fixedWeight = this->m_WeightMatrixFixed->GetPixel(fixedIndex);
-  const auto movingWeight = this->m_WeightMatrixMoving->GetPixel(movingIndex);
+  const auto fixedWeight = this->m_WeightMatrixFixed->GetPixel(threader_fiter->m_ImageIndex);
+  const auto movingWeight = this->m_WeightMatrixMoving->GetPixel(threader_fiter->m_ImageIndex);
+
 
   const RealType diff = (movingWeight * movingImageValue) - (fixedWeight * fixedImageValue);
   measure += diff * diff;
