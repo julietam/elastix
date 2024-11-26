@@ -181,7 +181,7 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
   /** Protected Typedefs ******************/
-  std::vector<typename WeightMatrixType::Pointer> m_WeightMatrices;
+  //std::vector<typename WeightMatrixType::Pointer> m_WeightMatrices;
   /** Typedefs inherited from superclass */
   using typename Superclass::FixedImageIndexType;
   using typename Superclass::FixedImageIndexValueType;
@@ -192,7 +192,7 @@ protected:
   using typename Superclass::BSplineInterpolatorType;
   using typename Superclass::MovingImageDerivativeType;
   using typename Superclass::NonZeroJacobianIndicesType;
-  using Superclass = itk::AdvancedImageToImageMetric<TFixedImage, TMovingImage>;
+  //using Superclass = itk::AdvancedImageToImageMetric<TFixedImage, TMovingImage>;
   using Superclass::m_Registration;
   using Superclass::GetCurrentLevel;
 
