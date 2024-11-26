@@ -105,7 +105,7 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMat
 
 template <typename TFixedImage, typename TMovingImage>
 void
-ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices((const std::vector<std::string>& filenames)
+ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices(const std::vector<std::string>& filenames)
 {
   if (m_WeightMatrixFilenames.size() != 2)
   {
