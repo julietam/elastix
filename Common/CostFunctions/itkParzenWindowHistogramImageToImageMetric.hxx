@@ -103,30 +103,6 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMat
  * ******************* LoadWeightMatrices *******************
  */
 
-template <typename TFixedImage, typename TMovingImage>
-void
-ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices(const std::vector<std::string>& filenames)
-{
-  if (m_WeightMatrixFilenames.size() != 2)
-  {
-    itkExceptionMacro("Expected two filenames: one for fixed image weights and one for moving image weights.");
-  }
-
-  using ReaderType = itk::ImageFileReader<WeightMatrixType>;
-
-  // Load fixed weight matrix
-  auto fixedReader = ReaderType::New();
-  fixedReader->SetFileName(m_WeightMatrixFilenames[0]);
-  fixedReader->Update();
-  m_WeightMatrixFixed = fixedReader->GetOutput();
-
-  // Load moving weight matrix
-  auto movingReader = ReaderType::New();
-  movingReader->SetFileName(m_WeightMatrixFilenames[1]);
-  movingReader->Update();
-  m_WeightMatrixMoving = movingReader->GetOutput();
-}
-
 /**
  * ******************* SetWeightMatrixFixed *******************
  */
