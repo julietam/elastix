@@ -187,9 +187,7 @@ public:
   itkSetClampMacro(MovingKernelBSplineOrder, unsigned int, 0, 3);
   itkGetConstMacro(MovingKernelBSplineOrder, unsigned int);
   
-  using PDFValueType = double;
-  using JointPDFType = Image<PDFValueType, 3>;
-  using JointPDFPointer = typename JointPDFType::Pointer;
+ 
   void SetWeightMatrixFilenames(const std::vector<std::string> &filenames);
   void SetWeightMatrixFixed(const JointPDFPointer& weightMatrix); // Declaration 
   void SetWeightMatrixMoving(const JointPDFPointer& weightMatrix); // Declaration 
@@ -241,6 +239,9 @@ protected:
   /** Protected Typedefs ******************/
   std::vector<std::string> m_WeightMatrixFilenames; // Filenames for weight matrices
   /** Typedefs inherited from superclass. */
+  using PDFValueType = double;
+  using JointPDFType = Image<PDFValueType, 3>;
+  using JointPDFPointer = typename JointPDFType::Pointer;
   using typename Superclass::FixedImageIndexType;
   using typename Superclass::FixedImageIndexValueType;
   using OffsetValueType = typename FixedImageType::OffsetValueType;
