@@ -190,6 +190,7 @@ public:
   itkGetConstMacro(MovingKernelBSplineOrder, unsigned int);
   
   using PDFValueType = double;
+  using JointPDFIndexType = JointPDFType::IndexType;
   using JointPDFType = typename Superclass::JointPDFType;
   using JointPDFPointer = typename Superclass::JointPDFPointer;
  
@@ -264,7 +265,7 @@ protected:
   using JointPDFDerivativesPointer = typename JointPDFDerivativesType::Pointer;
   using IncrementalMarginalPDFType = Image<PDFValueType, 2>;
   using IncrementalMarginalPDFPointer = typename IncrementalMarginalPDFType::Pointer;
-  using JointPDFIndexType = JointPDFType::IndexType;
+  
   using JointPDFRegionType = JointPDFType::RegionType;
   using JointPDFSizeType = JointPDFType::SizeType;
   using JointPDFDerivativesIndexType = JointPDFDerivativesType::IndexType;
