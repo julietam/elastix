@@ -47,11 +47,9 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
   /** Initialize transform, interpolator, etc. */
   Superclass::Initialize();
   /** using Superclass = itk::AdvancedImageToImageMetric<TFixedImage, TMovingImage>;*/
-  using Superclass::m_Registration;
-  using Superclass::GetCurrentLevel;
   
-  unsigned int level = m_Registration->GetCurrentLevel();
-
+  const unsigned int level = (this->m_Registration->GetAsITKBaseType())->GetCurrentLeve
+  
   if (this->GetUseNormalization())
   {
     /** Try to guess a normalization factor. */
