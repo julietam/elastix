@@ -105,7 +105,7 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMat
 
 template <typename TFixedImage, typename TMovingImage>
 void
-ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices()
+ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::LoadWeightMatrices((const std::vector<std::string>& filenames)
 {
   if (m_WeightMatrixFilenames.size() != 2)
   {
@@ -168,8 +168,8 @@ ParzenWindowHistogramImageToImageMetric<TFixedImage, TMovingImage>::ValidateWeig
   const auto fixedImageRegion = this->GetFixedImage()->GetLargestPossibleRegion();
   const auto movingImageRegion = this->GetMovingImage()->GetLargestPossibleRegion();
 
-  if (m_WeightMatrixFixed->GetLargestPossibleRegion() != fixedImageRegion) || 
-     (m_WeightMatrixMoving->GetLargestPossibleRegion() != movingImageRegion)
+  if ((m_WeightMatrixFixed->GetLargestPossibleRegion() != fixedImageRegion) || 
+     (m_WeightMatrixMoving->GetLargestPossibleRegion() != movingImageRegion))
   {
       itkExceptionMacro("Fixed weight matrix size does not match the fixed image size.");
   }
