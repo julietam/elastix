@@ -123,7 +123,7 @@ public:
   using ITKBaseType = typename Superclass2::ITKBaseType;
   
   /**Mod to include image weights.*/
-  using WeightMatrixType = itk::Image<double, FixedImageType::ImageDimension>;
+  using WeightMatrixType = itk::Image<float,3>;
   using WeightMatrixPointer = typename WeightMatrixType::Pointer;
 
   mutable WeightMatrixPointer m_WeightMatrixFixed;  // Weight matrix for fixed image bins

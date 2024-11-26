@@ -113,7 +113,7 @@ public:
   using typename Superclass::ThreadInfoType;
   //adding weight 
  
-  using WeightMatrixType = itk::Image<double, 3>;
+  using WeightMatrixType = itk::Image<float, 3>;
   using WeightMatrixPointer = typename WeightMatrixType::Pointer;
 
   mutable WeightMatrixPointer m_WeightMatrixFixed;  // Weight matrix for fixed image bins

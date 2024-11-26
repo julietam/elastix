@@ -281,7 +281,7 @@ protected:
   /** Typedefs for Parzen kernel. */
   using KernelFunctionType = KernelFunctionBase2<PDFValueType>;
   using KernelFunctionPointer = typename KernelFunctionType::Pointer;
-  using WeightMatrixType = itk::Image<double, 3>; // Adjust dimensions if necessary
+  using WeightMatrixType = itk::Image<float, 3>; // Adjust dimensions if necessary
   using WeightMatrixPointer = typename WeightMatrixType::Pointer;
   /** Protected variables **************************** */
   mutable JointPDFPointer m_JointPDF{ nullptr }; // Declare m_JointPDF here

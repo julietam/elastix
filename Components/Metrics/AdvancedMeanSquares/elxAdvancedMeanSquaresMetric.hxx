@@ -26,7 +26,7 @@
 
 // Declare ImageType (adjust based on your image format).
 using ImageType = itk::Image<float, 3>;  // Example: 3D float image
-using WeightMatrixType = itk::Image<double, 3>; // Adjust as needed
+using WeightMatrixType = itk::Image<float, 3>; // Adjust as needed
 
 //
 namespace elastix
