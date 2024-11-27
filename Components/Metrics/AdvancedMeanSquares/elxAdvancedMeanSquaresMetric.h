@@ -36,6 +36,11 @@ namespace elastix
  *    where range represents the maximum gray value range of the images.\n
  *    <tt>(UseNormalization "true")</tt>\n
  *    The default value is false.
+ * \parameter MetricWeightImage: A NIfTI (.nii) image file containing weights for each voxel.\n
+ *    The weight image must have the same dimensions as the fixed image.\n
+ *    Higher weights indicate more importance for those voxels in the registration.\n
+ *    <tt>(MetricWeightImage "weights.nii")</tt>\n
+ *    This parameter is optional, if not supplied uniform weights of 1.0 are used.
  *
  * \ingroup Metrics
  *
@@ -133,14 +138,27 @@ public:
   void
   BeforeEachResolution() override;
 
+  /** Weight parameter settings */
+  elxGetMacro(ImagePairWeight, double);
+  elxSetMacro(ImagePairWeight, double);
+
 protected:
   /** The constructor. */
   AdvancedMeanSquaresMetric() = default;
   /** The destructor. */
   ~AdvancedMeanSquaresMetric() override = default;
 
+  /** Weight parameter settings */
+  using WeightImageType = typename Superclass1::WeightImageType;
+  using WeightImagePointer = typename Superclass1::WeightImagePointer;
+
+  /** Read weight image from parameter file */
+  virtual void ReadWeightImageFromFile();
+
 private:
   elxOverrideGetSelfMacro;
+  double m_ImagePairWeight;
+  WeightImagePointer m_ImagePairWeights;
 };
 
 } // end namespace elastix

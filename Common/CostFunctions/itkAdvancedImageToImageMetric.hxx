@@ -811,6 +811,61 @@ AdvancedImageToImageMetric<TFixedImage, TMovingImage>::PrintSelf(std::ostream & 
 } // end PrintSelf()
 
 
+/** Set/Get the weights for this image pair metric */
+template <typename TFixedImage, typename TMovingImage>
+void
+AdvancedImageToImageMetric<TFixedImage, TMovingImage>::SetImagePairWeights(WeightImageType * weights)
+{
+  if (this->m_ImagePairWeights != weights)
+  {
+    this->m_ImagePairWeights = weights;
+    this->Modified();
+  }
+}
+
+template <typename TFixedImage, typename TMovingImage>
+const WeightImageType *
+AdvancedImageToImageMetric<TFixedImage, TMovingImage>::GetImagePairWeights() const
+{
+  return this->m_ImagePairWeights;
+}
+
+/** Get the weighted value of the metric */
+template <typename TFixedImage, typename TMovingImage>
+MeasureType
+AdvancedImageToImageMetric<TFixedImage, TMovingImage>::GetWeightedValue(const MeasureType value, const FixedImagePointType & point) const
+{
+  if (this->m_ImagePairWeights.IsNull())
+  {
+    return value;
+  }
+
+  typename WeightImageType::IndexType index;
+  this->m_ImagePairWeights->TransformPhysicalPointToIndex(point, index);
+  const RealType weight = this->m_ImagePairWeights->GetPixel(index);
+  return value * weight;
+}
+
+/** Get the weighted derivative of the metric */
+template <typename TFixedImage, typename TMovingImage>
+void
+AdvancedImageToImageMetric<TFixedImage, TMovingImage>::GetWeightedDerivative(
+  const DerivativeType & derivative,
+  const FixedImagePointType & point,
+  DerivativeType & weightedDerivative) const
+{
+  if (this->m_ImagePairWeights.IsNull())
+  {
+    weightedDerivative = derivative;
+    return;
+  }
+
+  typename WeightImageType::IndexType index;
+  this->m_ImagePairWeights->TransformPhysicalPointToIndex(point, index);
+  const RealType weight = this->m_ImagePairWeights->GetPixel(index);
+  weightedDerivative = derivative * weight;
+}
+
 } // end namespace itk
 
 #endif // end #ifndef _itkAdvancedImageToImageMetric_hxx
