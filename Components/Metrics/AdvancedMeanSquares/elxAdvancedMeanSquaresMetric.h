@@ -114,10 +114,20 @@ public:
   /** The moving image dimension. */
   itkStaticConstMacro(MovingImageDimension, unsigned int, MovingImageType::ImageDimension);
 
-  /** Typedef's inherited from Elastix. */
+  /** Typedefs inherited from Elastix. */
   using typename Superclass2::ElastixType;
   using typename Superclass2::RegistrationType;
   using ITKBaseType = typename Superclass2::ITKBaseType;
+
+  /** Typedefs inherited from the superclass. */
+  using typename Superclass1::FixedImageType;
+  using typename Superclass1::MovingImageType;
+  using typename Superclass1::FixedImagePointer;
+  using typename Superclass1::MovingImagePointer;
+  
+  /** Add typedef for the WeightImage. */
+  using WeightImageType = typename Superclass1::FixedImageType;
+  using WeightImagePointer = typename WeightImageType::Pointer;
 
   /** Sets up a timer to measure the initialization time and
    * calls the Superclass' implementation.
