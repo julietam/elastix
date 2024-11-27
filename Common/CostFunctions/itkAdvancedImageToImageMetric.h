@@ -119,6 +119,7 @@ public:
   using typename Superclass::GradientPixelType;
   using typename Superclass::GradientImageType;
   using typename Superclass::GradientImagePointer;
+  
 
   // Overrule the mask type from its base class, ITK ImageToImageMetric.
   using FixedImageMaskType = ImageMaskSpatialObject<Self::FixedImageDimension>;
@@ -168,6 +169,8 @@ public:
 
   /** Typedef for multi-threading. */
   using ThreadInfoType = MultiThreaderBase::WorkUnitInfo;
+
+  using WeightImageType = TFixedImage;
 
   /** Public methods ********************/
 
