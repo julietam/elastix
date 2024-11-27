@@ -866,6 +866,58 @@ AdvancedImageToImageMetric<TFixedImage, TMovingImage>::GetWeightedDerivative(
   weightedDerivative = derivative * weight;
 }
 
+/** Read weight image from parameter file */
+template <typename TFixedImage, typename TMovingImage>
+void
+AdvancedImageToImageMetric<TFixedImage, TMovingImage>::ReadWeightImageFromFile()
+{
+  /** Get weight image filename from parameter file. */
+  std::string weightImageFileName;
+  this->GetConfiguration()->ReadParameter(weightImageFileName,
+                                        "MetricWeightImage",
+                                        this->GetComponentLabel(),
+                                        0);
+
+  if (!weightImageFileName.empty())
+  {
+    // Verify file extension is .nii
+    const std::string extension = weightImageFileName.substr(weightImageFileName.length() - 4);
+    if (extension != ".nii")
+    {
+      xl::xout["error"] << "Error: MetricWeightImage must be a NIfTI (.nii) file, got: " 
+                        << weightImageFileName << std::endl;
+      return;
+    }
+
+    // Read the weight image
+    using WeightImageReaderType = itk::ImageFileReader<WeightImageType>;
+    auto weightImageReader = WeightImageReaderType::New();
+    weightImageReader->SetFileName(weightImageFileName);
+
+    try
+    {
+      weightImageReader->Update();
+      
+      // Verify the weight image has same dimensions as fixed image
+      WeightImagePointer weightImage = weightImageReader->GetOutput();
+      if (weightImage->GetLargestPossibleRegion().GetSize() != 
+          this->GetFixedImage()->GetLargestPossibleRegion().GetSize())
+      {
+        xl::xout["error"] << "Error: Weight image dimensions do not match fixed image dimensions" << std::endl;
+        return;
+      }
+
+      this->SetImagePairWeights(weightImage);
+      xl::xout["standard"] << "Successfully loaded weight image: " << weightImageFileName << std::endl;
+    }
+    catch (itk::ExceptionObject & err)
+    {
+      xl::xout["error"] << "Error reading weight image:" << std::endl;
+      xl::xout["error"] << err << std::endl;
+    }
+  }
+}
+
 } // end namespace itk
 
 #endif // end #ifndef _itkAdvancedImageToImageMetric_hxx

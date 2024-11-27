@@ -138,27 +138,11 @@ public:
   void
   BeforeEachResolution() override;
 
-  /** Weight parameter settings */
-  elxGetMacro(ImagePairWeight, double);
-  elxSetMacro(ImagePairWeight, double);
-
 protected:
   /** The constructor. */
   AdvancedMeanSquaresMetric() = default;
   /** The destructor. */
   ~AdvancedMeanSquaresMetric() override = default;
-
-  /** Weight parameter settings */
-  using WeightImageType = typename Superclass1::WeightImageType;
-  using WeightImagePointer = typename Superclass1::WeightImagePointer;
-
-  /** Read weight image from parameter file */
-  virtual void ReadWeightImageFromFile();
-
-private:
-  elxOverrideGetSelfMacro;
-  double m_ImagePairWeight;
-  WeightImagePointer m_ImagePairWeights;
 };
 
 } // end namespace elastix

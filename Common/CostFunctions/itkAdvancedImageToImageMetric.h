@@ -317,6 +317,24 @@ public:
   virtual void
   BeforeThreadedGetValueAndDerivative(const TransformParametersType & parameters) const;
 
+  /** Typedefs for the weight image */
+  using WeightImageType = itk::Image<RealType, FixedImageDimension>;
+  using WeightImagePointer = typename WeightImageType::Pointer;
+  using WeightImageConstPointer = typename WeightImageType::ConstPointer;
+
+  /** Set/Get the weights for this image pair metric */
+  virtual void SetImagePairWeights(WeightImageType * weights);
+  virtual const WeightImageType * GetImagePairWeights() const;
+
+  /** Get the weighted value of the metric */
+  virtual MeasureType GetWeightedValue(const MeasureType value, const FixedImagePointType & point) const;
+
+  /** Get the weighted derivative of the metric */
+  virtual void GetWeightedDerivative(
+    const DerivativeType & derivative,
+    const FixedImagePointType & point,
+    DerivativeType & weightedDerivative) const;
+
 protected:
   /** Constructor. */
   AdvancedImageToImageMetric();
@@ -596,6 +614,11 @@ protected:
 
   // Protected using-declaration, to avoid `-Woverloaded-virtual` warnings from GCC (GCC 11.4) or clang (macos-12).
   using Superclass::SetTransform;
+
+  WeightImagePointer m_ImagePairWeights{ nullptr }; // Default no weights
+
+  /** Read weight image from parameter file */
+  virtual void ReadWeightImageFromFile();
 
 private:
   template <typename... TOptionalThreadId>
