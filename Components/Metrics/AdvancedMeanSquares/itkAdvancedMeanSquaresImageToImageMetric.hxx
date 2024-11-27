@@ -131,16 +131,16 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
 } // end Initialize()
 
 
-template <typename TFixedImage, typename TMovingImage> // Correct prefix
-void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixFilenames(
-    const std::vector<std::string> &filenames)
-{
-    if (filenames.size() != 2)
-    {
-        itkExceptionMacro("Expected two weight matrix filenames: one for fixed and one for moving image.");
-    }
-    this->LoadWeightMatrices(filenames);
-}
+// template <typename TFixedImage, typename TMovingImage> // Correct prefix
+// void itk::AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetWeightMatrixFilenames(
+//     const std::vector<std::string> &filenames)
+// {
+//     if (filenames.size() != 2)
+//     {
+//         itkExceptionMacro("Expected two weight matrix filenames: one for fixed and one for moving image.");
+//     }
+//     this->LoadWeightMatrices(filenames);
+// }
 
 
 template <typename TFixedImage, typename TMovingImage> // Correct prefix
