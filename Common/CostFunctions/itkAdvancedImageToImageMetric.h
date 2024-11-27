@@ -352,7 +352,7 @@ protected:
   using FixedImageIndexType = typename FixedImageType::IndexType;
   using FixedImageIndexValueType = typename FixedImageIndexType::IndexValueType;
   using MovingImageIndexType = typename MovingImageType::IndexType;
-  using FixedImagePointType = typename TransformType::InputPointType;
+  using typename Superclass::FixedImagePointType;
   using MovingImagePointType = typename TransformType::OutputPointType;
   using MovingImageContinuousIndexType = typename InterpolatorType::ContinuousIndexType;
 
