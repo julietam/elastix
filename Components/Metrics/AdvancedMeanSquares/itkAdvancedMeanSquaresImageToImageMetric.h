@@ -196,8 +196,10 @@ protected:
   using Superclass::m_Registration;
   using Superclass::GetCurrentLevel;
 
-    // Add your additional declarations here
-    std::vector<typename WeightMatrixType::Pointer> m_WeightMatrices;
+  // Add your additional declarations here
+  std::vector<typename WeightMatrixType::Pointer> m_WeightMatrices;
+  std::vector<std::string> m_WeightMatrixFilenames; // Filenames for weight matrices
+
   /** Compute a pixel's contribution to the measure and derivatives;
    * Called by GetValueAndDerivative(). */
   void
