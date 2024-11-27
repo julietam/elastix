@@ -119,6 +119,7 @@ public:
   using typename Superclass::GradientPixelType;
   using typename Superclass::GradientImageType;
   using typename Superclass::GradientImagePointer;
+  
 
   // Overrule the mask type from its base class, ITK ImageToImageMetric.
   using FixedImageMaskType = ImageMaskSpatialObject<Self::FixedImageDimension>;
@@ -317,6 +318,41 @@ public:
   virtual void
   BeforeThreadedGetValueAndDerivative(const TransformParametersType & parameters) const;
 
+  /** Typedefs for the weight image */
+  using WeightImageType = itk::Image<RealType, FixedImageDimension>;
+  using WeightImagePointer = typename WeightImageType::Pointer;
+  using WeightImageConstPointer = typename WeightImageType::ConstPointer;
+
+  /** Set/Get the weights for this image pair metric */
+  virtual void SetImagePairWeights(WeightImageType * weights);
+  virtual const WeightImageType * GetImagePairWeights() const;
+
+  /** Get the weighted value of the metric */
+  using typename Superclass::FixedImagePointType;
+  virtual MeasureType GetWeightedValue(const MeasureType value, const FixedImagePointType & point) const;
+
+  /** Get the weighted derivative of the metric */
+  virtual void GetWeightedDerivative(
+    const DerivativeType & derivative,
+    const FixedImagePointType & point,
+    DerivativeType & weightedDerivative) const;
+
+  /** Typedefs for the weight images */
+  using WeightImageType = Image<RealType, FixedImageDimension>;
+  using WeightImagePointer = typename WeightImageType::Pointer;
+  using WeightImageConstPointer = typename WeightImageType::ConstPointer;
+
+  /** Set/Get the fixed image weights */
+  virtual void SetFixedImageWeights(WeightImageType * weights);
+  itkGetConstObjectMacro(FixedImageWeights, WeightImageType);
+
+  /** Set/Get the moving image weights */
+  virtual void SetMovingImageWeights(WeightImageType * weights);
+  itkGetConstObjectMacro(MovingImageWeights, WeightImageType);
+
+  /** Get whether weight images are being used */
+  itkGetConstMacro(UseWeightImages, bool);
+
 protected:
   /** Constructor. */
   AdvancedImageToImageMetric();
@@ -334,7 +370,6 @@ protected:
   using FixedImageIndexType = typename FixedImageType::IndexType;
   using FixedImageIndexValueType = typename FixedImageIndexType::IndexValueType;
   using MovingImageIndexType = typename MovingImageType::IndexType;
-  using FixedImagePointType = typename TransformType::InputPointType;
   using MovingImagePointType = typename TransformType::OutputPointType;
   using MovingImageContinuousIndexType = typename InterpolatorType::ContinuousIndexType;
 
@@ -596,6 +631,30 @@ protected:
 
   // Protected using-declaration, to avoid `-Woverloaded-virtual` warnings from GCC (GCC 11.4) or clang (macos-12).
   using Superclass::SetTransform;
+
+  WeightImagePointer m_ImagePairWeights{ nullptr }; // Default no weights
+
+  /** Read weight image from parameter file */
+  virtual void ReadWeightImageFromFile();
+
+  /** Initialize the weight images. */
+  virtual void InitializeWeightImages();
+
+  /** Validate weight image dimensions against the fixed/moving images. */
+  virtual void ValidateWeightImages() const;
+
+  /** Apply weights to a metric value at a specific point. */
+  virtual RealType ApplyWeights(RealType value, const FixedImagePointType & fixedPoint) const;
+
+  /** Apply weights to metric derivatives at a specific point. */
+  virtual void ApplyWeightsToDerivatives(
+    DerivativeType & derivatives,
+    const FixedImagePointType & fixedPoint) const;
+
+  /** Weight image member variables */
+  WeightImageConstPointer m_FixedImageWeights{ nullptr };
+  WeightImageConstPointer m_MovingImageWeights{ nullptr };
+  bool m_UseWeightImages{ false };
 
 private:
   template <typename... TOptionalThreadId>
