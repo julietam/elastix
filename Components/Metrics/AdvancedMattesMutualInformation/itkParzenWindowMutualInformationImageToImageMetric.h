@@ -188,6 +188,7 @@ protected:
 
   mutable JointPDFPointer m_WeightMatrixFixed;  // Weight matrix for fixed image bins
   mutable JointPDFPointer m_WeightMatrixMoving; // Weight matrix for moving image bins
+    mutable JointPDFPointer m_JointPDF{ nullptr };
    // Declaration of m_WeightMatrices as a vector of ImageType pointers
    // std::vector<ImageType::Pointer> m_WeightMatrices;
   /**  Get the value and analytic derivative.
