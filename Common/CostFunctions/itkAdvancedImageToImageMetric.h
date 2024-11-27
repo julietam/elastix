@@ -327,6 +327,7 @@ public:
   virtual const WeightImageType * GetImagePairWeights() const;
 
   /** Get the weighted value of the metric */
+  using typename Superclass::FixedImagePointType;
   virtual MeasureType GetWeightedValue(const MeasureType value, const FixedImagePointType & point) const;
 
   /** Get the weighted derivative of the metric */
@@ -352,7 +353,6 @@ protected:
   using FixedImageIndexType = typename FixedImageType::IndexType;
   using FixedImageIndexValueType = typename FixedImageIndexType::IndexValueType;
   using MovingImageIndexType = typename MovingImageType::IndexType;
-  using typename Superclass::FixedImagePointType;
   using MovingImagePointType = typename TransformType::OutputPointType;
   using MovingImageContinuousIndexType = typename InterpolatorType::ContinuousIndexType;
 
