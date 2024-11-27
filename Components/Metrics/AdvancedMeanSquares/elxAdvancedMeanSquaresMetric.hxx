@@ -51,12 +51,18 @@ template <typename TElastix>
 void
 AdvancedMeanSquaresMetric<TElastix>::BeforeEachResolution()
 {
-  // Call superclass implementation
-  Superclass1::BeforeEachResolution();
+  const Configuration & configuration = itk::Deref(Superclass2::GetConfiguration());
 
-  // Read weight image if specified
-  this->ReadWeightImageFromFile();
-}
+  /** Get the current resolution level. */
+  unsigned int level = (this->m_Registration->GetAsITKBaseType())->GetCurrentLevel();
+
+  /** Get and set the normalization. */
+  bool useNormalization = false;
+  configuration.ReadParameter(useNormalization, "UseNormalization", BaseComponent::GetComponentLabel(), level, 0);
+  this->SetUseNormalization(useNormalization);
+
+} // end BeforeEachResolution()
+
 
 } // end namespace elastix
 
