@@ -318,6 +318,7 @@ public:
   BeforeThreadedGetValueAndDerivative(const TransformParametersType & parameters) const;
 
   /** Typedefs for the weight image */
+  using typename Superclass::MeasureType;
   using WeightImageType = itk::Image<RealType, FixedImageDimension>;
   using WeightImagePointer = typename WeightImageType::Pointer;
   using WeightImageConstPointer = typename WeightImageType::ConstPointer;
