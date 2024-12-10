@@ -117,13 +117,6 @@ public:
   using typename Superclass::HessianType;
   using typename Superclass::ThreaderType;
   using typename Superclass::ThreadInfoType;
-  /**Adding Image weights */
-  typedef TFixedImage FixedWeightImageType;
-  typedef TMovingImage MovingWeightImageType;
-
-  void SetFixedWeightImage(const FixedWeightImageType * image);
-  void SetMovingWeightImage(const MovingWeightImageType * image);
-
 
   /** The fixed image dimension. */
   itkStaticConstMacro(FixedImageDimension, unsigned int, FixedImageType::ImageDimension);
@@ -222,9 +215,7 @@ protected:
   using SelfHessianSamplerType = ImageGridSampler<FixedImageType>;
 
   double m_NormalizationFactor{};
-  /**Adding image weights */
-  typename FixedWeightImageType::ConstPointer m_FixedWeightImage;
-  typename MovingWeightImageType::ConstPointer m_MovingWeightImage;
+
   /** Compute a pixel's contribution to the measure and derivatives;
    * Called by GetValueAndDerivative(). */
   void
