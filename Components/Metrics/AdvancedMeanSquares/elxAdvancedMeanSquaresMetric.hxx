@@ -41,6 +41,103 @@ AdvancedMeanSquaresMetric<TElastix>::Initialize()
 
 } // end Initialize()
 
+/**
+ * ******************* ReadParameterFile ***********************
+ */
+template <class TElastix>
+void
+AdvancedMeanSquaresMetric<TElastix>::ReadParameterFile()
+{
+  // Call the superclass's ReadParameterFile method
+  this->Superclass::ReadParameterFile();
+
+  // Read the FixedWeightMap parameter
+  this->GetConfiguration()->ReadParameter(
+    this->m_FixedWeightMapFileName,
+    "FixedWeightMap",
+    this->GetComponentLabel(),
+    0,    // Typically the resolution level index; 0 if not multi-resolution
+    ""    // Default value if parameter not found
+  );
+
+  if (!this->m_FixedWeightMapFileName.empty())
+  {
+    elx::xout << "  FixedWeightMap: " << this->m_FixedWeightMapFileName << std::endl;
+  }
+
+  // Read the MovingWeightMap parameter
+  this->GetConfiguration()->ReadParameter(
+    this->m_MovingWeightMapFileName,
+    "MovingWeightMap",
+    this->GetComponentLabel(),
+    0,    // Typically the resolution level index; 0 if not multi-resolution
+    ""    // Default value if parameter not found
+  );
+
+  if (!this->m_MovingWeightMapFileName.empty())
+  {
+    elx::xout << "  MovingWeightMap: " << this->m_MovingWeightMapFileName << std::endl;
+  }
+}
+
+/**
+ * ******************* BeforeAll ***********************
+ */
+template <class TElastix>
+void
+AdvancedMeanSquaresMetric<TElastix>::BeforeAll()
+{
+  // Call the superclass's BeforeAll method
+  this->Superclass::BeforeAll();
+
+  // If no weight maps are specified, proceed normally
+  if (this->m_FixedWeightMapFileName.empty() && this->m_MovingWeightMapFileName.empty())
+  {
+    return;
+  }
+
+  // Define typedefs for reading the weight maps
+  typedef itk::ImageFileReader<FixedImageType>  FixedWeightReaderType;
+  typedef itk::ImageFileReader<MovingImageType> MovingWeightReaderType;
+
+  // Load and set the FixedWeightImage if specified
+  if (!this->m_FixedWeightMapFileName.empty())
+  {
+    typename FixedWeightReaderType::Pointer fixedWeightReader = FixedWeightReaderType::New();
+    fixedWeightReader->SetFileName(this->m_FixedWeightMapFileName);
+    try
+    {
+      fixedWeightReader->Update();
+      this->m_Metric->SetFixedWeightImage(fixedWeightReader->GetOutput());
+      elx::xout << "Fixed weight map set in the metric." << std::endl;
+    }
+    catch (itk::ExceptionObject & err)
+    {
+      elx::xout << "Error loading fixed weight map: " << err << std::endl;
+      // Depending on your error handling strategy, you might want to exit or handle differently
+    }
+  }
+
+  // Load and set the MovingWeightImage if specified
+  if (!this->m_MovingWeightMapFileName.empty())
+  {
+    typename MovingWeightReaderType::Pointer movingWeightReader = MovingWeightReaderType::New();
+    movingWeightReader->SetFileName(this->m_MovingWeightMapFileName);
+    try
+    {
+      movingWeightReader->Update();
+      this->m_Metric->SetMovingWeightImage(movingWeightReader->GetOutput());
+      elx::xout << "Moving weight map set in the metric." << std::endl;
+    }
+    catch (itk::ExceptionObject & err)
+    {
+      elx::xout << "Error loading moving weight map: " << err << std::endl;
+      // Depending on your error handling strategy, you might want to exit or handle differently
+    }
+  }
+}
+
+
 
 /**
  * ***************** BeforeEachResolution ***********************
