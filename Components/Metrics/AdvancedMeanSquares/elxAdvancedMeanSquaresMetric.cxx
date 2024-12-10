@@ -17,9 +17,9 @@
  *=========================================================================*/
 
 #include "elxAdvancedMeanSquaresMetric.h"
-#include "elxConfiguration.h"           // For GetConfiguration()
-#include "itkImageFileReader.h"         // For reading weight images
-#include "elxMacro.h"                   // For elx::xout
+#include "elxConfiguration.h"    // for GetConfiguration()
+#include "elxMacro.h"            // for elx::xout
+#include "itkImageFileReader.h"  // for reading weight images
 
 // This macro installs the AdvancedMeanSquaresMetric into elastix.
 elxInstallMacro(AdvancedMeanSquaresMetric);
@@ -27,14 +27,16 @@ elxInstallMacro(AdvancedMeanSquaresMetric);
 namespace elastix
 {
 
+// Define the methods with the template parameter
+template <class TElastix>
 int
-AdvancedMeanSquaresMetric::ReadParameterFile()
+AdvancedMeanSquaresMetric<TElastix>::ReadParameterFile()
 {
-  // First call the superclass method
+  // Call the superclass version if it exists
   int returnValue = Superclass::ReadParameterFile();
   if (returnValue != 0)
   {
-    return returnValue; // If superclass reading failed, propagate error.
+    return returnValue;
   }
 
   // Read the FixedWeightMap parameter
@@ -42,8 +44,8 @@ AdvancedMeanSquaresMetric::ReadParameterFile()
     this->m_FixedWeightMapFileName,
     "FixedWeightMap",
     this->GetComponentLabel(),
-    0,  // Usually the resolution level index is given here; 0 if single-level
-    ""  // Default value if parameter not found
+    0,   // level index if needed
+    ""   // default
   );
   if (!this->m_FixedWeightMapFileName.empty())
   {
@@ -66,28 +68,29 @@ AdvancedMeanSquaresMetric::ReadParameterFile()
   return 0;
 }
 
-
+template <class TElastix>
 int
-AdvancedMeanSquaresMetric::BeforeAll()
+AdvancedMeanSquaresMetric<TElastix>::BeforeAll()
 {
-  // Call superclass first
+  // Call superclass first if it exists
   Superclass::BeforeAll();
 
-  // If no filenames were read, just proceed normally.
+  // If no weight maps are specified, just return
   if (this->m_FixedWeightMapFileName.empty() && this->m_MovingWeightMapFileName.empty())
   {
     return 0;
   }
 
-  // Define typedefs for reading the weight images
-  typedef itk::ImageFileReader<FixedImageType>  FixedWeightReaderType;
-  typedef itk::ImageFileReader<MovingImageType> MovingWeightReaderType;
+  // Define typedefs for reading weight maps
+  using FixedWeightReaderType = itk::ImageFileReader<FixedImageType>;
+  using MovingWeightReaderType = itk::ImageFileReader<MovingImageType>;
 
-  // Load and set the fixed weight image if specified
+  // Load and set the fixed weight map if given
   if (!this->m_FixedWeightMapFileName.empty())
   {
     typename FixedWeightReaderType::Pointer fixedWeightReader = FixedWeightReaderType::New();
     fixedWeightReader->SetFileName(this->m_FixedWeightMapFileName);
+
     try
     {
       fixedWeightReader->Update();
@@ -101,11 +104,12 @@ AdvancedMeanSquaresMetric::BeforeAll()
     }
   }
 
-  // Load and set the moving weight image if specified
+  // Load and set the moving weight map if given
   if (!this->m_MovingWeightMapFileName.empty())
   {
     typename MovingWeightReaderType::Pointer movingWeightReader = MovingWeightReaderType::New();
     movingWeightReader->SetFileName(this->m_MovingWeightMapFileName);
+
     try
     {
       movingWeightReader->Update();
@@ -122,5 +126,9 @@ AdvancedMeanSquaresMetric::BeforeAll()
   return 0;
 }
 
-} // end namespace elastix
+// Explicit template instantiation if required
+// This often depends on how elastix handles templates.
+// Check other metric .cxx files for similar patterns.
+template class AdvancedMeanSquaresMetric<elastix::ElastixTemplate>;
 
+} // end namespace elastix
