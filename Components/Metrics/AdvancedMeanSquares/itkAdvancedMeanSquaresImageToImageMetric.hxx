@@ -813,25 +813,6 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
 } // end UpdateValueAndDerivativeTerms()
 
 
-/**Store the weights */
-template <class TFixedImage, class TMovingImage>
-void
-AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>
-::SetFixedWeightImage(const FixedWeightImageType * image)
-{
-  this->m_FixedWeightImage = image;
-  this->Modified();
-}
-
-template <class TFixedImage, class TMovingImage>
-void
-AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>
-::SetMovingWeightImage(const MovingWeightImageType * image)
-{
-  this->m_MovingWeightImage = image;
-  this->Modified();
-}
-
 /**
  * ******************* GetSelfHessian *******************
  */
