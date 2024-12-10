@@ -144,8 +144,6 @@ protected:
 
 private:
   elxOverrideGetSelfMacro;
-  std::string m_FixedWeightMapFileName;
-  std::string m_MovingWeightMapFileName;
 };
 
 } // end namespace elastix
