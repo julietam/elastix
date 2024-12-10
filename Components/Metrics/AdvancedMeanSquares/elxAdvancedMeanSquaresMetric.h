@@ -127,6 +127,12 @@ public:
    */
   void
   Initialize() override;
+  
+  void 
+  ReadParameterFile() override;
+
+  void
+  BeforeAll() override;
 
   /**
    * Do some things before each resolution:
@@ -144,6 +150,9 @@ protected:
 
 private:
   elxOverrideGetSelfMacro;
+  /** Member variables to store weight map filenames */
+  std::string m_FixedWeightMapFileName;
+  std::string m_MovingWeightMapFileName;
 };
 
 } // end namespace elastix
