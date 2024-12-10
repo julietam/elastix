@@ -45,11 +45,15 @@ AdvancedMeanSquaresMetric<TElastix>::Initialize()
  * ******************* ReadParameterFile ***********************
  */
 template <class TElastix>
-void
+int
 AdvancedMeanSquaresMetric<TElastix>::ReadParameterFile()
 {
   // Call the superclass's ReadParameterFile method
-  this->Superclass::ReadParameterFile();
+  int returnValue = Superclass1::ReadParameterFile();
+  if (returnValue != 0)
+  {
+    return returnValue; // Propagate the error if superclass reading failed
+  }
 
   // Read the FixedWeightMap parameter
   this->GetConfiguration()->ReadParameter(
@@ -78,22 +82,28 @@ AdvancedMeanSquaresMetric<TElastix>::ReadParameterFile()
   {
     elx::xout << "  MovingWeightMap: " << this->m_MovingWeightMapFileName << std::endl;
   }
+
+  return 0; // Indicate success
 }
 
 /**
  * ******************* BeforeAll ***********************
  */
 template <class TElastix>
-void
+int
 AdvancedMeanSquaresMetric<TElastix>::BeforeAll()
 {
   // Call the superclass's BeforeAll method
-  this->Superclass::BeforeAll();
+  int returnValue = Superclass1::BeforeAll();
+  if (returnValue != 0)
+  {
+    return returnValue; // Propagate the error if superclass BeforeAll failed
+  }
 
   // If no weight maps are specified, proceed normally
   if (this->m_FixedWeightMapFileName.empty() && this->m_MovingWeightMapFileName.empty())
   {
-    return;
+    return 0;
   }
 
   // Define typedefs for reading the weight maps
@@ -114,7 +124,7 @@ AdvancedMeanSquaresMetric<TElastix>::BeforeAll()
     catch (itk::ExceptionObject & err)
     {
       elx::xout << "Error loading fixed weight map: " << err << std::endl;
-      // Depending on your error handling strategy, you might want to exit or handle differently
+      return 1; // Indicate an error
     }
   }
 
@@ -132,11 +142,12 @@ AdvancedMeanSquaresMetric<TElastix>::BeforeAll()
     catch (itk::ExceptionObject & err)
     {
       elx::xout << "Error loading moving weight map: " << err << std::endl;
-      // Depending on your error handling strategy, you might want to exit or handle differently
+      return 1; // Indicate an error
     }
   }
-}
 
+  return 0; // Indicate success
+}
 
 
 /**
