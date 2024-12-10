@@ -118,8 +118,8 @@ public:
   using typename Superclass::ThreaderType;
   using typename Superclass::ThreadInfoType;
    /** Typedefs for Weight Images */
-  using typedef FixedImageType FixedWeightImageType;
-  using typedef MovingImageType MovingWeightImageType;
+  using FixedImageType FixedWeightImageType;
+  using MovingImageType MovingWeightImageType;
  /** Set methods for weight images */
   void 
   SetFixedWeightImage(const FixedWeightImageType * image);
