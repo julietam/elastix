@@ -20,6 +20,10 @@
 
 #include "itkAdvancedImageToImageMetric.h"
 
+#include "itkSmoothingRecursiveGaussianImageFilter.h"   // needed for SelfHessian
+#include "itkImageGridSampler.h"                        // needed for SelfHessian
+#include "itkNearestNeighborInterpolateImageFunction.h" // needed for SelfHessian
+
 namespace itk
 {
 
@@ -48,7 +52,7 @@ namespace itk
  * \ingroup Metrics
  */
 
-template <typename TFixedImage, typename TMovingImage>
+template <class TFixedImage, class TMovingImage>
 class ITK_TEMPLATE_EXPORT AdvancedMeanSquaresImageToImageMetric
   : public AdvancedImageToImageMetric<TFixedImage, TMovingImage>
 {
@@ -65,7 +69,7 @@ public:
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkOverrideGetNameOfClassMacro(AdvancedMeanSquaresImageToImageMetric);
+  itkTypeMacro(AdvancedMeanSquaresImageToImageMetric, AdvancedImageToImageMetric);
 
   /** Typedefs from the superclass. */
   using typename Superclass::CoordinateRepresentationType;
@@ -79,6 +83,7 @@ public:
   using typename Superclass::TransformPointer;
   using typename Superclass::InputPointType;
   using typename Superclass::OutputPointType;
+  using typename Superclass::TransformParametersType;
   using typename Superclass::TransformJacobianType;
   using typename Superclass::NumberOfParametersType;
   using typename Superclass::InterpolatorType;
@@ -87,6 +92,8 @@ public:
   using typename Superclass::GradientPixelType;
   using typename Superclass::GradientImageType;
   using typename Superclass::GradientImagePointer;
+  using typename Superclass::GradientImageFilterType;
+  using typename Superclass::GradientImageFilterPointer;
   using typename Superclass::FixedImageMaskType;
   using typename Superclass::FixedImageMaskPointer;
   using typename Superclass::MovingImageMaskType;
@@ -106,7 +113,17 @@ public:
   using typename Superclass::FixedImageLimiterOutputType;
   using typename Superclass::MovingImageLimiterOutputType;
   using typename Superclass::MovingImageDerivativeScalesType;
+  using typename Superclass::HessianValueType;
+  using typename Superclass::HessianType;
+  using typename Superclass::ThreaderType;
   using typename Superclass::ThreadInfoType;
+  /**Adding Image weights */
+  typedef TFixedImage FixedWeightImageType;
+  typedef TMovingImage MovingWeightImageType;
+
+  void SetFixedWeightImage(const FixedWeightImageType * image);
+  void SetMovingWeightImage(const MovingWeightImageType * image);
+
 
   /** The fixed image dimension. */
   itkStaticConstMacro(FixedImageDimension, unsigned int, FixedImageType::ImageDimension);
@@ -116,25 +133,41 @@ public:
 
   /** Get the value for single valued optimizers. */
   virtual MeasureType
-  GetValueSingleThreaded(const ParametersType & parameters) const;
+  GetValueSingleThreaded(const TransformParametersType & parameters) const;
 
   MeasureType
-  GetValue(const ParametersType & parameters) const override;
+  GetValue(const TransformParametersType & parameters) const override;
 
   /** Get the derivatives of the match measure. */
   void
-  GetDerivative(const ParametersType & parameters, DerivativeType & derivative) const override;
+  GetDerivative(const TransformParametersType & parameters, DerivativeType & derivative) const override;
 
   /** Get value and derivative. */
   void
-  GetValueAndDerivativeSingleThreaded(const ParametersType & parameters,
-                                      MeasureType &          value,
-                                      DerivativeType &       derivative) const;
+  GetValueAndDerivativeSingleThreaded(const TransformParametersType & parameters,
+                                      MeasureType &                   value,
+                                      DerivativeType &                derivative) const;
 
   void
-  GetValueAndDerivative(const ParametersType & parameters,
-                        MeasureType &          value,
-                        DerivativeType &       derivative) const override;
+  GetValueAndDerivative(const TransformParametersType & parameters,
+                        MeasureType &                   value,
+                        DerivativeType &                derivative) const override;
+
+  /** Experimental feature: compute SelfHessian */
+  void
+  GetSelfHessian(const TransformParametersType & parameters, HessianType & H) const override;
+
+  /** Default: 1.0 mm */
+  itkSetMacro(SelfHessianSmoothingSigma, double);
+  itkGetConstMacro(SelfHessianSmoothingSigma, double);
+
+  /** Default: 1.0 mm */
+  itkSetMacro(SelfHessianNoiseRange, double);
+  itkGetConstMacro(SelfHessianNoiseRange, double);
+
+  /** Default: 100000 */
+  itkSetMacro(NumberOfSamplesForSelfHessian, unsigned int);
+  itkGetConstMacro(NumberOfSamplesForSelfHessian, unsigned int);
 
   /** Initialize the Metric by making sure that all the components
    *  are present and plugged together correctly.
@@ -153,6 +186,13 @@ public:
   itkSetMacro(UseNormalization, bool);
   itkGetConstMacro(UseNormalization, bool);
 
+  /** If the compiler supports OpenMP, this flag specifies whether
+   * or not to use it. For this metric we have an OpenMP variant for
+   * GetValueAndDerivative(). It is also used at other places.
+   * Note that MS Visual Studio and gcc support OpenMP.
+   */
+  itkSetMacro(UseOpenMP, bool);
+
 protected:
   AdvancedMeanSquaresImageToImageMetric();
   ~AdvancedMeanSquaresImageToImageMetric() override = default;
@@ -170,9 +210,21 @@ protected:
   using typename Superclass::MovingImagePointType;
   using typename Superclass::MovingImageContinuousIndexType;
   using typename Superclass::BSplineInterpolatorType;
+  using typename Superclass::CentralDifferenceGradientFilterType;
   using typename Superclass::MovingImageDerivativeType;
   using typename Superclass::NonZeroJacobianIndicesType;
 
+  /** Protected typedefs for SelfHessian */
+  using SmootherType = SmoothingRecursiveGaussianImageFilter<FixedImageType, FixedImageType>;
+  using FixedImageInterpolatorType = BSplineInterpolateImageFunction<FixedImageType, CoordinateRepresentationType>;
+  using DummyFixedImageInterpolatorType =
+    NearestNeighborInterpolateImageFunction<FixedImageType, CoordinateRepresentationType>;
+  using SelfHessianSamplerType = ImageGridSampler<FixedImageType>;
+
+  double m_NormalizationFactor{};
+  /**Adding image weights */
+  typename FixedWeightImageType::ConstPointer m_FixedWeightImage;
+  typename MovingWeightImageType::ConstPointer m_MovingWeightImage;
   /** Compute a pixel's contribution to the measure and derivatives;
    * Called by GetValueAndDerivative(). */
   void
@@ -183,9 +235,16 @@ protected:
                                 MeasureType &                      measure,
                                 DerivativeType &                   deriv) const;
 
+  /** Compute a pixel's contribution to the SelfHessian;
+   * Called by GetSelfHessian(). */
+  void
+  UpdateSelfHessianTerms(const DerivativeType &             imageJacobian,
+                         const NonZeroJacobianIndicesType & nzji,
+                         HessianType &                      H) const;
+
   /** Get value for each thread. */
   void
-  ThreadedGetValue(ThreadIdType threadID) const override;
+  ThreadedGetValue(ThreadIdType threadID) override;
 
   /** Gather the values from all threads. */
   void
@@ -193,15 +252,17 @@ protected:
 
   /** Get value and derivatives for each thread. */
   void
-  ThreadedGetValueAndDerivative(ThreadIdType threadID) const override;
+  ThreadedGetValueAndDerivative(ThreadIdType threadID) override;
 
   /** Gather the values and derivatives from all threads. */
   void
   AfterThreadedGetValueAndDerivative(MeasureType & value, DerivativeType & derivative) const override;
 
 private:
-  double m_NormalizationFactor{ 1.0 };
-  bool   m_UseNormalization{ false };
+  bool         m_UseNormalization{};
+  double       m_SelfHessianSmoothingSigma{};
+  double       m_SelfHessianNoiseRange{};
+  unsigned int m_NumberOfSamplesForSelfHessian{};
 };
 
 } // end namespace itk
