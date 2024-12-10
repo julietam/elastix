@@ -41,7 +41,7 @@ namespace elastix
  *
  */
 
-template <typename TElastix>
+template <class TElastix>
 class ITK_TEMPLATE_EXPORT AdvancedMeanSquaresMetric
   : public itk::AdvancedMeanSquaresImageToImageMetric<typename MetricBase<TElastix>::FixedImageType,
                                                       typename MetricBase<TElastix>::MovingImageType>
@@ -62,7 +62,7 @@ public:
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkOverrideGetNameOfClassMacro(AdvancedMeanSquaresMetric);
+  itkTypeMacro(AdvancedMeanSquaresMetric, itk::AdvancedMeanSquaresImageToImageMetric);
 
   /** Name of this class.
    * Use this name in the parameter file to select this specific metric. \n
@@ -82,6 +82,7 @@ public:
   using typename Superclass1::TransformPointer;
   using typename Superclass1::InputPointType;
   using typename Superclass1::OutputPointType;
+  using typename Superclass1::TransformParametersType;
   using typename Superclass1::TransformJacobianType;
   using typename Superclass1::InterpolatorType;
   using typename Superclass1::InterpolatorPointer;
@@ -89,6 +90,8 @@ public:
   using typename Superclass1::GradientPixelType;
   using typename Superclass1::GradientImageType;
   using typename Superclass1::GradientImagePointer;
+  using typename Superclass1::GradientImageFilterType;
+  using typename Superclass1::GradientImageFilterPointer;
   using typename Superclass1::FixedImageMaskType;
   using typename Superclass1::FixedImageMaskPointer;
   using typename Superclass1::MovingImageMaskType;
@@ -141,6 +144,8 @@ protected:
 
 private:
   elxOverrideGetSelfMacro;
+  std::string m_FixedWeightMapFileName;
+  std::string m_MovingWeightMapFileName;
 };
 
 } // end namespace elastix
