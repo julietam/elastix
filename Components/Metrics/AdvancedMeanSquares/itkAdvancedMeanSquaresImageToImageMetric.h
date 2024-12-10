@@ -117,7 +117,14 @@ public:
   using typename Superclass::HessianType;
   using typename Superclass::ThreaderType;
   using typename Superclass::ThreadInfoType;
-
+   /** Typedefs for Weight Images */
+  using typedef FixedImageType FixedWeightImageType;
+  using typedef MovingImageType MovingWeightImageType;
+ /** Set methods for weight images */
+  void 
+  SetFixedWeightImage(const FixedWeightImageType * image);
+  void 
+  SetMovingWeightImage(const MovingWeightImageType * image);
   /** The fixed image dimension. */
   itkStaticConstMacro(FixedImageDimension, unsigned int, FixedImageType::ImageDimension);
 
@@ -254,6 +261,8 @@ private:
   double       m_SelfHessianSmoothingSigma{};
   double       m_SelfHessianNoiseRange{};
   unsigned int m_NumberOfSamplesForSelfHessian{};
+  using typename FixedWeightImageType::ConstPointer m_FixedWeightImage;
+  using typename MovingWeightImageType::ConstPointer m_MovingWeightImage;
 };
 
 } // end namespace itk
