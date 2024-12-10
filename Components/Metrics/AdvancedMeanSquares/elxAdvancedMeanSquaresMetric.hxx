@@ -49,11 +49,8 @@ int
 AdvancedMeanSquaresMetric<TElastix>::ReadParameterFile()
 {
   // Call the superclass's ReadParameterFile method
-  int returnValue = Superclass1::ReadParameterFile();
-  if (returnValue != 0)
-  {
-    return returnValue; // Propagate the error if superclass reading failed
-  }
+ Superclass1::ReadParameterFile();
+  
 
   // Read the FixedWeightMap parameter
   this->GetConfiguration()->ReadParameter(
