@@ -128,10 +128,10 @@ public:
   void
   Initialize() override;
   
-  void 
+  int  
   ReadParameterFile() override;
 
-  void
+  int
   BeforeAll() override;
 
   /**
