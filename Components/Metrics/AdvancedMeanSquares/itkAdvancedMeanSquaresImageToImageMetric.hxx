@@ -137,6 +137,27 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
 
 } // end Initialize()
 
+/**
+ * ******************* SetFixedWeightImage ***********************
+ */
+template <class TFixedImage, class TMovingImage>
+void
+AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetFixedWeightImage(const FixedWeightImageType * image)
+{
+  this->m_FixedWeightImage = image;
+  this->Modified();
+}
+
+/**
+ * ******************* SetMovingWeightImage ***********************
+ */
+template <class TFixedImage, class TMovingImage>
+void
+AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::SetMovingWeightImage(const MovingWeightImageType * image)
+{
+  this->m_MovingWeightImage = image;
+  this->Modified();
+}
 
 /**
  * ******************* PrintSelf *******************
