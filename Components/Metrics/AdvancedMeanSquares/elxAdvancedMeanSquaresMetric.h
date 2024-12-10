@@ -128,6 +128,7 @@ public:
   void
   Initialize() override;
   
+  void ReadParameterFile() override;
   /**
    * Do some things before each resolution:
    * \li Set CheckNumberOfSamples setting
