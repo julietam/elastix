@@ -207,6 +207,23 @@ ElastixBase::BeforeAllBase()
     {
       log::info("-mMask    unspecified, so no moving mask used");
     }
+
+    /** Read the fixed and moving image weights. These are not obliged options,
+     * so do not print any errors if they are not present.
+     * Do print some info (second boolean = true).
+     */
+    int weightreturndummy = 0;
+    m_FixedImageWeightContainer = GenerateFileNameContainer(*m_Configuration, "-fWeight", weightreturndummy, false, true);
+    if (weightreturndummy != 0)
+    {
+      log::info("-fWeight  unspecified, so no fixed image weights used");
+    }
+    weightreturndummy = 0;
+    m_MovingImageWeightContainer = GenerateFileNameContainer(*m_Configuration, "-mWeight", weightreturndummy, false, true);
+    if (weightreturndummy != 0)
+    {
+      log::info("-mWeight  unspecified, so no moving image weights used");
+    }
   }
 
   /** Check for appearance of "-out". */

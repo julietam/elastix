@@ -1050,6 +1050,76 @@ ElastixRegistrationMethod<TFixedImage, TMovingImage>::ConvertToItkTransform(cons
   itkGenericExceptionMacro("Failed to convert transform object " << elxTransform);
 }
 
+template <typename TFixedImage, typename TMovingImage>
+auto
+ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetFixedWeightedMask() const -> const WeightedMaskType *
+{
+  if (this->GetNumberOfFixedWeightedMasks() > 1)
+  {
+    itkExceptionMacro("Please provide an index when more than one fixed weighted masks are available.");
+  }
+
+  return this->m_FixedWeightedMasks.empty() ? nullptr : this->m_FixedWeightedMasks.front().GetPointer();
+}
+
+template <typename TFixedImage, typename TMovingImage>
+auto
+ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetFixedWeightedMask(const unsigned int index) const
+  -> const WeightedMaskType *
+{
+  if (index >= this->m_FixedWeightedMasks.size())
+  {
+    itkExceptionMacro("Index exceeds the number of fixed weighted masks (index: " << index
+                                                                                  << ", number of fixed weighted masks: "
+                                                                                  << this->m_FixedWeightedMasks.size()
+                                                                                  << ")");
+  }
+
+  return this->m_FixedWeightedMasks[index].GetPointer();
+}
+
+template <typename TFixedImage, typename TMovingImage>
+unsigned int
+ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetNumberOfFixedWeightedMasks() const
+{
+  return this->m_FixedWeightedMasks.size();
+}
+
+template <typename TFixedImage, typename TMovingImage>
+auto
+ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetMovingWeightedMask() const -> const WeightedMaskType *
+{
+  if (this->GetNumberOfMovingWeightedMasks() > 1)
+  {
+    itkExceptionMacro("Please provide an index when more than one moving weighted masks are available.");
+  }
+
+  return this->m_MovingWeightedMasks.empty() ? nullptr : this->m_MovingWeightedMasks.front().GetPointer();
+}
+
+template <typename TFixedImage, typename TMovingImage>
+auto
+ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetMovingWeightedMask(const unsigned int index) const
+  -> const WeightedMaskType *
+{
+  if (index >= this->m_MovingWeightedMasks.size())
+  {
+    itkExceptionMacro("Index exceeds the number of moving weighted masks (index: " << index
+                                                                                   << ", number of moving weighted masks: "
+                                                                                   << this->m_MovingWeightedMasks.size()
+                                                                                   << ")");
+  }
+
+  return this->m_MovingWeightedMasks[index].GetPointer();
+}
+
+template <typename TFixedImage, typename TMovingImage>
+unsigned int
+ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetNumberOfMovingWeightedMasks() const
+{
+  return this->m_MovingWeightedMasks.size();
+}
+
 } // namespace itk
 
 #endif

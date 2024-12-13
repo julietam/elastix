@@ -114,6 +114,10 @@ public:
   using MovingImageType = TMovingImage;
   using ResultImageType = FixedImageType;
 
+ 
+  using FixedWeightedMaskType = Image<unsigned char, FixedImageDimension>;
+  using MovingWeightedMaskType = Image<unsigned char, MovingImageDimension>;
+
   /** Set/Add/Get/NumberOf fixed images. */
   virtual void
   SetFixedImage(TFixedImage * fixedImage);
@@ -165,6 +169,49 @@ public:
   RemoveMovingMask();
   unsigned int
   GetNumberOfMovingMasks() const;
+  /** Set/Add/Get/Remove/NumberOf fixed weighted masks. */
+  virtual void
+  SetFixedWeightedMask(FixedMaskType * fixedWeightedMask);
+  virtual void
+  AddFixedWeightedMask(FixedMaskType * fixedWeightedMask);
+  const FixedMaskType *
+  GetFixedWeightedMask() const;
+  const FixedMaskType *
+  GetFixedWeightedMask(const unsigned int index) const;
+  void
+  RemoveFixedWeightedMask();
+  unsigned int
+  GetNumberOfFixedWeightedMasks() const;
+
+  /** Set/Add/Get/Remove/NumberOf moving weighted masks. */
+  virtual void
+  SetMovingWeightedMask(MovingMaskType * movingWeightedMask);
+  virtual void
+  AddMovingWeightedMask(MovingMaskType * movingWeightedMask);
+  const MovingMaskType *
+  GetMovingWeightedMask() const;
+  const MovingMaskType *
+  GetMovingWeightedMask(const unsigned int index) const;
+  virtual void
+  RemoveMovingWeightedMask();
+  unsigned int
+  GetNumberOfMovingWeightedMasks() const;
+
+  /** Get/NumberOf fixed weighted masks. */
+  const WeightedMaskType *
+  GetFixedWeightedMask() const;
+  const WeightedMaskType *
+  GetFixedWeightedMask(const unsigned int index) const;
+  unsigned int
+  GetNumberOfFixedWeightedMasks() const;
+
+  /** Get/NumberOf moving weighted masks. */
+  const WeightedMaskType *
+  GetMovingWeightedMask() const;
+  const WeightedMaskType *
+  GetMovingWeightedMask(const unsigned int index) const;
+  unsigned int
+  GetNumberOfMovingWeightedMasks() const;
 
   itkSetConstObjectMacro(FixedPoints, PointContainerType<double>);
   itkSetConstObjectMacro(MovingPoints, PointContainerType<double>);
@@ -443,6 +490,9 @@ private:
   int m_NumberOfThreads{ 0 };
 
   unsigned int m_InputUID{ 0 };
+
+  std::vector<SmartPointer<WeightedMaskType>> m_FixedWeightedMasks{};
+  std::vector<SmartPointer<WeightedMaskType>> m_MovingWeightedMasks{};
 };
 
 } // namespace itk

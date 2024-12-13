@@ -177,17 +177,27 @@ ElastixTemplate<TFixedImage, TMovingImage>::Run()
   {
     this->SetMovingImageContainer(MultipleImageLoader<MovingImageType>::GenerateImageContainer(
       this->GetMovingImageFileNameContainer(), "Moving Image", useDirCos));
-  }
-  if (this->GetFixedMask() == nullptr)
-  {
+    }
+    if (this->GetFixedMask() == nullptr)
+    {
     this->SetFixedMaskContainer(MultipleImageLoader<FixedMaskType>::GenerateImageContainer(
       this->GetFixedMaskFileNameContainer(), "Fixed Mask", useDirCos));
-  }
-  if (this->GetMovingMask() == nullptr)
-  {
+    }
+    if (this->GetMovingMask() == nullptr)
+    {
     this->SetMovingMaskContainer(MultipleImageLoader<MovingMaskType>::GenerateImageContainer(
       this->GetMovingMaskFileNameContainer(), "Moving Mask", useDirCos));
-  }
+    }
+    if (this->GetFixedWeightedMask() == nullptr)
+    {
+    this->SetFixedWeightedMaskContainer(MultipleImageLoader<FixedWeightedMaskType>::GenerateImageContainer(
+      this->GetFixedWeightedMaskFileNameContainer(), "Fixed Weighted Mask", useDirCos));
+    }
+    if (this->GetMovingWeightedMask() == nullptr)
+    {
+    this->SetMovingWeightedMaskContainer(MultipleImageLoader<MovingWeightedMaskType>::GenerateImageContainer(
+      this->GetMovingWeightedMaskFileNameContainer(), "Moving Weighted Mask", useDirCos));
+    }
 
   /** Print the time spent on reading images. */
   ElastixBase::m_Timer0.Stop();

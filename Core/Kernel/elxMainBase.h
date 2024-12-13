@@ -164,6 +164,24 @@ public:
   static const ComponentDatabase &
   GetComponentDatabase();
 
+  using WeightedMaskType = itk::Image<unsigned char, 3>;
+
+  /** Get/NumberOf fixed weighted masks. */
+  virtual const WeightedMaskType *
+  GetFixedWeightedMask() const = 0;
+  virtual const WeightedMaskType *
+  GetFixedWeightedMask(const unsigned int index) const = 0;
+  virtual unsigned int
+  GetNumberOfFixedWeightedMasks() const = 0;
+
+  /** Get/NumberOf moving weighted masks. */
+  virtual const WeightedMaskType *
+  GetMovingWeightedMask() const = 0;
+  virtual const WeightedMaskType *
+  GetMovingWeightedMask(const unsigned int index) const = 0;
+  virtual unsigned int
+  GetNumberOfMovingWeightedMasks() const = 0;
+
 protected:
   MainBase();
   ~MainBase() override = 0;
@@ -188,6 +206,11 @@ protected:
   DataObjectContainerPointer m_MovingImageContainer{ nullptr };
   DataObjectContainerPointer m_ResultImageContainer{ nullptr };
   DataObjectContainerPointer m_ResultDeformationFieldContainer{ nullptr };
+
+  /** The weighted images and masks. */
+  DataObjectContainerPointer m_WeightedMovingImageContainer{ nullptr };
+  DataObjectContainerPointer m_WeightedResultImageContainer{ nullptr };
+  DataObjectContainerPointer m_WeightedResultDeformationFieldContainer{ nullptr };
 
   /** InitDBIndex sets m_DBIndex by asking the ImageTypes
    * from the Configuration object and obtaining the corresponding
