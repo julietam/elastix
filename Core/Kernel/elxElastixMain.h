@@ -19,7 +19,8 @@
 #define elxElastixMain_h
 
 #include "elxMainBase.h"
-
+#include <itkVectorContainer.h>
+#include <itkDataObject.h>
 
 namespace elastix
 {
@@ -82,6 +83,11 @@ public:
   /** Run-time type information (and related methods). */
   itkOverrideGetNameOfClassMacro(ElastixMain);
 
+  /** Typedefs for data object containers. */
+  using DataObjectContainerType = itk::VectorContainer<unsigned int, itk::DataObject::Pointer>;
+  using DataObjectContainerPointer = DataObjectContainerType::Pointer;
+  using WeightedMaskContainerType = DataObjectContainerType;
+
   /** Set/Get functions for the fixed images
    * (if these are not used, elastix tries to read them from disk,
    * according to the command line parameters).
@@ -97,6 +103,15 @@ public:
   itkSetObjectMacro(MovingMaskContainer, DataObjectContainerType);
   itkGetModifiableObjectMacro(FixedMaskContainer, DataObjectContainerType);
   itkGetModifiableObjectMacro(MovingMaskContainer, DataObjectContainerType);
+
+  /** Set/Get functions for the fixed and moving weighted masks
+   * (if these are not used, elastix tries to read them from disk,
+   * according to the command line parameters).
+   */
+  itkSetObjectMacro(FixedWeightedMaskContainer, DataObjectContainerType);
+  itkSetObjectMacro(MovingWeightedMaskContainer, DataObjectContainerType);
+  itkGetModifiableObjectMacro(FixedWeightedMaskContainer, DataObjectContainerType);
+  itkGetModifiableObjectMacro(MovingWeightedMaskContainer, DataObjectContainerType);
 
   itkSetConstObjectMacro(FixedPoints, itk::Object);
   itkSetConstObjectMacro(MovingPoints, itk::Object);
@@ -178,6 +193,10 @@ private:
   DataObjectContainerPointer m_MovingMaskContainer{ nullptr };
   DataObjectContainerPointer m_ResultImageContainer{ nullptr };
 
+  /** The fixed weighted masks. */
+  DataObjectContainerPointer m_FixedWeightedMaskContainer{ nullptr };
+  DataObjectContainerPointer m_MovingWeightedMaskContainer{ nullptr };
+
   itk::SmartPointer<const itk::Object> m_FixedPoints{ nullptr };
   itk::SmartPointer<const itk::Object> m_MovingPoints{ nullptr };
 
@@ -194,6 +213,12 @@ private:
   ParameterMapType m_TransformParameterMap{};
 
   FlatDirectionCosinesType m_OriginalFixedImageDirectionFlat{};
+
+  /** The fixed weighted points. */
+  itk::SmartPointer<const itk::Object> m_FixedWPoints{ nullptr };
+
+  /** The moving weighted points. */
+  itk::SmartPointer<const itk::Object> m_MovingWPoints{ nullptr };
 };
 
 } // end namespace elastix
