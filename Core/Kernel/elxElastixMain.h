@@ -120,6 +120,11 @@ public:
   const WeightedMaskContainerType & GetFixedWeightedMaskContainer() const override;
   const WeightedMaskContainerType & GetMovingWeightedMaskContainer() const override;
 
+  void SetWeightedMaskContainer(const WeightedMaskContainerType & weightedMaskContainer);
+  WeightedMaskContainerType & GetModifiableWeightedMaskContainer();
+  const WeightedMaskContainerType & GetWeightedMaskContainer() const;
+  void SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer);
+
   itkSetConstObjectMacro(FixedPoints, itk::Object);
   itkSetConstObjectMacro(MovingPoints, itk::Object);
 
