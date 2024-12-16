@@ -113,6 +113,13 @@ public:
   itkGetModifiableObjectMacro(FixedWeightedMaskContainer, DataObjectContainerType);
   itkGetModifiableObjectMacro(MovingWeightedMaskContainer, DataObjectContainerType);
 
+  void SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer) override;
+  void SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer) override;
+  WeightedMaskContainerType & GetModifiableFixedWeightedMaskContainer() override;
+  WeightedMaskContainerType & GetModifiableMovingWeightedMaskContainer() override;
+  const WeightedMaskContainerType & GetFixedWeightedMaskContainer() const override;
+  const WeightedMaskContainerType & GetMovingWeightedMaskContainer() const override;
+
   itkSetConstObjectMacro(FixedPoints, itk::Object);
   itkSetConstObjectMacro(MovingPoints, itk::Object);
 

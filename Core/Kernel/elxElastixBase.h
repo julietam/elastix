@@ -389,6 +389,14 @@ public:
     m_IterationInfo.AddNewTargetCell(name);
   }
 
+  /** Set/Get functions for the fixed and moving weighted masks. */
+  void SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer);
+  void SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer);
+  WeightedMaskContainerType & GetModifiableFixedWeightedMaskContainer();
+  WeightedMaskContainerType & GetModifiableMovingWeightedMaskContainer();
+  const WeightedMaskContainerType & GetFixedWeightedMaskContainer() const;
+  const WeightedMaskContainerType & GetMovingWeightedMaskContainer() const;
+
 protected:
   ElastixBase();
   ~ElastixBase() override = default;
@@ -540,6 +548,10 @@ private:
    * From Elastix 4.3 to 4.7: Ignore direction cosines by default, for
    * backward compatability. From Elastix 4.8: set it to true by default. */
   bool m_UseDirectionCosines{ true };
+
+  /** The fixed and moving weighted mask containers. */
+  WeightedMaskContainerType m_FixedWeightedMaskContainer{ nullptr };
+  WeightedMaskContainerType m_MovingWeightedMaskContainer{ nullptr };
 };
 
 } // end namespace elastix
