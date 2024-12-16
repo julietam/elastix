@@ -22,6 +22,10 @@
 #include <itkVectorContainer.h>
 #include <itkDataObject.h>
 
+// Ensure these headers are included
+#include <itkLightObject.h>
+#include <itkObject.h>
+
 namespace elastix
 {
 
@@ -120,10 +124,17 @@ public:
   const WeightedMaskContainerType & GetFixedWeightedMaskContainer() const override;
   const WeightedMaskContainerType & GetMovingWeightedMaskContainer() const override;
 
-  void SetWeightedMaskContainer(const WeightedMaskContainerType & weightedMaskContainer);
-  WeightedMaskContainerType & GetModifiableWeightedMaskContainer();
-  const WeightedMaskContainerType & GetWeightedMaskContainer() const;
-  void SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer);
+  void SetWeightedMaskContainer(const DataObjectContainerType * weightedMaskContainer);
+  DataObjectContainerType * GetModifiableWeightedMaskContainer();
+  const DataObjectContainerType * GetWeightedMaskContainer() const;
+
+  void SetFixedWeightedMaskContainer(const DataObjectContainerType * fixedWeightedMaskContainer);
+  DataObjectContainerType * GetModifiableFixedWeightedMaskContainer();
+  const DataObjectContainerType * GetFixedWeightedMaskContainer() const;
+
+  void SetMovingWeightedMaskContainer(const DataObjectContainerType * movingWeightedMaskContainer);
+  DataObjectContainerType * GetModifiableMovingWeightedMaskContainer();
+  const DataObjectContainerType * GetMovingWeightedMaskContainer() const;
 
   itkSetConstObjectMacro(FixedPoints, itk::Object);
   itkSetConstObjectMacro(MovingPoints, itk::Object);

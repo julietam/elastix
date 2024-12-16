@@ -19,6 +19,10 @@
 #include "elxElastixMain.h"
 #include <itkDeref.h>
 
+// Ensure these headers are included
+#include <itkLightObject.h>
+#include <itkObject.h>
+
 #ifdef ELASTIX_USE_OPENCL
 #  include "itkOpenCLContext.h"
 #  include "itkOpenCLSetup.h"
@@ -566,7 +570,7 @@ ElastixMain::GetImageInformationFromFile(const std::string & filename, ImageDime
  * ******************** SetWeightedMaskContainer ********************
  */
 void
-ElastixMain::SetWeightedMaskContainer(const WeightedMaskContainerType & weightedMaskContainer)
+ElastixMain::SetWeightedMaskContainer(const DataObjectContainerType * weightedMaskContainer)
 {
   m_WeightedMaskContainer = weightedMaskContainer;
 }
@@ -574,26 +578,26 @@ ElastixMain::SetWeightedMaskContainer(const WeightedMaskContainerType & weighted
 /**
  * ******************** GetModifiableWeightedMaskContainer ********************
  */
-ElastixMain::WeightedMaskContainerType &
+ElastixMain::DataObjectContainerType *
 ElastixMain::GetModifiableWeightedMaskContainer()
 {
-  return m_WeightedMaskContainer;
+  return m_WeightedMaskContainer.GetPointer();
 }
 
 /**
  * ******************** GetWeightedMaskContainer ********************
  */
-const ElastixMain::WeightedMaskContainerType &
+const ElastixMain::DataObjectContainerType *
 ElastixMain::GetWeightedMaskContainer() const
 {
-  return m_WeightedMaskContainer;
+  return m_WeightedMaskContainer.GetPointer();
 }
 
 /**
  * ******************** SetFixedWeightedMaskContainer ********************
  */
 void
-ElastixMain::SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer)
+ElastixMain::SetFixedWeightedMaskContainer(const DataObjectContainerType * fixedWeightedMaskContainer)
 {
   m_FixedWeightedMaskContainer = fixedWeightedMaskContainer;
 }
@@ -601,26 +605,26 @@ ElastixMain::SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fix
 /**
  * ******************** GetModifiableFixedWeightedMaskContainer ********************
  */
-ElastixMain::WeightedMaskContainerType &
+ElastixMain::DataObjectContainerType *
 ElastixMain::GetModifiableFixedWeightedMaskContainer()
 {
-  return m_FixedWeightedMaskContainer;
+  return m_FixedWeightedMaskContainer.GetPointer();
 }
 
 /**
  * ******************** GetFixedWeightedMaskContainer ********************
  */
-const ElastixMain::WeightedMaskContainerType &
+const ElastixMain::DataObjectContainerType *
 ElastixMain::GetFixedWeightedMaskContainer() const
 {
-  return m_FixedWeightedMaskContainer;
+  return m_FixedWeightedMaskContainer.GetPointer();
 }
 
 /**
  * ******************** SetMovingWeightedMaskContainer ********************
  */
 void
-ElastixMain::SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer)
+ElastixMain::SetMovingWeightedMaskContainer(const DataObjectContainerType * movingWeightedMaskContainer)
 {
   m_MovingWeightedMaskContainer = movingWeightedMaskContainer;
 }
@@ -628,19 +632,19 @@ ElastixMain::SetMovingWeightedMaskContainer(const WeightedMaskContainerType & mo
 /**
  * ******************** GetModifiableMovingWeightedMaskContainer ********************
  */
-ElastixMain::WeightedMaskContainerType &
+ElastixMain::DataObjectContainerType *
 ElastixMain::GetModifiableMovingWeightedMaskContainer()
 {
-  return m_MovingWeightedMaskContainer;
+  return m_MovingWeightedMaskContainer.GetPointer();
 }
 
 /**
  * ******************** GetMovingWeightedMaskContainer ********************
  */
-const ElastixMain::WeightedMaskContainerType &
+const ElastixMain::DataObjectContainerType *
 ElastixMain::GetMovingWeightedMaskContainer() const
 {
-  return m_MovingWeightedMaskContainer;
+  return m_MovingWeightedMaskContainer.GetPointer();
 }
 
 } // end namespace elastix
