@@ -261,6 +261,12 @@ public:
   elxSetObjectMacro(FixedMaskFileNameContainer, FileNameContainerType);
   elxSetObjectMacro(MovingMaskFileNameContainer, FileNameContainerType);
 
+  /** Set/Get the fixed/moving weighted mask containers. */
+  elxGetObjectMacro(FixedWeightedMaskContainer, WeightedMaskContainerType);
+  elxGetObjectMacro(MovingWeightedMaskContainer, WeightedMaskContainerType);
+  elxSetObjectMacro(FixedWeightedMaskContainer, WeightedMaskContainerType);
+  elxSetObjectMacro(MovingWeightedMaskContainer, WeightedMaskContainerType);
+
   /** Define some convenience functions: GetNumberOfMetrics() for example. */
   elxGetNumberOfMacro(Registration);
   elxGetNumberOfMacro(FixedImagePyramid);
@@ -389,14 +395,7 @@ public:
     m_IterationInfo.AddNewTargetCell(name);
   }
 
-  /** Set/Get functions for the fixed and moving weighted masks. */
-  void SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer);
-  void SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer);
-  WeightedMaskContainerType & GetModifiableFixedWeightedMaskContainer();
-  WeightedMaskContainerType & GetModifiableMovingWeightedMaskContainer();
-  const WeightedMaskContainerType & GetFixedWeightedMaskContainer() const;
-  const WeightedMaskContainerType & GetMovingWeightedMaskContainer() const;
-
+  
 protected:
   ElastixBase();
   ~ElastixBase() override = default;
