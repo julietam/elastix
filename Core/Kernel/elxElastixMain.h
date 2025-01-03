@@ -91,7 +91,7 @@ public:
   using DataObjectContainerType = itk::VectorContainer<unsigned int, itk::DataObject::Pointer>;
   using DataObjectContainerPointer = DataObjectContainerType::Pointer;
 
-  using WeightedMaskType = itk::Image<unsigned char, 3>;
+  using WeightedMaskType = itk::Image<float, 3>;
 
   /** Set/Get functions for the fixed images
    * (if these are not used, elastix tries to read them from disk,
