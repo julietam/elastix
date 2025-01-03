@@ -311,57 +311,39 @@ MainBase::SetMaximumNumberOfThreads() const
 } // end SetMaximumNumberOfThreads()
 
 /**
- * ******************** SetFixedWeightedMaskContainer ********************
+ * ******************** SetFixedWeightedMask ********************
  */
 void
-MainBase::SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer)
+MainBase::SetFixedWeightedMask(const WeightedMaskType::Pointer & fixedWeightedMask)
 {
-  m_WeightedMovingImageContainer = fixedWeightedMaskContainer;
+  m_FixedWeightedMask = fixedWeightedMask;
 }
 
 /**
- * ******************** GetModifiableFixedWeightedMaskContainer ********************
+ * ******************** GetFixedWeightedMask ********************
  */
-MainBase::WeightedMaskContainerType &
-MainBase::GetModifiableFixedWeightedMaskContainer()
+MainBase::WeightedMaskType::Pointer
+MainBase::GetFixedWeightedMask() const
 {
-  return m_WeightedMovingImageContainer;
+  return m_FixedWeightedMask;
 }
 
 /**
- * ******************** GetFixedWeightedMaskContainer ********************
- */
-const MainBase::WeightedMaskContainerType &
-MainBase::GetFixedWeightedMaskContainer() const
-{
-  return m_WeightedMovingImageContainer;
-}
-
-/**
- * ******************** SetMovingWeightedMaskContainer ********************
+ * ******************** SetMovingWeightedMask ********************
  */
 void
-MainBase::SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer)
+MainBase::SetMovingWeightedMask(const WeightedMaskType::Pointer & movingWeightedMask)
 {
-  m_WeightedResultImageContainer = movingWeightedMaskContainer;
+  m_MovingWeightedMask = movingWeightedMask;
 }
 
 /**
- * ******************** GetModifiableMovingWeightedMaskContainer ********************
+ * ******************** GetMovingWeightedMask ********************
  */
-MainBase::WeightedMaskContainerType &
-MainBase::GetModifiableMovingWeightedMaskContainer()
+MainBase::WeightedMaskType::Pointer
+MainBase::GetMovingWeightedMask() const
 {
-  return m_WeightedResultImageContainer;
-}
-
-/**
- * ******************** GetMovingWeightedMaskContainer ********************
- */
-const MainBase::WeightedMaskContainerType &
-MainBase::GetMovingWeightedMaskContainer() const
-{
-  return m_WeightedResultImageContainer;
+  return m_MovingWeightedMask;
 }
 
 } // end namespace elastix

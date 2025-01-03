@@ -159,8 +159,8 @@ ElastixMain::Run()
   elastixBase.SetResultImageContainer(this->GetModifiableResultImageContainer());
   elastixBase.SetFixedPoints(m_FixedPoints);
   elastixBase.SetMovingPoints(m_MovingPoints);
-  elastixBase.SetFixedWeightedMaskContainer(this->GetModifiableFixedWeightedMaskContainer());
-  elastixBase.SetMovingWeightedMaskContainer(this->GetModifiableMovingWeightedMaskContainer());
+  elastixBase.SetFixedWeightedMask(this->GetFixedWeightedMask());
+  elastixBase.SetMovingWeightedMask(this->GetMovingWeightedMask());
  
 
   /** Set the initial transform, if it happens to be there. */
@@ -567,57 +567,39 @@ ElastixMain::GetImageInformationFromFile(const std::string & filename, ImageDime
 
 
 /**
- * ******************** SetFixedWeightedMaskContainer ********************
+ * ******************** SetFixedWeightedMask ********************
  */
 void
-ElastixMain::SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer)
+ElastixMain::SetFixedWeightedMask(const WeightedMaskType::Pointer & fixedWeightedMask)
 {
-  m_FixedWeightedMaskContainer = fixedWeightedMaskContainer;
+  m_FixedWeightedMask = fixedWeightedMask;
 }
 
 /**
- * ******************** GetModifiableFixedWeightedMaskContainer ********************
+ * ******************** GetFixedWeightedMask ********************
  */
-ElastixMain::WeightedMaskContainerType &
-ElastixMain::GetModifiableFixedWeightedMaskContainer()
+ElastixMain::WeightedMaskType::Pointer
+ElastixMain::GetFixedWeightedMask() const
 {
-  return m_FixedWeightedMaskContainer;
+  return m_FixedWeightedMask;
 }
 
 /**
- * ******************** GetFixedWeightedMaskContainer ********************
- */
-const ElastixMain::WeightedMaskContainerType &
-ElastixMain::GetFixedWeightedMaskContainer() const
-{
-  return m_FixedWeightedMaskContainer;
-}
-
-/**
- * ******************** SetMovingWeightedMaskContainer ********************
+ * ******************** SetMovingWeightedMask ********************
  */
 void
-ElastixMain::SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer)
+ElastixMain::SetMovingWeightedMask(const WeightedMaskType::Pointer & movingWeightedMask)
 {
-  m_MovingWeightedMaskContainer = movingWeightedMaskContainer;
+  m_MovingWeightedMask = movingWeightedMask;
 }
 
 /**
- * ******************** GetModifiableMovingWeightedMaskContainer ********************
+ * ******************** GetMovingWeightedMask ********************
  */
-ElastixMain::WeightedMaskContainerType &
-ElastixMain::GetModifiableMovingWeightedMaskContainer()
+ElastixMain::WeightedMaskType::Pointer
+ElastixMain::GetMovingWeightedMask() const
 {
-  return m_MovingWeightedMaskContainer;
-}
-
-/**
- * ******************** GetMovingWeightedMaskContainer ********************
- */
-const ElastixMain::WeightedMaskContainerType &
-ElastixMain::GetMovingWeightedMaskContainer() const
-{
-  return m_MovingWeightedMaskContainer;
+  return m_MovingWeightedMask;
 }
 
 } // end namespace elastix

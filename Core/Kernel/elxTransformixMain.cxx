@@ -198,57 +198,39 @@ TransformixMain::SetInputImageContainer(DataObjectContainerType * inputImageCont
 
 
 /**
- * ******************** SetFixedWeightedMaskContainer ********************
+ * ******************** SetFixedWeightedMask ********************
  */
 void
-TransformixMain::SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer)
+TransformixMain::SetFixedWeightedMask(const WeightedMaskType::Pointer & fixedWeightedMask)
 {
-  m_FixedWeightedMaskContainer = fixedWeightedMaskContainer;
+  m_FixedWeightedMask = fixedWeightedMask;
 }
 
 /**
- * ******************** GetModifiableFixedWeightedMaskContainer ********************
+ * ******************** GetFixedWeightedMask ********************
  */
-TransformixMain::WeightedMaskContainerType &
-TransformixMain::GetModifiableFixedWeightedMaskContainer()
+TransformixMain::WeightedMaskType::Pointer
+TransformixMain::GetFixedWeightedMask() const
 {
-  return m_FixedWeightedMaskContainer;
+  return m_FixedWeightedMask;
 }
 
 /**
- * ******************** GetFixedWeightedMaskContainer ********************
- */
-const TransformixMain::WeightedMaskContainerType &
-TransformixMain::GetFixedWeightedMaskContainer() const
-{
-  return m_FixedWeightedMaskContainer;
-}
-
-/**
- * ******************** SetMovingWeightedMaskContainer ********************
+ * ******************** SetMovingWeightedMask ********************
  */
 void
-TransformixMain::SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer)
+TransformixMain::SetMovingWeightedMask(const WeightedMaskType::Pointer & movingWeightedMask)
 {
-  m_MovingWeightedMaskContainer = movingWeightedMaskContainer;
+  m_MovingWeightedMask = movingWeightedMask;
 }
 
 /**
- * ******************** GetModifiableMovingWeightedMaskContainer ********************
+ * ******************** GetMovingWeightedMask ********************
  */
-TransformixMain::WeightedMaskContainerType &
-TransformixMain::GetModifiableMovingWeightedMaskContainer()
+TransformixMain::WeightedMaskType::Pointer
+TransformixMain::GetMovingWeightedMask() const
 {
-  return m_MovingWeightedMaskContainer;
-}
-
-/**
- * ******************** GetMovingWeightedMaskContainer ********************
- */
-const TransformixMain::WeightedMaskContainerType &
-TransformixMain::GetMovingWeightedMaskContainer() const
-{
-  return m_MovingWeightedMaskContainer;
+  return m_MovingWeightedMask;
 }
 
 /**
