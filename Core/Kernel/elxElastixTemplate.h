@@ -216,15 +216,13 @@ public:
   MovingMaskType *
   GetMovingMask(unsigned int idx = 0) const;
 
-  /** Set/Get the fixed weighted mask container. */
-  void SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer);
-  WeightedMaskContainerType & GetModifiableFixedWeightedMaskContainer();
-  const WeightedMaskContainerType & GetFixedWeightedMaskContainer() const;
+  /** Set/Get the fixed weighted mask. */
+  void SetFixedWeightedMask(const FixedWeightedMaskPointer & fixedWeightedMask);
+  FixedWeightedMaskPointer GetFixedWeightedMask() const;
 
-  /** Set/Get the moving weighted mask container. */
-  void SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer);
-  WeightedMaskContainerType & GetModifiableMovingWeightedMaskContainer();
-  const WeightedMaskContainerType & GetMovingWeightedMaskContainer() const;
+  /** Set/Get the moving weighted mask. */
+  void SetMovingWeightedMask(const MovingWeightedMaskPointer & movingWeightedMask);
+  MovingWeightedMaskPointer GetMovingWeightedMask() const;
 
   /** Main functions:
    * Run() for registration, and ApplyTransform() for just

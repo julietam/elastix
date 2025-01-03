@@ -185,19 +185,6 @@ TransformixMain::Run(const ArgumentMapType &               argmap,
 
 
 /**
- * ********************* SetInputImage **************************
- */
-
-void
-TransformixMain::SetInputImageContainer(DataObjectContainerType * inputImageContainer)
-{
-  /** InputImage == MovingImage. */
-  this->SetMovingImageContainer(inputImageContainer);
-
-} // end SetInputImage()
-
-
-/**
  * ******************** SetFixedWeightedMask ********************
  */
 void

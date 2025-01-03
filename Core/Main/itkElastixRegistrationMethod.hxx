@@ -1087,7 +1087,7 @@ ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetFixedWeightedMask() con
     itkExceptionMacro("Please provide an index when more than one fixed weighted masks are available.");
   }
 
-  return this->m_FixedWeightedMasks.empty() ? nullptr : this->m_FixedWeightedMasks.front().GetPointer();
+  return itkDynamicCastInDebugMode<const WeightedMaskType *>(this->ProcessObject::GetInput("FixedWeightedMask"));
 }
 
 template <typename TFixedImage, typename TMovingImage>
@@ -1095,22 +1095,29 @@ auto
 ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetFixedWeightedMask(const unsigned int index) const
   -> const WeightedMaskType *
 {
-  if (index >= this->m_FixedWeightedMasks.size())
+  unsigned int n = 0;
+  for (const auto & inputName : this->GetInputNames())
   {
-    itkExceptionMacro("Index exceeds the number of fixed weighted masks (index: " << index
-                                                                                  << ", number of fixed weighted masks: "
-                                                                                  << this->m_FixedWeightedMasks.size()
-                                                                                  << ")");
+    if (this->IsInputOfType("FixedWeightedMask", inputName))
+    {
+      if (index == n)
+      {
+        return itkDynamicCastInDebugMode<const WeightedMaskType *>(this->ProcessObject::GetInput(inputName));
+      }
+      ++n;
+    }
   }
 
-  return this->m_FixedWeightedMasks[index].GetPointer();
+  itkExceptionMacro("Index exceeds the number of fixed weighted masks (index: " << index
+                                                                                 << ", number of fixed weighted masks: "
+                                                                                 << n << ")");
 }
 
 template <typename TFixedImage, typename TMovingImage>
 unsigned int
 ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetNumberOfFixedWeightedMasks() const
 {
-  return this->m_FixedWeightedMasks.size();
+  return this->GetNumberOfInputsOfType("FixedWeightedMask");
 }
 
 template <typename TFixedImage, typename TMovingImage>
@@ -1122,7 +1129,7 @@ ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetMovingWeightedMask() co
     itkExceptionMacro("Please provide an index when more than one moving weighted masks are available.");
   }
 
-  return this->m_MovingWeightedMasks.empty() ? nullptr : this->m_MovingWeightedMasks.front().GetPointer();
+  return itkDynamicCastInDebugMode<const WeightedMaskType *>(this->ProcessObject::GetInput("MovingWeightedMask"));
 }
 
 template <typename TFixedImage, typename TMovingImage>
@@ -1130,22 +1137,29 @@ auto
 ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetMovingWeightedMask(const unsigned int index) const
   -> const WeightedMaskType *
 {
-  if (index >= this->m_MovingWeightedMasks.size())
+  unsigned int n = 0;
+  for (const auto & inputName : this->GetInputNames())
   {
-    itkExceptionMacro("Index exceeds the number of moving weighted masks (index: " << index
-                                                                                   << ", number of moving weighted masks: "
-                                                                                   << this->m_MovingWeightedMasks.size()
-                                                                                   << ")");
+    if (this->IsInputOfType("MovingWeightedMask", inputName))
+    {
+      if (index == n)
+      {
+        return itkDynamicCastInDebugMode<const WeightedMaskType *>(this->ProcessObject::GetInput(inputName));
+      }
+      ++n;
+    }
   }
 
-  return this->m_MovingWeightedMasks[index].GetPointer();
+  itkExceptionMacro("Index exceeds the number of moving weighted masks (index: " << index
+                                                                                 << ", number of moving weighted masks: "
+                                                                                 << n << ")");
 }
 
 template <typename TFixedImage, typename TMovingImage>
 unsigned int
 ElastixRegistrationMethod<TFixedImage, TMovingImage>::GetNumberOfMovingWeightedMasks() const
 {
-  return this->m_MovingWeightedMasks.size();
+  return this->GetNumberOfInputsOfType("MovingWeightedMask");
 }
 
 } // namespace itk

@@ -161,86 +161,6 @@ MainBase::CreateComponent(const ComponentDescriptionType & name)
 
 
 /**
- * *********************** CreateComponents *****************************
- */
-
-MainBase::ObjectContainerPointer
-MainBase::CreateComponents(const std::string &              key,
-                           const ComponentDescriptionType & defaultComponentName,
-                           int &                            errorcode,
-                           bool                             mandatoryComponent)
-{
-  ComponentDescriptionType componentName = defaultComponentName;
-  unsigned int             componentnr = 0;
-  ObjectContainerPointer   objectContainer = ObjectContainerType::New();
-  objectContainer->Initialize();
-
-  /** Read the component name.
-   * If the user hasn't specified any component names, use
-   * the default, and give a warning.
-   */
-  bool found = m_Configuration->ReadParameter(componentName, key, componentnr, true);
-
-  /** If the default equals "" (so no default), the mandatoryComponent
-   * flag is true, and not component was given by the user,
-   * then elastix quits.
-   */
-  if (!found && (defaultComponentName.empty()))
-  {
-    if (mandatoryComponent)
-    {
-      log::error(std::ostringstream{} << "ERROR: the following component has not been specified: " << key);
-      errorcode = 1;
-      return objectContainer;
-    }
-    else
-    {
-      /* Just return an empty container without nagging. */
-      errorcode = 0;
-      return objectContainer;
-    }
-  }
-
-  /** Try creating the specified component. */
-  try
-  {
-    objectContainer->CreateElementAt(componentnr) = this->CreateComponent(componentName);
-  }
-  catch (const itk::ExceptionObject & excp)
-  {
-    log::error(std::ostringstream{} << "ERROR: error occurred while creating " << key << " " << componentnr << ".\n"
-                                    << excp);
-    errorcode = 1;
-    return objectContainer;
-  }
-
-  /** Check if more than one component name is given. */
-  while (found)
-  {
-    ++componentnr;
-    found = m_Configuration->ReadParameter(componentName, key, componentnr, false);
-    if (found)
-    {
-      try
-      {
-        objectContainer->CreateElementAt(componentnr) = this->CreateComponent(componentName);
-      }
-      catch (const itk::ExceptionObject & excp)
-      {
-        log::error(std::ostringstream{} << "ERROR: error occurred while creating " << key << " " << componentnr << ".\n"
-                                        << excp);
-        errorcode = 1;
-        return objectContainer;
-      }
-    } // end if
-  }   // end while
-
-  return objectContainer;
-
-} // end CreateComponents()
-
-
-/**
  * *********************** SetProcessPriority *************************
  */
 
@@ -344,6 +264,42 @@ MainBase::WeightedMaskType::Pointer
 MainBase::GetMovingWeightedMask() const
 {
   return m_MovingWeightedMask;
+}
+
+/**
+ * ******************** SetMovingImageContainer ********************
+ */
+void
+MainBase::SetMovingImageContainer(const DataObjectContainerPointer & movingImageContainer)
+{
+  m_MovingImageContainer = movingImageContainer;
+}
+
+/**
+ * ******************** SetResultImageContainer ********************
+ */
+void
+MainBase::SetResultImageContainer(const DataObjectContainerPointer & resultImageContainer)
+{
+  m_ResultImageContainer = resultImageContainer;
+}
+
+/**
+ * ******************** SetResultDeformationFieldContainer ********************
+ */
+void
+MainBase::SetResultDeformationFieldContainer(const DataObjectContainerPointer & resultDeformationFieldContainer)
+{
+  m_ResultDeformationFieldContainer = resultDeformationFieldContainer;
+}
+
+/**
+ * ******************** SetConfiguration ********************
+ */
+void
+MainBase::SetConfiguration(const Configuration::Pointer & configuration)
+{
+  m_Configuration = configuration;
 }
 
 } // end namespace elastix

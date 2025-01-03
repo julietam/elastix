@@ -96,21 +96,21 @@ public:
    * (if these are not used, elastix tries to read them from disk,
    * according to the command line parameters).
    */
-  itkSetObjectMacro(MovingImageContainer, DataObjectContainerType);
+  void SetMovingImageContainer(const DataObjectContainerPointer & movingImageContainer);
   itkGetModifiableObjectMacro(MovingImageContainer, DataObjectContainerType);
 
   /** Set/Get functions for the result images
    * (if these are not used, elastix tries to read them from disk,
    * according to the command line parameters).
    */
-  itkSetObjectMacro(ResultImageContainer, DataObjectContainerType);
+  void SetResultImageContainer(const DataObjectContainerPointer & resultImageContainer);
   itkGetModifiableObjectMacro(ResultImageContainer, DataObjectContainerType);
 
-  itkSetObjectMacro(ResultDeformationFieldContainer, DataObjectContainerType);
+  void SetResultDeformationFieldContainer(const DataObjectContainerPointer & resultDeformationFieldContainer);
   itkGetModifiableObjectMacro(ResultDeformationFieldContainer, DataObjectContainerType);
 
   /** Set/Get the configuration object. */
-  itkSetObjectMacro(Configuration, Configuration);
+  void SetConfiguration(const Configuration::Pointer & configuration);
   itkGetModifiableObjectMacro(Configuration, Configuration);
 
   /** Functions to get pointers to the elastix components.
@@ -164,7 +164,7 @@ public:
   static const ComponentDatabase &
   GetComponentDatabase();
 
-  using WeightedMaskType = itk::Image<unsigned char, 3>;
+  using WeightedMaskType = itk::Image<float, 3>;
 
   /** Set/Get the fixed weighted mask. */
   virtual void SetFixedWeightedMask(const WeightedMaskType::Pointer & fixedWeightedMask) = 0;
