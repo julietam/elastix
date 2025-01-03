@@ -198,6 +198,60 @@ TransformixMain::SetInputImageContainer(DataObjectContainerType * inputImageCont
 
 
 /**
+ * ******************** SetFixedWeightedMaskContainer ********************
+ */
+void
+TransformixMain::SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer)
+{
+  m_FixedWeightedMaskContainer = fixedWeightedMaskContainer;
+}
+
+/**
+ * ******************** GetModifiableFixedWeightedMaskContainer ********************
+ */
+TransformixMain::WeightedMaskContainerType &
+TransformixMain::GetModifiableFixedWeightedMaskContainer()
+{
+  return m_FixedWeightedMaskContainer;
+}
+
+/**
+ * ******************** GetFixedWeightedMaskContainer ********************
+ */
+const TransformixMain::WeightedMaskContainerType &
+TransformixMain::GetFixedWeightedMaskContainer() const
+{
+  return m_FixedWeightedMaskContainer;
+}
+
+/**
+ * ******************** SetMovingWeightedMaskContainer ********************
+ */
+void
+TransformixMain::SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer)
+{
+  m_MovingWeightedMaskContainer = movingWeightedMaskContainer;
+}
+
+/**
+ * ******************** GetModifiableMovingWeightedMaskContainer ********************
+ */
+TransformixMain::WeightedMaskContainerType &
+TransformixMain::GetModifiableMovingWeightedMaskContainer()
+{
+  return m_MovingWeightedMaskContainer;
+}
+
+/**
+ * ******************** GetMovingWeightedMaskContainer ********************
+ */
+const TransformixMain::WeightedMaskContainerType &
+TransformixMain::GetMovingWeightedMaskContainer() const
+{
+  return m_MovingWeightedMaskContainer;
+}
+
+/**
  * ********************** Destructor ****************************
  */
 

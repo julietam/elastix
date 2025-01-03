@@ -1532,6 +1532,60 @@ TransformBase<TElastix>::AutomaticScalesEstimationStackTransform(const unsigned 
 } // end AutomaticScalesEstimationStackTransform()
 
 
+/**
+ * ******************** SetFixedWeightedMaskContainer ********************
+ */
+void
+TransformBase<TElastix>::SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer)
+{
+  m_FixedWeightedMaskContainer = fixedWeightedMaskContainer;
+}
+
+/**
+ * ******************** GetModifiableFixedWeightedMaskContainer ********************
+ */
+TransformBase<TElastix>::WeightedMaskContainerType &
+TransformBase<TElastix>::GetModifiableFixedWeightedMaskContainer()
+{
+  return m_FixedWeightedMaskContainer;
+}
+
+/**
+ * ******************** GetFixedWeightedMaskContainer ********************
+ */
+const TransformBase<TElastix>::WeightedMaskContainerType &
+TransformBase<TElastix>::GetFixedWeightedMaskContainer() const
+{
+  return m_FixedWeightedMaskContainer;
+}
+
+/**
+ * ******************** SetMovingWeightedMaskContainer ********************
+ */
+void
+TransformBase<TElastix>::SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer)
+{
+  m_MovingWeightedMaskContainer = movingWeightedMaskContainer;
+}
+
+/**
+ * ******************** GetModifiableMovingWeightedMaskContainer ********************
+ */
+TransformBase<TElastix>::WeightedMaskContainerType &
+TransformBase<TElastix>::GetModifiableMovingWeightedMaskContainer()
+{
+  return m_MovingWeightedMaskContainer;
+}
+
+/**
+ * ******************** GetMovingWeightedMaskContainer ********************
+ */
+const TransformBase<TElastix>::WeightedMaskContainerType &
+TransformBase<TElastix>::GetMovingWeightedMaskContainer() const
+{
+  return m_MovingWeightedMaskContainer;
+}
+
 } // end namespace elastix
 
 #endif // end #ifndef elxTransformBase_hxx
