@@ -90,7 +90,8 @@ public:
   /** Typedefs for data object containers. */
   using DataObjectContainerType = itk::VectorContainer<unsigned int, itk::DataObject::Pointer>;
   using DataObjectContainerPointer = DataObjectContainerType::Pointer;
-  using WeightedMaskContainerType = DataObjectContainerType;
+
+  using WeightedMaskType = itk::Image<unsigned char, 3>;
 
   /** Set/Get functions for the fixed images
    * (if these are not used, elastix tries to read them from disk,
@@ -108,33 +109,13 @@ public:
   itkGetModifiableObjectMacro(FixedMaskContainer, DataObjectContainerType);
   itkGetModifiableObjectMacro(MovingMaskContainer, DataObjectContainerType);
 
-  /** Set/Get functions for the fixed and moving weighted masks
-   * (if these are not used, elastix tries to read them from disk,
-   * according to the command line parameters).
-   */
-  itkSetObjectMacro(FixedWeightedMaskContainer, DataObjectContainerType);
-  itkSetObjectMacro(MovingWeightedMaskContainer, DataObjectContainerType);
-  itkGetModifiableObjectMacro(FixedWeightedMaskContainer, DataObjectContainerType);
-  itkGetModifiableObjectMacro(MovingWeightedMaskContainer, DataObjectContainerType);
+  /** Set/Get the fixed weighted mask. */
+  void SetFixedWeightedMask(const WeightedMaskType::Pointer & fixedWeightedMask);
+  WeightedMaskType::Pointer GetFixedWeightedMask() const;
 
-  void SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer) override;
-  void SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer) override;
-  WeightedMaskContainerType & GetModifiableFixedWeightedMaskContainer() override;
-  WeightedMaskContainerType & GetModifiableMovingWeightedMaskContainer() override;
-  const WeightedMaskContainerType & GetFixedWeightedMaskContainer() const override;
-  const WeightedMaskContainerType & GetMovingWeightedMaskContainer() const override;
-
-  void SetWeightedMaskContainer(const DataObjectContainerType * weightedMaskContainer);
-  DataObjectContainerType * GetModifiableWeightedMaskContainer();
-  const DataObjectContainerType * GetWeightedMaskContainer() const;
-
-  void SetFixedWeightedMaskContainer(const DataObjectContainerType * fixedWeightedMaskContainer);
-  DataObjectContainerType * GetModifiableFixedWeightedMaskContainer();
-  const DataObjectContainerType * GetFixedWeightedMaskContainer() const;
-
-  void SetMovingWeightedMaskContainer(const DataObjectContainerType * movingWeightedMaskContainer);
-  DataObjectContainerType * GetModifiableMovingWeightedMaskContainer();
-  const DataObjectContainerType * GetMovingWeightedMaskContainer() const;
+  /** Set/Get the moving weighted mask. */
+  void SetMovingWeightedMask(const WeightedMaskType::Pointer & movingWeightedMask);
+  WeightedMaskType::Pointer GetMovingWeightedMask() const;
 
   itkSetConstObjectMacro(FixedPoints, itk::Object);
   itkSetConstObjectMacro(MovingPoints, itk::Object);
@@ -217,12 +198,11 @@ private:
   DataObjectContainerPointer m_ResultImageContainer{ nullptr };
 
   /** The fixed weighted masks. */
-  DataObjectContainerPointer m_FixedWeightedMaskContainer{ nullptr };
-  DataObjectContainerPointer m_MovingWeightedMaskContainer{ nullptr };
+  WeightedMaskType::Pointer m_FixedWeightedMask{ nullptr };
+  WeightedMaskType::Pointer m_MovingWeightedMask{ nullptr };
 
   itk::SmartPointer<const itk::Object> m_FixedPoints{ nullptr };
   itk::SmartPointer<const itk::Object> m_MovingPoints{ nullptr };
-
 
   /** A transform that is the result of registration. */
   ObjectPointer m_FinalTransform{ nullptr };

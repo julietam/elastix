@@ -154,9 +154,6 @@ ElastixMain::Run()
    */
   elastixBase.SetFixedImageContainer(this->GetModifiableFixedImageContainer());
   elastixBase.SetMovingImageContainer(this->GetModifiableMovingImageContainer());
-  elastixBase.SetFixedMaskContainer(this->GetModifiableFixedMaskContainer());
-  elastixBase.SetMovingMaskContainer(this->GetModifiableMovingMaskContainer());
-  elastixBase.SetResultImageContainer(this->GetModifiableResultImageContainer());
   elastixBase.SetFixedPoints(m_FixedPoints);
   elastixBase.SetMovingPoints(m_MovingPoints);
   elastixBase.SetFixedWeightedMask(this->GetFixedWeightedMask());
@@ -205,9 +202,6 @@ ElastixMain::Run()
   /** Store the images in ElastixMain. */
   this->SetFixedImageContainer(elastixBase.GetFixedImageContainer());
   this->SetMovingImageContainer(elastixBase.GetMovingImageContainer());
-  this->SetFixedMaskContainer(elastixBase.GetFixedMaskContainer());
-  this->SetMovingMaskContainer(elastixBase.GetMovingMaskContainer());
-  this->SetResultImageContainer(elastixBase.GetResultImageContainer());
 
   /** Store the original fixed image direction cosines (relevant in case the
    * UseDirectionCosines parameter was set to false. */
