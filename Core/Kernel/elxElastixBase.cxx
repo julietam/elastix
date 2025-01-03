@@ -553,4 +553,16 @@ const ElastixBase::DataObjectContainerType & ElastixBase::GetMovingWeightedMaskC
   return m_MovingWeightedMaskContainer;
 }
 
+void
+ElastixBase::SetFixedWeightedMaskContainer(const DataObjectContainerType * fixedWeightedMaskContainer)
+{
+  m_FixedWeightedMaskContainer = fixedWeightedMaskContainer;
+}
+
+void
+ElastixBase::SetMovingWeightedMaskContainer(const DataObjectContainerType * movingWeightedMaskContainer)
+{
+  m_MovingWeightedMaskContainer = movingWeightedMaskContainer;
+}
+
 } // end namespace elastix
