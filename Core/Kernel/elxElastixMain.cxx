@@ -567,33 +567,6 @@ ElastixMain::GetImageInformationFromFile(const std::string & filename, ImageDime
 
 
 /**
- * ******************** SetWeightedMaskContainer ********************
- */
-void
-ElastixMain::SetWeightedMaskContainer(const DataObjectContainerType * weightedMaskContainer)
-{
-  m_WeightedMaskContainer = weightedMaskContainer;
-}
-
-/**
- * ******************** GetModifiableWeightedMaskContainer ********************
- */
-ElastixMain::DataObjectContainerType *
-ElastixMain::GetModifiableWeightedMaskContainer()
-{
-  return m_WeightedMaskContainer.GetPointer();
-}
-
-/**
- * ******************** GetWeightedMaskContainer ********************
- */
-const ElastixMain::DataObjectContainerType *
-ElastixMain::GetWeightedMaskContainer() const
-{
-  return m_WeightedMaskContainer.GetPointer();
-}
-
-/**
  * ******************** SetFixedWeightedMaskContainer ********************
  */
 void

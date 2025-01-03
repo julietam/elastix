@@ -195,16 +195,6 @@ public:
   elxGetBaseMacro(ResampleInterpolator, ResampleInterpolatorBaseType);
   elxGetBaseMacro(Transform, TransformBaseType);
 
-  /** Set/Get the fixed weighted mask container. */
-  void SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer);
-  WeightedMaskContainerType & GetModifiableFixedWeightedMaskContainer();
-  const WeightedMaskContainerType & GetFixedWeightedMaskContainer() const;
-
-  /** Set/Get the moving weighted mask container. */
-  void SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer);
-  WeightedMaskContainerType & GetModifiableMovingWeightedMaskContainer();
-  const WeightedMaskContainerType & GetMovingWeightedMaskContainer() const;
-
   /** Get pointers to the images. They are obtained from the
    * {Fixed,Moving}ImageContainer and casted to the appropriate type.
    */
@@ -224,6 +214,16 @@ public:
 
   MovingMaskType *
   GetMovingMask(unsigned int idx = 0) const;
+
+  /** Set/Get the fixed weighted mask container. */
+  void SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer);
+  WeightedMaskContainerType & GetModifiableFixedWeightedMaskContainer();
+  const WeightedMaskContainerType & GetFixedWeightedMaskContainer() const;
+
+  /** Set/Get the moving weighted mask container. */
+  void SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer);
+  WeightedMaskContainerType & GetModifiableMovingWeightedMaskContainer();
+  const WeightedMaskContainerType & GetMovingWeightedMaskContainer() const;
 
   /** Main functions:
    * Run() for registration, and ApplyTransform() for just
