@@ -165,6 +165,7 @@ public:
   GetComponentDatabase();
 
   using WeightedMaskType = itk::Image<unsigned char, 3>;
+  using WeightedMaskContainerType = std::vector<WeightedMaskType::Pointer>;
 
   /** Get/NumberOf fixed weighted masks. */
   virtual const WeightedMaskType *
@@ -183,14 +184,14 @@ public:
   GetNumberOfMovingWeightedMasks() const = 0;
 
   /** Set/Get the fixed weighted mask container. */
-  virtual void SetFixedWeightedMaskContainer(const DataObjectContainerType * fixedWeightedMaskContainer) = 0;
-  virtual DataObjectContainerType * GetModifiableFixedWeightedMaskContainer() = 0;
-  virtual const DataObjectContainerType * GetFixedWeightedMaskContainer() const = 0;
+  virtual void SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer) = 0;
+  virtual WeightedMaskContainerType & GetModifiableFixedWeightedMaskContainer() = 0;
+  virtual const WeightedMaskContainerType & GetFixedWeightedMaskContainer() const = 0;
 
   /** Set/Get the moving weighted mask container. */
-  virtual void SetMovingWeightedMaskContainer(const DataObjectContainerType * movingWeightedMaskContainer) = 0;
-  virtual DataObjectContainerType * GetModifiableMovingWeightedMaskContainer() = 0;
-  virtual const DataObjectContainerType * GetMovingWeightedMaskContainer() const = 0;
+  virtual void SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer) = 0;
+  virtual WeightedMaskContainerType & GetModifiableMovingWeightedMaskContainer() = 0;
+  virtual const WeightedMaskContainerType & GetMovingWeightedMaskContainer() const = 0;
 
 protected:
   MainBase();

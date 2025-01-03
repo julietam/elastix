@@ -310,4 +310,58 @@ MainBase::SetMaximumNumberOfThreads() const
   }
 } // end SetMaximumNumberOfThreads()
 
+/**
+ * ******************** SetFixedWeightedMaskContainer ********************
+ */
+void
+MainBase::SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer)
+{
+  m_WeightedMovingImageContainer = fixedWeightedMaskContainer;
+}
+
+/**
+ * ******************** GetModifiableFixedWeightedMaskContainer ********************
+ */
+MainBase::WeightedMaskContainerType &
+MainBase::GetModifiableFixedWeightedMaskContainer()
+{
+  return m_WeightedMovingImageContainer;
+}
+
+/**
+ * ******************** GetFixedWeightedMaskContainer ********************
+ */
+const MainBase::WeightedMaskContainerType &
+MainBase::GetFixedWeightedMaskContainer() const
+{
+  return m_WeightedMovingImageContainer;
+}
+
+/**
+ * ******************** SetMovingWeightedMaskContainer ********************
+ */
+void
+MainBase::SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer)
+{
+  m_WeightedResultImageContainer = movingWeightedMaskContainer;
+}
+
+/**
+ * ******************** GetModifiableMovingWeightedMaskContainer ********************
+ */
+MainBase::WeightedMaskContainerType &
+MainBase::GetModifiableMovingWeightedMaskContainer()
+{
+  return m_WeightedResultImageContainer;
+}
+
+/**
+ * ******************** GetMovingWeightedMaskContainer ********************
+ */
+const MainBase::WeightedMaskContainerType &
+MainBase::GetMovingWeightedMaskContainer() const
+{
+  return m_WeightedResultImageContainer;
+}
+
 } // end namespace elastix

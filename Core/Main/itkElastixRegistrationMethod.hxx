@@ -88,6 +88,8 @@ ElastixRegistrationMethod<TFixedImage, TMovingImage>::GenerateData()
   {
     DataObjectContainerPointer fixedMaskContainer{ nullptr };
     DataObjectContainerPointer movingMaskContainer{ nullptr };
+    DataObjectContainerPointer fixedWeightedMaskContainer{ nullptr };
+    DataObjectContainerPointer movingWeightedMaskContainer{ nullptr };
     DataObjectContainerPointer resultImageContainer{ nullptr };
     ElastixMainObjectPointer   transform{ nullptr };
     FlatDirectionCosinesType   fixedImageOriginalDirectionFlat{};
@@ -118,6 +120,28 @@ ElastixRegistrationMethod<TFixedImage, TMovingImage>::GenerateData()
       }
 
       registrationData.movingMaskContainer->push_back(this->ProcessObject::GetInput(inputName));
+      continue;
+    }
+
+    if (this->IsInputOfType("FixedWeightedMask", inputName))
+    {
+      if (registrationData.fixedWeightedMaskContainer.IsNull())
+      {
+        registrationData.fixedWeightedMaskContainer = DataObjectContainerType::New();
+      }
+
+      registrationData.fixedWeightedMaskContainer->push_back(this->ProcessObject::GetInput(inputName));
+      continue;
+    }
+
+    if (this->IsInputOfType("MovingWeightedMask", inputName))
+    {
+      if (registrationData.movingWeightedMaskContainer.IsNull())
+      {
+        registrationData.movingWeightedMaskContainer = DataObjectContainerType::New();
+      }
+
+      registrationData.movingWeightedMaskContainer->push_back(this->ProcessObject::GetInput(inputName));
     }
   }
 
@@ -363,6 +387,8 @@ ElastixRegistrationMethod<TFixedImage, TMovingImage>::GenerateData()
                            movingInternalImageContainers));
     elastixMain->SetFixedMaskContainer(registrationData.fixedMaskContainer);
     elastixMain->SetMovingMaskContainer(registrationData.movingMaskContainer);
+    elastixMain->SetFixedWeightedMaskContainer(registrationData.fixedWeightedMaskContainer);
+    elastixMain->SetMovingWeightedMaskContainer(registrationData.movingWeightedMaskContainer);
     elastixMain->SetFixedPoints(m_FixedPoints);
     elastixMain->SetMovingPoints(m_MovingPoints);
     elastixMain->SetResultImageContainer(registrationData.resultImageContainer);
@@ -390,6 +416,8 @@ ElastixRegistrationMethod<TFixedImage, TMovingImage>::GenerateData()
     // Get stuff in order to put it in the next registration
     registrationData = { elastixMain->GetFixedMaskContainer(),
                          elastixMain->GetMovingMaskContainer(),
+                         elastixMain->GetFixedWeightedMaskContainer(),
+                         elastixMain->GetMovingWeightedMaskContainer(),
                          elastixMain->GetResultImageContainer(),
                          elastixMain->GetFinalTransform(),
                          elastixMain->GetOriginalFixedImageDirectionFlat() };

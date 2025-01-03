@@ -141,6 +141,7 @@ public:
   using MovingWeightedMaskType = itk::Image<MovingMaskPixelType, MovingDimension>;
   using FixedWeightedMaskPointer = typename FixedWeightedMaskType::Pointer;
   using MovingWeightedMaskPointer = typename MovingWeightedMaskType::Pointer;
+  using WeightedMaskContainerType = std::vector<typename FixedWeightedMaskType::Pointer>;
   /** Typedef for the UseDirectionCosines option. */
   using FixedImageDirectionType = typename FixedImageType::DirectionType;
 
