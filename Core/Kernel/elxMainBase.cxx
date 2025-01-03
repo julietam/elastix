@@ -267,33 +267,6 @@ MainBase::GetMovingWeightedMask() const
 }
 
 /**
- * ******************** SetMovingImageContainer ********************
- */
-void
-MainBase::SetMovingImageContainer(const DataObjectContainerPointer & movingImageContainer)
-{
-  m_MovingImageContainer = movingImageContainer;
-}
-
-/**
- * ******************** SetResultImageContainer ********************
- */
-void
-MainBase::SetResultImageContainer(const DataObjectContainerPointer & resultImageContainer)
-{
-  m_ResultImageContainer = resultImageContainer;
-}
-
-/**
- * ******************** SetResultDeformationFieldContainer ********************
- */
-void
-MainBase::SetResultDeformationFieldContainer(const DataObjectContainerPointer & resultDeformationFieldContainer)
-{
-  m_ResultDeformationFieldContainer = resultDeformationFieldContainer;
-}
-
-/**
  * ******************** SetConfiguration ********************
  */
 void

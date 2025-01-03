@@ -199,11 +199,6 @@ protected:
   DataObjectContainerPointer m_ResultImageContainer{ nullptr };
   DataObjectContainerPointer m_ResultDeformationFieldContainer{ nullptr };
 
-  /** The weighted images and masks. */
-  DataObjectContainerPointer m_WeightedMovingImageContainer{ nullptr };
-  DataObjectContainerPointer m_WeightedResultImageContainer{ nullptr };
-  DataObjectContainerPointer m_WeightedResultDeformationFieldContainer{ nullptr };
-
   /** InitDBIndex sets m_DBIndex by asking the ImageTypes
    * from the Configuration object and obtaining the corresponding
    * DB index from the ComponentDatabase.
