@@ -182,6 +182,16 @@ public:
   virtual unsigned int
   GetNumberOfMovingWeightedMasks() const = 0;
 
+  /** Set/Get the fixed weighted mask container. */
+  virtual void SetFixedWeightedMaskContainer(const DataObjectContainerType * fixedWeightedMaskContainer) = 0;
+  virtual DataObjectContainerType * GetModifiableFixedWeightedMaskContainer() = 0;
+  virtual const DataObjectContainerType * GetFixedWeightedMaskContainer() const = 0;
+
+  /** Set/Get the moving weighted mask container. */
+  virtual void SetMovingWeightedMaskContainer(const DataObjectContainerType * movingWeightedMaskContainer) = 0;
+  virtual DataObjectContainerType * GetModifiableMovingWeightedMaskContainer() = 0;
+  virtual const DataObjectContainerType * GetMovingWeightedMaskContainer() const = 0;
+
 protected:
   MainBase();
   ~MainBase() override = 0;

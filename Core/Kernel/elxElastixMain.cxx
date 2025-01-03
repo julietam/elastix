@@ -570,7 +570,7 @@ ElastixMain::GetImageInformationFromFile(const std::string & filename, ImageDime
  * ******************** SetFixedWeightedMaskContainer ********************
  */
 void
-ElastixMain::SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer)
+ElastixMain::SetFixedWeightedMaskContainer(const DataObjectContainerType * fixedWeightedMaskContainer)
 {
   m_FixedWeightedMaskContainer = fixedWeightedMaskContainer;
 }
@@ -578,26 +578,26 @@ ElastixMain::SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fix
 /**
  * ******************** GetModifiableFixedWeightedMaskContainer ********************
  */
-ElastixMain::WeightedMaskContainerType &
+ElastixMain::DataObjectContainerType *
 ElastixMain::GetModifiableFixedWeightedMaskContainer()
 {
-  return m_FixedWeightedMaskContainer;
+  return m_FixedWeightedMaskContainer.GetPointer();
 }
 
 /**
  * ******************** GetFixedWeightedMaskContainer ********************
  */
-const ElastixMain::WeightedMaskContainerType &
+const ElastixMain::DataObjectContainerType *
 ElastixMain::GetFixedWeightedMaskContainer() const
 {
-  return m_FixedWeightedMaskContainer;
+  return m_FixedWeightedMaskContainer.GetPointer();
 }
 
 /**
  * ******************** SetMovingWeightedMaskContainer ********************
  */
 void
-ElastixMain::SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer)
+ElastixMain::SetMovingWeightedMaskContainer(const DataObjectContainerType * movingWeightedMaskContainer)
 {
   m_MovingWeightedMaskContainer = movingWeightedMaskContainer;
 }
@@ -605,19 +605,19 @@ ElastixMain::SetMovingWeightedMaskContainer(const WeightedMaskContainerType & mo
 /**
  * ******************** GetModifiableMovingWeightedMaskContainer ********************
  */
-ElastixMain::WeightedMaskContainerType &
+ElastixMain::DataObjectContainerType *
 ElastixMain::GetModifiableMovingWeightedMaskContainer()
 {
-  return m_MovingWeightedMaskContainer;
+  return m_MovingWeightedMaskContainer.GetPointer();
 }
 
 /**
  * ******************** GetMovingWeightedMaskContainer ********************
  */
-const ElastixMain::WeightedMaskContainerType &
+const ElastixMain::DataObjectContainerType *
 ElastixMain::GetMovingWeightedMaskContainer() const
 {
-  return m_MovingWeightedMaskContainer;
+  return m_MovingWeightedMaskContainer.GetPointer();
 }
 
 } // end namespace elastix
