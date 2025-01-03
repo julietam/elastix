@@ -523,32 +523,32 @@ ElastixBase::GetNumberOfTransformConfigurations() const
   return m_TransformConfigurations.size();
 }
 
-void ElastixBase::SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer)
+void ElastixBase::SetFixedWeightedMaskContainer(const DataObjectContainerType & fixedWeightedMaskContainer)
 {
   m_FixedWeightedMaskContainer = fixedWeightedMaskContainer;
 }
 
-void ElastixBase::SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer)
+void ElastixBase::SetMovingWeightedMaskContainer(const DataObjectContainerType & movingWeightedMaskContainer)
 {
   m_MovingWeightedMaskContainer = movingWeightedMaskContainer;
 }
 
-ElastixBase::WeightedMaskContainerType & ElastixBase::GetModifiableFixedWeightedMaskContainer()
+ElastixBase::DataObjectContainerType & ElastixBase::GetModifiableFixedWeightedMaskContainer()
 {
   return m_FixedWeightedMaskContainer;
 }
 
-ElastixBase::WeightedMaskContainerType & ElastixBase::GetModifiableMovingWeightedMaskContainer()
+ElastixBase::DataObjectContainerType & ElastixBase::GetModifiableMovingWeightedMaskContainer()
 {
   return m_MovingWeightedMaskContainer;
 }
 
-const ElastixBase::WeightedMaskContainerType & ElastixBase::GetFixedWeightedMaskContainer() const
+const ElastixBase::DataObjectContainerType & ElastixBase::GetFixedWeightedMaskContainer() const
 {
   return m_FixedWeightedMaskContainer;
 }
 
-const ElastixBase::WeightedMaskContainerType & ElastixBase::GetMovingWeightedMaskContainer() const
+const ElastixBase::DataObjectContainerType & ElastixBase::GetMovingWeightedMaskContainer() const
 {
   return m_MovingWeightedMaskContainer;
 }

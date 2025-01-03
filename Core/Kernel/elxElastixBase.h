@@ -262,10 +262,10 @@ public:
   elxSetObjectMacro(MovingMaskFileNameContainer, FileNameContainerType);
 
   /** Set/Get the fixed/moving weighted mask containers. */
-  elxGetObjectMacro(FixedWeightedMaskContainer, WeightedMaskContainerType);
-  elxGetObjectMacro(MovingWeightedMaskContainer, WeightedMaskContainerType);
-  elxSetObjectMacro(FixedWeightedMaskContainer, WeightedMaskContainerType);
-  elxSetObjectMacro(MovingWeightedMaskContainer, WeightedMaskContainerType);
+  elxGetObjectMacro(FixedWeightedMaskContainer, DataObjectContainerType);
+  elxGetObjectMacro(MovingWeightedMaskContainer, DataObjectContainerType);
+  elxSetObjectMacro(FixedWeightedMaskContainer, DataObjectContainerType);
+  elxSetObjectMacro(MovingWeightedMaskContainer, DataObjectContainerType);
 
   /** Define some convenience functions: GetNumberOfMetrics() for example. */
   elxGetNumberOfMacro(Registration);
@@ -549,8 +549,8 @@ private:
   bool m_UseDirectionCosines{ true };
 
   /** The fixed and moving weighted mask containers. */
-  WeightedMaskContainerType m_FixedWeightedMaskContainer{ nullptr };
-  WeightedMaskContainerType m_MovingWeightedMaskContainer{ nullptr };
+  DataObjectContainerPointer m_FixedWeightedMaskContainer{ nullptr };
+  DataObjectContainerPointer m_MovingWeightedMaskContainer{ nullptr };
 };
 
 } // end namespace elastix
