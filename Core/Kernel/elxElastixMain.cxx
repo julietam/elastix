@@ -44,7 +44,6 @@ ElastixMain::ElastixMain() = default;
 
 ElastixMain::~ElastixMain() = default;
 
-
 /**
  * **************************** Run *****************************
  *
@@ -243,7 +242,6 @@ ElastixMain::RunWithInitialTransformParameterMaps(const ArgumentMapType &       
   return ElastixMain::Run();
 }
 
-
 /**
  * ************************** InitDBIndex ***********************
  *
@@ -431,7 +429,6 @@ ElastixMain::InitDBIndex()
 
 } // end InitDBIndex()
 
-
 /**
  * ********************* SetElastixLevel ************************
  */
@@ -444,7 +441,6 @@ ElastixMain::SetElastixLevel(unsigned int level)
   configuration.SetElastixLevel(level);
 
 } // end SetElastixLevel()
-
 
 /**
  * ********************* GetElastixLevel ************************
@@ -459,7 +455,6 @@ ElastixMain::GetElastixLevel() const
 
 } // end GetElastixLevel()
 
-
 /**
  * ********************* SetTotalNumberOfElastixLevels ************************
  */
@@ -472,7 +467,6 @@ ElastixMain::SetTotalNumberOfElastixLevels(unsigned int levels)
   configuration.SetTotalNumberOfElastixLevels(levels);
 
 } // end SetTotalNumberOfElastixLevels()
-
 
 /**
  * ********************* GetTotalNumberOfElastixLevels ************************
@@ -487,7 +481,6 @@ ElastixMain::GetTotalNumberOfElastixLevels() const
 
 } // end GetTotalNumberOfElastixLevels()
 
-
 /**
  * ******************** SetOriginalFixedImageDirectionFlat ********************
  */
@@ -497,7 +490,6 @@ ElastixMain::SetOriginalFixedImageDirectionFlat(const FlatDirectionCosinesType &
 {
   m_OriginalFixedImageDirectionFlat = arg;
 } // end SetOriginalFixedImageDirectionFlat()
-
 
 /**
  * ******************** GetOriginalFixedImageDirectionFlat ********************
@@ -509,7 +501,6 @@ ElastixMain::GetOriginalFixedImageDirectionFlat() const
   return m_OriginalFixedImageDirectionFlat;
 } // end GetOriginalFixedImageDirectionFlat()
 
-
 /**
  * ******************** GetTransformParameterMap ********************
  */
@@ -519,7 +510,6 @@ ElastixMain::GetTransformParameterMap() const
 {
   return m_TransformParameterMap;
 } // end GetTransformParameterMap()
-
 
 /**
  * ******************** GetImageInformationFromFile ********************
@@ -557,7 +547,6 @@ ElastixMain::GetImageInformationFromFile(const std::string & filename, ImageDime
   } // end if
 
 } // end GetImageInformationFromFile()
-
 
 /**
  * ******************** SetFixedWeightedMask ********************
