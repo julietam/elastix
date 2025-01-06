@@ -93,9 +93,6 @@ public:
 
   using WeightedMaskType = itk::Image<float, 3>;
 
-  /** Typedefs for weighted mask containers. */
-  using WeightedMaskContainerType = itk::VectorContainer<unsigned int, WeightedMaskType::Pointer>;
-  using WeightedMaskContainerPointer = WeightedMaskContainerType::Pointer;
 
   /** Set/Get functions for the fixed images
    * (if these are not used, elastix tries to read them from disk,
@@ -120,15 +117,6 @@ public:
   /** Set/Get the moving weighted mask. */
   void SetMovingWeightedMask(const WeightedMaskType::Pointer & movingWeightedMask);
   WeightedMaskType::Pointer GetMovingWeightedMask() const;
-
-  /** Set/Get functions for the weighted mask containers. */
-  void SetFixedWeightedMaskContainer(const WeightedMaskContainerType & fixedWeightedMaskContainer);
-  WeightedMaskContainerType & GetModifiableFixedWeightedMaskContainer();
-  const WeightedMaskContainerType & GetFixedWeightedMaskContainer() const;
-
-  void SetMovingWeightedMaskContainer(const WeightedMaskContainerType & movingWeightedMaskContainer);
-  WeightedMaskContainerType & GetModifiableMovingWeightedMaskContainer();
-  const WeightedMaskContainerType & GetMovingWeightedMaskContainer() const;
 
   itkSetConstObjectMacro(FixedPoints, itk::Object);
   itkSetConstObjectMacro(MovingPoints, itk::Object);

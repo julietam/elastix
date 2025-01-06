@@ -395,13 +395,7 @@ public:
     m_IterationInfo.AddNewTargetCell(name);
   }
 
-  /** Set the fixed weighted mask container. */
-  void SetFixedWeightedMaskContainer(const DataObjectContainerType * fixedWeightedMaskContainer);
-
-  /** Set the moving weighted mask container. */
-  void SetMovingWeightedMaskContainer(const DataObjectContainerType * movingWeightedMaskContainer);
-
-  
+ 
 protected:
   ElastixBase();
   ~ElastixBase() override = default;

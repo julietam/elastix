@@ -387,8 +387,6 @@ ElastixRegistrationMethod<TFixedImage, TMovingImage>::GenerateData()
                            movingInternalImageContainers));
     elastixMain->SetFixedMaskContainer(registrationData.fixedMaskContainer);
     elastixMain->SetMovingMaskContainer(registrationData.movingMaskContainer);
-    elastixMain->SetFixedWeightedMaskContainer(registrationData.fixedWeightedMaskContainer);
-    elastixMain->SetMovingWeightedMaskContainer(registrationData.movingWeightedMaskContainer);
     elastixMain->SetFixedPoints(m_FixedPoints);
     elastixMain->SetMovingPoints(m_MovingPoints);
     elastixMain->SetResultImageContainer(registrationData.resultImageContainer);
