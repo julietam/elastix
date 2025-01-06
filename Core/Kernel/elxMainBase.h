@@ -236,6 +236,10 @@ protected:
 private:
   /** The configuration object, containing the parameters and command-line arguments. */
   Configuration::Pointer m_Configuration{ Configuration::New() };
+
+  /** The fixed weighted masks. */
+  WeightedMaskType::Pointer m_FixedWeightedMask{ nullptr };
+  WeightedMaskType::Pointer m_MovingWeightedMask{ nullptr };
 };
 
 } // end namespace elastix
