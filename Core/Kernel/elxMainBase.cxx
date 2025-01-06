@@ -43,8 +43,8 @@ namespace elastix
  */
 
 MainBase::MainBase()
-  : m_Additional3DImage1(ImageType3D::New())
-  , m_Additional3DImage2(ImageType3D::New())
+  : m_Additional3DImage1(nullptr)
+  , m_Additional3DImage2(nullptr)
 {
 }
 
