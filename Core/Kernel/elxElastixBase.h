@@ -389,6 +389,9 @@ public:
     m_IterationInfo.AddNewTargetCell(name);
   }
 
+  elxSetObjectMacro(WeightedFixedMaskContainer, DataObjectContainerType);
+  elxGetObjectMacro(WeightedFixedMaskContainer, DataObjectContainerType);
+
 protected:
   ElastixBase();
   ~ElastixBase() override = default;
