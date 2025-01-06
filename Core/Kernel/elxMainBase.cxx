@@ -42,11 +42,7 @@ namespace elastix
  * ********************* Constructor ****************************
  */
 
-MainBase::MainBase()
-  : m_Additional3DImage1(nullptr)
-  , m_Additional3DImage2(nullptr)
-{
-}
+MainBase::MainBase() = default;
 
 /**
  * ****************** GetComponentDatabase *********

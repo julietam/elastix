@@ -26,7 +26,6 @@
 
 // ITK header files:
 #include <itkTimeProbe.h>
-#include <itkImageFileReader.h>
 #include <itksys/SystemInformation.hxx>
 #include <itksys/SystemTools.hxx>
 
@@ -68,9 +67,7 @@ constexpr const char * elastixHelpText =
   "  -loglevel set the log level to \"off\", \"error\", \"warning\", or \"info\" (default),\n"
   "  -priority set the process priority to high, abovenormal, normal (default),\n"
   "            belownormal, or idle (Windows only option)\n"
-  "  -threads  set the maximum number of threads of elastix\n"
-  "  -additional3DImage1  additional 3D image 1\n"
-  "  -additional3DImage2  additional 3D image 2\n\n"
+  "  -threads  set the maximum number of threads of elastix\n\n"
 
   /** The parameter file.*/
   "The parameter-file must contain all the information "
@@ -139,8 +136,6 @@ main(int argc, char ** argv)
     std::queue<std::string> parameterFileList;
     std::string             outFolder;
     auto                    level = elx::log::level::info;
-    std::string             additional3DImage1;
-    std::string             additional3DImage2;
 
     /** Put command line parameters into parameterFileList. */
     for (unsigned int i = 1; static_cast<long>(i) < (argc - 1); i += 2)
@@ -168,14 +163,6 @@ main(int argc, char ** argv)
             // Unsupported log level value.
             return EXIT_FAILURE;
           }
-        }
-        else if (key == "-additional3DImage1")
-        {
-          additional3DImage1 = value;
-        }
-        else if (key == "-additional3DImage2")
-        {
-          additional3DImage2 = value;
         }
         else
         {

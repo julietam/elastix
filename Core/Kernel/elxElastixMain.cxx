@@ -32,7 +32,7 @@ using itk::Deref;
  * ********************* Constructor ****************************
  */
 
-ElastixMain::ElastixMain() = default;
+ElastixMain::ElastixMain() : m_WeightedFixedMaskContainer(DataObjectContainerType::New()) {}
 
 /**
  * ********************** Destructor ****************************
@@ -164,6 +164,8 @@ ElastixMain::Run()
    * UseDirectionCosines parameter was set to false.
    */
   elastixBase.SetOriginalFixedImageDirectionFlat(this->GetOriginalFixedImageDirectionFlat());
+
+  elastixBase.SetWeightedFixedMaskContainer(this->GetModifiableWeightedFixedMaskContainer());
 
   /** Run elastix! */
   try

@@ -98,6 +98,9 @@ public:
   itkGetModifiableObjectMacro(FixedMaskContainer, DataObjectContainerType);
   itkGetModifiableObjectMacro(MovingMaskContainer, DataObjectContainerType);
 
+  itkSetObjectMacro(WeightedFixedMaskContainer, DataObjectContainerType);
+  itkGetModifiableObjectMacro(WeightedFixedMaskContainer, DataObjectContainerType);
+
   itkSetConstObjectMacro(FixedPoints, itk::Object);
   itkSetConstObjectMacro(MovingPoints, itk::Object);
 
@@ -177,6 +180,7 @@ private:
   DataObjectContainerPointer m_FixedMaskContainer{ nullptr };
   DataObjectContainerPointer m_MovingMaskContainer{ nullptr };
   DataObjectContainerPointer m_ResultImageContainer{ nullptr };
+  DataObjectContainerPointer m_WeightedFixedMaskContainer{ nullptr };
 
   itk::SmartPointer<const itk::Object> m_FixedPoints{ nullptr };
   itk::SmartPointer<const itk::Object> m_MovingPoints{ nullptr };
