@@ -109,6 +109,14 @@ public:
   itkSetObjectMacro(ResultDeformationFieldContainer, DataObjectContainerType);
   itkGetModifiableObjectMacro(ResultDeformationFieldContainer, DataObjectContainerType);
 
+  using ImageType3D = itk::Image<float, 3>;
+  using ImageType3DPointer = ImageType3D::Pointer;
+
+  itkSetObjectMacro(Additional3DImage1, ImageType3D);
+  itkGetModifiableObjectMacro(Additional3DImage1, ImageType3D);
+  itkSetObjectMacro(Additional3DImage2, ImageType3D);
+  itkGetModifiableObjectMacro(Additional3DImage2, ImageType3D);
+
   /** Set/Get the configuration object. */
   itkSetObjectMacro(Configuration, Configuration);
   itkGetModifiableObjectMacro(Configuration, Configuration);
@@ -188,6 +196,8 @@ protected:
   DataObjectContainerPointer m_MovingImageContainer{ nullptr };
   DataObjectContainerPointer m_ResultImageContainer{ nullptr };
   DataObjectContainerPointer m_ResultDeformationFieldContainer{ nullptr };
+  ImageType3DPointer m_Additional3DImage1{ nullptr };
+  ImageType3DPointer m_Additional3DImage2{ nullptr };
 
   /** InitDBIndex sets m_DBIndex by asking the ImageTypes
    * from the Configuration object and obtaining the corresponding

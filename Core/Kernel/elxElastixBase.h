@@ -389,6 +389,14 @@ public:
     m_IterationInfo.AddNewTargetCell(name);
   }
 
+  using ImageType3D = itk::Image<float, 3>;
+  using ImageType3DPointer = ImageType3D::Pointer;
+
+  elxSetObjectMacro(Additional3DImage1, ImageType3D);
+  elxGetObjectMacro(Additional3DImage1, ImageType3D);
+  elxSetObjectMacro(Additional3DImage2, ImageType3D);
+  elxGetObjectMacro(Additional3DImage2, ImageType3D);
+
 protected:
   ElastixBase();
   ~ElastixBase() override = default;
@@ -540,6 +548,12 @@ private:
    * From Elastix 4.3 to 4.7: Ignore direction cosines by default, for
    * backward compatability. From Elastix 4.8: set it to true by default. */
   bool m_UseDirectionCosines{ true };
+
+  DataObjectContainerPointer m_Additional3DImage1{ nullptr };
+  DataObjectContainerPointer m_Additional3DImage2{ nullptr };
+
+  ImageType3DPointer m_Additional3DImage1{ nullptr };
+  ImageType3DPointer m_Additional3DImage2{ nullptr };
 };
 
 } // end namespace elastix

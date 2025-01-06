@@ -147,6 +147,8 @@ TransformixMain::RunWithTransform(itk::TransformBase * const transform)
    * ElastixTemplate will try to load them from disk.
    */
   elastixBase.SetMovingImageContainer(this->GetModifiableMovingImageContainer());
+  elastixBase.SetAdditional3DImage1(this->GetModifiableAdditional3DImage1());
+  elastixBase.SetAdditional3DImage2(this->GetModifiableAdditional3DImage2());
 
   /** ApplyTransform! */
   try
