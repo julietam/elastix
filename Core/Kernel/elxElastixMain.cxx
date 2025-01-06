@@ -153,6 +153,7 @@ ElastixMain::Run()
   elastixBase.SetFixedMaskContainer(this->GetModifiableFixedMaskContainer());
   elastixBase.SetMovingMaskContainer(this->GetModifiableMovingMaskContainer());
   elastixBase.SetResultImageContainer(this->GetModifiableResultImageContainer());
+  elastixBase.SetWeightedFixedMaskContainer(this->GetModifiableWeightedFixedMaskContainer());
 
   elastixBase.SetFixedPoints(m_FixedPoints);
   elastixBase.SetMovingPoints(m_MovingPoints);
