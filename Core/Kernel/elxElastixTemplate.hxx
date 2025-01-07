@@ -188,15 +188,15 @@ ElastixTemplate<TFixedImage, TMovingImage>::Run()
     this->SetMovingMaskContainer(MultipleImageLoader<MovingMaskType>::GenerateImageContainer(
       this->GetMovingMaskFileNameContainer(), "Moving Mask", useDirCos));
   }
+  if (this->GetWeightedFixedMask() == nullptr)
+  {
+    this->SetWeightedFixedMaskContainer(MultipleImageLoader<FixedMaskType>::GenerateImageContainer(
+      this->GetWeightedFixedMaskFileNameContainer(), "Weighted Fixed Mask", useDirCos));
+  }
 
   /** Print the time spent on reading images. */
   ElastixBase::m_Timer0.Stop();
   log::info(std::ostringstream{} << "Reading images took "
-                                 << static_cast<unsigned long>(ElastixBase::m_Timer0.GetMean() * 1000) << " ms.\n");
-
-  /** Give all components the opportunity to do some initialization. */
-  this->BeforeRegistration();
-
   /** START! */
   try
   {

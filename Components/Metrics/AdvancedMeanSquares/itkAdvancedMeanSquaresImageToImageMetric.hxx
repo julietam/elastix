@@ -180,7 +180,14 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
 
       /** The difference squared. */
       const RealType diff = movingImageValue - fixedImageValue;
-      measure += diff * diff;
+      double weight = 1.0;
+      if (m_WeightedMask)
+      {
+        // Apply the weighted mask as an attention map
+        const auto index = fixedImageSample.m_ImageIndex;
+        weight = m_WeightedMask->GetPixel(index);
+      }
+      measure += weight * diff * diff;
 
     } // end if sampleOk
 
@@ -302,7 +309,14 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
 
       /** The difference squared. */
       const RealType diff = movingImageValue - fixedImageValue;
-      measure += diff * diff;
+      double weight = 1.0;
+      if (m_WeightedMask)
+      {
+        // Apply the weighted mask as an attention map
+        const auto index = threader_fiter->m_ImageIndex;
+        weight = m_WeightedMask->GetPixel(index);
+      }
+      measure += weight * diff * diff;
 
     } // end if sampleOk
 
@@ -692,10 +706,17 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
 {
   /** The difference squared. */
   const RealType diff = movingImageValue - fixedImageValue;
-  measure += diff * diff;
+  double weight = 1.0;
+  if (m_WeightedMask)
+  {
+    // Apply the weighted mask as an attention map
+    const auto index = fixedImageSample.m_ImageIndex;
+    weight = m_WeightedMask->GetPixel(index);
+  }
+  measure += weight * diff * diff;
 
   /** Calculate the contributions to the derivatives with respect to each parameter. */
-  const RealType diff_2 = diff * 2.0;
+  const RealType diff_2 = diff * 2.0 * weight;
 
   const auto numberOfParameters = this->GetNumberOfParameters();
 
