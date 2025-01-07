@@ -93,7 +93,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
     this->m_NormalizationFactor = 1.0;
     if (maxdiff > 1e-10)
     {
-      this->m_NormalizationFactor = 100.0 / maxdiff / maxdiff;
+      this->m_NormalizationFactor = 1.0 / maxdiff / maxdiff;
     }
   }
   else
@@ -110,6 +110,9 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
 
 template <typename TFixedImage, typename TMovingImage>
 void
+AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::PrintSelf(std::ostream & os, Indent indent) const
+{
+  Superclass::PrintSelf(os, indent);
 AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
@@ -713,6 +716,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
     // Apply the weighted mask as an attention map
     weight = m_WeightedMask->GetPixel(fixedImageIndex);
   }
+
   measure += weight * diff * diff;
 
   /** Calculate the contributions to the derivatives with respect to each parameter. */
@@ -744,6 +748,9 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
 } // end UpdateValueAndDerivativeTerms()
 
 
+
 } // end namespace itk
+
+#endif // end #ifndef _itkAdvancedMeanSquaresImageToImageMetric_hxx
 
 #endif // end #ifndef _itkAdvancedMeanSquaresImageToImageMetric_hxx
