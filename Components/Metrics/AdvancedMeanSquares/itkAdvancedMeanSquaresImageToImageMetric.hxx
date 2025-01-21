@@ -703,7 +703,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   const NonZeroJacobianIndicesType & nzji,
   MeasureType &                      measure,
   DerivativeType &                   deriv,
-  const typename FixedImageType::IndexType & index) const
+  const typename FixedImageType::IndexType & fixedImageIndex) const
 {
   /** The difference squared. */
   const RealType diff = movingImageValue - fixedImageValue;
@@ -711,7 +711,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   if (m_WeightedMask)
   {
     // Apply the weighted mask as an attention map
-    weight = m_WeightedMask->GetPixel(index);
+    weight = m_WeightedMask->GetPixel(fixedImageIndex);
   }
   measure += weight * diff * diff;
 
@@ -737,8 +737,8 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
     /** Only pick the nonzero Jacobians. */
     for (unsigned int i = 0; i < imageJacobian.GetSize(); ++i)
     {
-      const unsigned int index = nzji[i];
-      deriv[index] += diff_2 * imageJacobian[i];
+      const unsigned int localIndex = nzji[i];
+      deriv[localIndex] += diff_2 * imageJacobian[i];
     }
   }
 } // end UpdateValueAndDerivativeTerms()

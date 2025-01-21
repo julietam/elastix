@@ -21,6 +21,7 @@
 #include "elxAdvancedMeanSquaresMetric.h"
 #include "itkTimeProbe.h"
 #include <itkDeref.h>
+#include "itkAdvancedMeanSquaresImageToImageMetric.h"
 
 namespace elastix
 {
@@ -67,15 +68,15 @@ AdvancedMeanSquaresMetric<TElastix>::BeforeEachResolution()
 template <typename TElastix>
 void
 AdvancedMeanSquaresMetric<TElastix>::UpdateValueAndDerivativeTerms(
-  const RealType                     fixedImageValue,
-  const RealType                     movingImageValue,
-  const DerivativeType &             imageJacobian,
-  const NonZeroJacobianIndicesType & nzji,
-  MeasureType &                      measure,
-  DerivativeType &                   deriv,
-  const typename FixedImageType::IndexType & index) const
+  typename AdvancedMeanSquaresMetric<TElastix>::Superclass1::RealType value,
+  typename AdvancedMeanSquaresMetric<TElastix>::Superclass1::RealType derivative,
+  const typename AdvancedMeanSquaresMetric<TElastix>::Superclass1::DerivativeType & derivativeType,
+  const typename AdvancedMeanSquaresMetric<TElastix>::Superclass1::NonZeroJacobianIndicesType & nzji,
+  typename AdvancedMeanSquaresMetric<TElastix>::Superclass1::MeasureType & measure,
+  typename AdvancedMeanSquaresMetric<TElastix>::Superclass1::DerivativeType & derivativeResult,
+  const typename AdvancedMeanSquaresMetric<TElastix>::Superclass1::FixedImageType::IndexType & index) const
 {
-  this->Superclass1::UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, deriv, index);
+  this->Superclass1::UpdateValueAndDerivativeTerms(value, derivative, derivativeType, nzji, measure, derivativeResult, index);
 }
 
 } // end namespace elastix
