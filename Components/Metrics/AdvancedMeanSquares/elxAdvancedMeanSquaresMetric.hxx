@@ -64,6 +64,20 @@ AdvancedMeanSquaresMetric<TElastix>::BeforeEachResolution()
 } // end BeforeEachResolution()
 
 
+template <typename TElastix>
+void
+AdvancedMeanSquaresMetric<TElastix>::UpdateValueAndDerivativeTerms(
+  const RealType                     fixedImageValue,
+  const RealType                     movingImageValue,
+  const DerivativeType &             imageJacobian,
+  const NonZeroJacobianIndicesType & nzji,
+  MeasureType &                      measure,
+  DerivativeType &                   deriv,
+  const typename FixedImageType::IndexType & index) const
+{
+  this->Superclass1::UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, deriv, index);
+}
+
 } // end namespace elastix
 
 #endif // end #ifndef elxAdvancedMeanSquaresMetric_hxx

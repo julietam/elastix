@@ -476,7 +476,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueAndDer
 #endif
 
       /** Compute this pixel's contribution to the measure and derivatives. */
-      this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative);
+      this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative, fixedImageSample.m_ImageIndex);
 
     } // end if sampleOk
 
@@ -626,7 +626,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
 #endif
 
       /** Compute this pixel's contribution to the measure and derivatives. */
-      this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative);
+      this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative, threader_fiter->m_ImageIndex);
 
     } // end if sampleOk
 
@@ -702,7 +702,8 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   const DerivativeType &             imageJacobian,
   const NonZeroJacobianIndicesType & nzji,
   MeasureType &                      measure,
-  DerivativeType &                   deriv) const
+  DerivativeType &                   deriv,
+  const typename FixedImageType::IndexType & index) const
 {
   /** The difference squared. */
   const RealType diff = movingImageValue - fixedImageValue;
@@ -710,7 +711,6 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   if (m_WeightedMask)
   {
     // Apply the weighted mask as an attention map
-    const auto index = fixedImageSample.m_ImageIndex;
     weight = m_WeightedMask->GetPixel(index);
   }
   measure += weight * diff * diff;
