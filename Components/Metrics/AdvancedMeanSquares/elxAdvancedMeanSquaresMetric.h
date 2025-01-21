@@ -139,6 +139,16 @@ protected:
   /** The destructor. */
   ~AdvancedMeanSquaresMetric() override = default;
 
+  void
+  UpdateValueAndDerivativeTerms(
+    typename Superclass1::RealType value,
+    typename Superclass1::RealType derivative,
+    const typename Superclass1::DerivativeType & derivativeType,
+    const typename Superclass1::NonZeroJacobianIndicesType & nzji,
+    typename Superclass1::MeasureType & measure,
+    typename Superclass1::DerivativeType & derivativeResult,
+    const typename Superclass1::FixedImageType::IndexType & index) const override;
+
 private:
   elxOverrideGetSelfMacro;
 };
