@@ -147,7 +147,7 @@ protected:
     const typename Superclass1::NonZeroJacobianIndicesType & nzji,
     typename Superclass1::MeasureType & measure,
     typename Superclass1::DerivativeType & derivativeResult,
-    const typename Superclass1::FixedImageType::IndexType & index) const override;
+    const typename Superclass1::FixedImageType::IndexType & index) const;
 
 private:
   elxOverrideGetSelfMacro;
