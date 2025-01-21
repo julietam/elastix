@@ -197,6 +197,11 @@ ElastixTemplate<TFixedImage, TMovingImage>::Run()
   /** Print the time spent on reading images. */
   ElastixBase::m_Timer0.Stop();
   log::info(std::ostringstream{} << "Reading images took "
+                                 << static_cast<unsigned long>(ElastixBase::m_Timer0.GetMean() * 1000) << " ms.\n");
+
+  /** Give all components the opportunity to do some initialization. */
+  this->BeforeRegistration();
+  
   /** START! */
   try
   {
