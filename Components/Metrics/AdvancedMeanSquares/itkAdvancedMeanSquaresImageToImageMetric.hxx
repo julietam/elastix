@@ -103,6 +103,16 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
     this->m_NormalizationFactor = 100.0;
   }
 
+  // Ensure the mask is considered in the calculations
+  if (this->GetFixedImageMask())
+  {
+    this->m_FixedImageMask = this->GetFixedImageMask();
+  }
+  if (this->GetMovingImageMask())
+  {
+    this->m_MovingImageMask = this->GetMovingImageMask();
+  }
+
 } // end Initialize()
 
 

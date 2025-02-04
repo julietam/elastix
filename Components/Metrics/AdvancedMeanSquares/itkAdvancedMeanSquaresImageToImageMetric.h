@@ -208,6 +208,8 @@ private:
   double m_NormalizationFactor{ 1.0 };
   bool   m_UseNormalization{ false };
   typename FixedImageType::Pointer m_WeightedMask;
+  typename FixedImageMaskType::Pointer m_FixedImageMask;
+  typename MovingImageMaskType::Pointer m_MovingImageMask;
 };
 
 } // end namespace itk
