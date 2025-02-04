@@ -117,6 +117,25 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
   if (this->GetWeightedMask())
   {
     this->m_WeightedMask = this->GetWeightedMask();
+
+    // Normalize the mask values to the range [0, 1]
+    itk::ImageRegionConstIterator<FixedImageType> maskIt(this->m_WeightedMask, this->m_WeightedMask->GetRequestedRegion());
+    double maxMaskValue = 0.0;
+    for (maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
+    {
+      if (maskIt.Get() > maxMaskValue)
+      {
+        maxMaskValue = maskIt.Get();
+      }
+    }
+    if (maxMaskValue > 0.0)
+    {
+      itk::ImageRegionIterator<FixedImageType> normMaskIt(this->m_WeightedMask, this->m_WeightedMask->GetRequestedRegion());
+      for (normMaskIt.GoToBegin(); !normMaskIt.IsAtEnd(); ++normMaskIt)
+      {
+        normMaskIt.Set(normMaskIt.Get() / maxMaskValue);
+      }
+    }
   }
 
 } // end Initialize()
