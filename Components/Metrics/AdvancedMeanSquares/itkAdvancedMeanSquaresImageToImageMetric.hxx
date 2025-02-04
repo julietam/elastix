@@ -136,6 +136,24 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
         normMaskIt.Set(normMaskIt.Get() / maxMaskValue);
       }
     }
+
+    // Log the mask size and intensity values
+    const auto region = this->m_WeightedMask->GetLargestPossibleRegion();
+    const auto size = region.GetSize();
+    std::cout << "Weighted mask size: " << size << std::endl;
+
+    // Log some intensity values
+    itk::ImageRegionConstIterator<FixedImageType> maskIt(this->m_WeightedMask, region);
+    std::cout << "Weighted mask intensity values:" << std::endl;
+    for (maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
+    {
+      std::cout << maskIt.Get() << " ";
+    }
+    std::cout << std::endl;
+  }
+  else
+  {
+    std::cout << "No weighted mask provided." << std::endl;
   }
 
 } // end Initialize()
