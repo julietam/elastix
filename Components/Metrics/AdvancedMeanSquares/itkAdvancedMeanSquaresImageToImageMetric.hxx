@@ -86,25 +86,21 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
     const double diff2 = Superclass::m_MovingImageTrueMax - Superclass::m_FixedImageTrueMin;
     const double maxdiff = std::max(diff1, diff2);
 
-    /** We guess that maxdiff/10 is the maximum average difference that will
-     * be observed.
-     * \todo We may involve the standard derivation of the image into this estimate.
-     */
-    this->m_NormalizationFactor = 1.0;
+    this->m_NormalizationFactor = 100.0;
     if (maxdiff > 1e-10)
     {
-      this->m_NormalizationFactor = 1.0 / maxdiff / maxdiff;
+      this->m_NormalizationFactor = 100.0 / maxdiff / maxdiff;
     }
   }
   else
   {
-    this->m_NormalizationFactor = 1.0;
+    this->m_NormalizationFactor = 100.0;
   }
 
   // Apply normalization factor based on the presence of a mask
   if (this->GetFixedImageMask() || this->GetMovingImageMask())
   {
-    this->m_NormalizationFactor = 1.0;
+    this->m_NormalizationFactor = 100.0;
   }
 
 } // end Initialize()
