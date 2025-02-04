@@ -1153,7 +1153,7 @@ ElastixTemplate<TFixedImage, TMovingImage>::SetOriginalFixedImageDirection(const
   ElastixBase::m_OriginalFixedImageDirectionFlat.resize(FixedDimension * FixedDimension);
   for (unsigned int i = 0; i < FixedDimension; ++i)
   {
-    for (unsigned int j = 0; j < FixedDimension; ++j)
+    for (unsigned int j = 0; i < FixedDimension; ++j)
     {
       ElastixBase::m_OriginalFixedImageDirectionFlat[i * FixedDimension + j] = arg(j, i);
     }

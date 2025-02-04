@@ -770,6 +770,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   {
     // Apply the weighted mask as an attention map
     weight = m_WeightedMask->GetPixel(fixedImageIndex);
+    std::cout << "Applying mask value at index " << fixedImageIndex << ": " << weight << std::endl;
   }
 
   measure += weight * diff * diff;
