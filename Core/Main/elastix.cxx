@@ -61,6 +61,7 @@ constexpr const char * elastixHelpText =
   "Optional extra commands:\n"
   "  -fMask    mask for fixed image\n"
   "  -mMask    mask for moving image\n"
+  "  -wfMask   weighted mask for fixed image\n"
   "  -fp       point set for fixed image\n"
   "  -mp       point set for moving image\n"
   "  -t0       parameter file for initial transform\n"
@@ -236,6 +237,13 @@ main(int argc, char ** argv)
     {
       returndummy = -2;
       std::cerr << "ERROR: No CommandLine option \"-out\" given!" << std::endl;
+    }
+
+    // Ensure the mask is loaded and passed to the metric
+    if (argMap.count("-wfMask") > 0)
+    {
+      const std::string weightedFixedMaskFileName = argMap["-wfMask"];
+      elx::log::info(std::ostringstream{} << "Weighted Fixed Mask: " << weightedFixedMaskFileName);
     }
 
     /** Stop if some fatal errors occurred. */

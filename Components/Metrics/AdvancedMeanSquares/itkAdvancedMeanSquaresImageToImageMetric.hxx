@@ -113,6 +113,12 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
     this->m_MovingImageMask = this->GetMovingImageMask();
   }
 
+  // Ensure the weighted mask is considered in the calculations
+  if (this->GetWeightedMask())
+  {
+    this->m_WeightedMask = this->GetWeightedMask();
+  }
+
 } // end Initialize()
 
 
