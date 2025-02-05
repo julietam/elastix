@@ -137,9 +137,10 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
       }
     }
 
-    // Log the mask size and intensity values
+    // Log the mask type and size
     const auto region = this->m_WeightedMask->GetLargestPossibleRegion();
     const auto size = region.GetSize();
+    std::cout << "Weighted mask type: " << typeid(this->m_WeightedMask).name() << std::endl;
     std::cout << "Weighted mask size: " << size << std::endl;
 
     // Log some intensity values
@@ -791,4 +792,22 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
       ++imjacit;
       ++derivit;
     }
-  }  else  {    /** Only pick the nonzero Jacobians. */    for (unsigned int i = 0; i < imageJacobian.GetSize(); ++i)    {      const unsigned int localIndex = nzji[i];      deriv[localIndex] += diff_2 * imageJacobian[i];    }  }} // end UpdateValueAndDerivativeTerms()} // end namespace itk#endif // end #ifndef _itkAdvancedMeanSquaresImageToImageMetric_hxx#endif // end #ifndef _itkAdvancedMeanSquaresImageToImageMetric_hxx
+  }
+  else
+  {
+    /** Only pick the nonzero Jacobians. */
+    for (unsigned int i = 0; i < imageJacobian.GetSize(); ++i)
+    {
+      const unsigned int localIndex = nzji[i];
+      deriv[localIndex] += diff_2 * imageJacobian[i];
+    }
+  }
+} // end UpdateValueAndDerivativeTerms()
+
+
+
+} // end namespace itk
+
+#endif // end #ifndef _itkAdvancedMeanSquaresImageToImageMetric_hxx
+
+#endif // end #ifndef _itkAdvancedMeanSquaresImageToImageMetric_hxx

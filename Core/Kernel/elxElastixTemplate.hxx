@@ -203,6 +203,7 @@ ElastixTemplate<TFixedImage, TMovingImage>::Run()
     {
       const auto region = mask->GetLargestPossibleRegion();
       const auto size = region.GetSize();
+      log::info(std::ostringstream{} << "Mask type: " << typeid(mask).name());
       log::info(std::ostringstream{} << "Mask size: " << size);
 
       // Log some intensity values
