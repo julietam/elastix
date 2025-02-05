@@ -213,6 +213,34 @@ ElastixBase::BeforeAllBase()
     {
       log::info("-wfMask    unspecified, so no weighted fixed mask used");
     }
+    else
+    {
+      // Log the mask type and size
+      if (m_WeightedFixedMaskFileNameContainer && !m_WeightedFixedMaskFileNameContainer->empty())
+      {
+        log::info(std::ostringstream{} << "Using weighted fixed mask: " << m_WeightedFixedMaskFileNameContainer->ElementAt(0));
+        const auto mask = m_WeightedFixedMaskContainer->ElementAt(0);
+        if (mask)
+        {
+          const auto region = mask->GetLargestPossibleRegion();
+          const auto size = region.GetSize();
+          log::info(std::ostringstream{} << "Mask type: " << typeid(mask).name());
+          log::info(std::ostringstream{} << "Mask size: " << size);
+
+          // Log some intensity values
+          itk::ImageRegionConstIterator<FixedMaskType> maskIt(mask, region);
+          log::info("Mask intensity values:");
+          for (maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
+          {
+            log::info(std::ostringstream{} << maskIt.Get() << " ");
+          }
+        }
+        else
+        {
+          log::info("Mask is not loaded correctly.");
+        }
+      }
+    }
   }
 
   /** Check for appearance of "-out". */
