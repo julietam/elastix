@@ -791,22 +791,4 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
       ++imjacit;
       ++derivit;
     }
-  }
-  else
-  {
-    /** Only pick the nonzero Jacobians. */
-    for (unsigned int i = 0; i < imageJacobian.GetSize(); ++i)
-    {
-      const unsigned int localIndex = nzji[i];
-      deriv[localIndex] += diff_2 * imageJacobian[i];
-    }
-  }
-} // end UpdateValueAndDerivativeTerms()
-
-
-
-} // end namespace itk
-
-#endif // end #ifndef _itkAdvancedMeanSquaresImageToImageMetric_hxx
-
-#endif // end #ifndef _itkAdvancedMeanSquaresImageToImageMetric_hxx
+  }  else  {    /** Only pick the nonzero Jacobians. */    for (unsigned int i = 0; i < imageJacobian.GetSize(); ++i)    {      const unsigned int localIndex = nzji[i];      deriv[localIndex] += diff_2 * imageJacobian[i];    }  }} // end UpdateValueAndDerivativeTerms()} // end namespace itk#endif // end #ifndef _itkAdvancedMeanSquaresImageToImageMetric_hxx#endif // end #ifndef _itkAdvancedMeanSquaresImageToImageMetric_hxx
