@@ -32,7 +32,9 @@ using itk::Deref;
  * ********************* Constructor ****************************
  */
 
-ElastixMain::ElastixMain() : m_WeightedFixedMaskContainer(DataObjectContainerType::New()) {}
+ElastixMain::ElastixMain()
+  : m_WeightedFixedMaskContainer(DataObjectContainerType::New())
+{}
 
 /**
  * ********************** Destructor ****************************

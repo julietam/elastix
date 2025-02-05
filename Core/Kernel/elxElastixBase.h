@@ -545,7 +545,7 @@ private:
   bool m_UseDirectionCosines{ true };
 
   DataObjectContainerPointer m_WeightedFixedMaskContainer{ DataObjectContainerType::New() };
-  FileNameContainerPointer m_WeightedFixedMaskFileNameContainer{ FileNameContainerType::New() };
+  FileNameContainerPointer   m_WeightedFixedMaskFileNameContainer{ FileNameContainerType::New() };
 };
 
 } // end namespace elastix

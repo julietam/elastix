@@ -129,7 +129,9 @@ GenerateFileNameContainer(const Configuration & configuration,
  * ********************* Constructor ****************************
  */
 
-ElastixBase::ElastixBase() : m_WeightedFixedMaskContainer(DataObjectContainerType::New()) {}
+ElastixBase::ElastixBase()
+  : m_WeightedFixedMaskContainer(DataObjectContainerType::New())
+{}
 
 /**
  * ********************* GenerateDataObjectContainer ***********************
@@ -208,7 +210,8 @@ ElastixBase::BeforeAllBase()
       log::info("-mMask    unspecified, so no moving mask used");
     }
     maskreturndummy = 0;
-    m_WeightedFixedMaskFileNameContainer = GenerateFileNameContainer(*m_Configuration, "-wfMask", maskreturndummy, false, true);
+    m_WeightedFixedMaskFileNameContainer =
+      GenerateFileNameContainer(*m_Configuration, "-wfMask", maskreturndummy, false, true);
     if (maskreturndummy != 0)
     {
       log::info("-wfMask    unspecified, so no weighted fixed mask used");
