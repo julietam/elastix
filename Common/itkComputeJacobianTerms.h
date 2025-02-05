@@ -52,10 +52,8 @@ public:
   itkOverrideGetNameOfClassMacro(ComputeJacobianTerms);
 
   /** typedef  */
-  using FixedImageType = TFixedImage;
-  using TransformType = TTransform;
-  using TransformPointer = typename TransformType::Pointer;
-  using FixedImageRegionType = typename FixedImageType::RegionType;
+  using TransformPointer = typename TTransform::Pointer;
+  using FixedImageRegionType = typename TFixedImage::RegionType;
 
   /** Type for the mask of the fixed image. Only pixels that are "inside"
    * this mask will be considered for the computation of the Jacobian terms.
@@ -65,16 +63,13 @@ public:
   using FixedImageMaskPointer = typename FixedImageMaskType::Pointer;
   using FixedImageMaskConstPointer = typename FixedImageMaskType::ConstPointer;
 
-  using ScaledSingleValuedNonLinearOptimizerType = ScaledSingleValuedNonLinearOptimizer;
-  using ScaledCostFunctionPointer = typename ScaledSingleValuedNonLinearOptimizerType ::ScaledCostFunctionPointer;
-  using ScalesType = typename ScaledSingleValuedNonLinearOptimizerType::ScalesType;
-  using NonZeroJacobianIndicesType = typename TransformType::NonZeroJacobianIndicesType;
+  using ScalesType = ScaledSingleValuedNonLinearOptimizer::ScalesType;
 
   /** Set the fixed image. */
-  itkSetConstObjectMacro(FixedImage, FixedImageType);
+  itkSetConstObjectMacro(FixedImage, TFixedImage);
 
   /** Set the transform. */
-  itkSetObjectMacro(Transform, TransformType);
+  itkSetObjectMacro(Transform, TTransform);
 
   /** Set/Get the fixed image mask. */
   itkSetObjectMacro(FixedImageMask, FixedImageMaskType);
@@ -92,61 +87,49 @@ public:
   void
   SetFixedImageRegion(const FixedImageRegionType & region)
   {
-    if (region != this->m_FixedImageRegion)
-    {
-      this->m_FixedImageRegion = region;
-    }
+    m_FixedImageRegion = region;
   }
 
 
   /** Get the region over which the metric will be computed. */
   itkGetConstReferenceMacro(FixedImageRegion, FixedImageRegionType);
 
+  /** The terms returned by `Compute()`. */
+  struct Terms
+  {
+    double TrC;
+    double TrCC;
+    double maxJJ;
+    double maxJCJ;
+  };
+
   /** The main functions that performs the computation. */
-  virtual void
-  Compute(double & TrC, double & TrCC, double & maxJJ, double & maxJCJ);
+  Terms
+  Compute() const;
 
 protected:
   ComputeJacobianTerms() = default;
   ~ComputeJacobianTerms() override = default;
 
-  typename FixedImageType::ConstPointer m_FixedImage{ nullptr };
-  FixedImageRegionType                  m_FixedImageRegion{};
-  FixedImageMaskConstPointer            m_FixedImageMask{ nullptr };
-  TransformPointer                      m_Transform{ nullptr };
-  ScalesType                            m_Scales{};
-  bool                                  m_UseScales{ false };
-
-  unsigned int  m_MaxBandCovSize{ 0 };
-  unsigned int  m_NumberOfBandStructureSamples{ 0 };
-  SizeValueType m_NumberOfJacobianMeasurements{ 0 };
-
-  using FixedImageIndexType = typename FixedImageType::IndexType;
-  using FixedImagePointType = typename FixedImageType::PointType;
-  using JacobianType = typename TransformType::JacobianType;
-  using JacobianValueType = typename JacobianType::ValueType;
-
-  /** Samplers. */
-  using ImageSamplerBaseType = ImageSamplerBase<FixedImageType>;
-  using ImageSamplerBasePointer = typename ImageSamplerBaseType::Pointer;
-  using ImageRandomSamplerBaseType = ImageRandomSamplerBase<FixedImageType>;
-  using ImageRandomSamplerBasePointer = typename ImageRandomSamplerBaseType::Pointer;
-
-  using ImageGridSamplerType = ImageGridSampler<FixedImageType>;
-  using ImageGridSamplerPointer = typename ImageGridSamplerType::Pointer;
-  using ImageSampleContainerType = typename ImageGridSamplerType ::ImageSampleContainerType;
-  using ImageSampleContainerPointer = typename ImageSampleContainerType::Pointer;
-
-  /** Typedefs for support of sparse Jacobians and AdvancedTransforms. */
-  using TransformJacobianType = JacobianType;
-  using CoordinateRepresentationType = typename TransformType::ScalarType;
-  using NumberOfParametersType = typename TransformType::NumberOfParametersType;
+  using ImageSampleType = ImageSample<TFixedImage>;
 
   /** Sample the fixed image to compute the Jacobian terms. */
   // \todo: note that this is an exact copy of itk::ComputeDisplacementDistribution
   // in the future it would be better to refactoring this part of the code.
-  virtual void
-  SampleFixedImageForJacobianTerms(ImageSampleContainerPointer & sampleContainer);
+  std::vector<ImageSampleType>
+  SampleFixedImageForJacobianTerms() const;
+
+private:
+  typename TFixedImage::ConstPointer m_FixedImage{ nullptr };
+  FixedImageRegionType               m_FixedImageRegion{};
+  FixedImageMaskConstPointer         m_FixedImageMask{ nullptr };
+  TransformPointer                   m_Transform{ nullptr };
+  ScalesType                         m_Scales{};
+  bool                               m_UseScales{ false };
+
+  unsigned int  m_MaxBandCovSize{ 0 };
+  unsigned int  m_NumberOfBandStructureSamples{ 0 };
+  SizeValueType m_NumberOfJacobianMeasurements{ 0 };
 };
 
 } // end namespace itk

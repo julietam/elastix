@@ -64,14 +64,13 @@ public:
   using typename Superclass::ParametersType;
   using typename Superclass::DerivativeType;
   using typename Superclass::ScalesType;
-
   using typename Superclass::FixedImageMaskType;
   using typename Superclass::FixedImageMaskPointer;
   using typename Superclass::FixedImageMaskConstPointer;
   using typename Superclass::NonZeroJacobianIndicesType;
 
   // check
-  itkStaticConstMacro(FixedImageDimension, unsigned int, FixedImageType::ImageDimension);
+  itkStaticConstMacro(FixedImageDimension, unsigned int, TFixedImage::ImageDimension);
 
   /** Set/get kappa for regularization. */
   itkSetClampMacro(RegularizationKappa, double, 0.0, 1.0);
@@ -94,8 +93,8 @@ public:
   /** The main function that performs the computation.
    * The aims to be a generic function, working for all transformations.
    */
-  virtual void
-  Compute(const ParametersType & mu, double & maxJJ, ParametersType & preconditioner);
+  void
+  Compute(const ParametersType & mu, double & maxJJ, ParametersType & preconditioner) const;
 
   void
   ComputeJacobiTypePreconditioner(double & maxJJ, ParametersType & preconditioner);
@@ -112,16 +111,7 @@ protected:
   using typename Superclass::FixedImagePointType;
   using typename Superclass::JacobianType;
   using typename Superclass::JacobianValueType;
-  using typename Superclass::ImageSamplerBaseType;
-  using typename Superclass::ImageSamplerBasePointer;
-  using typename Superclass::ImageFullSamplerType;
-  using typename Superclass::ImageFullSamplerPointer;
-  using typename Superclass::ImageRandomSamplerBaseType;
-  using typename Superclass::ImageRandomSamplerBasePointer;
-  using typename Superclass::ImageGridSamplerType;
-  using typename Superclass::ImageGridSamplerPointer;
-  using typename Superclass::ImageSampleContainerType;
-  using typename Superclass::ImageSampleContainerPointer;
+  using typename Superclass::ImageSampleType;
   using typename Superclass::TransformJacobianType;
   using typename Superclass::CoordinateRepresentationType;
   using typename Superclass::NumberOfParametersType;

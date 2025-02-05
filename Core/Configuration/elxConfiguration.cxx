@@ -87,19 +87,32 @@ void
 Configuration::PrintParameterFile() const
 {
   /** Read what's in the parameter file. */
-  std::string params = m_ParameterFileParser->ReturnParameterFileAsString();
+  std::string params = itk::ParameterFileParser::ReturnParameterFileAsString(m_ParameterFileName);
 
   /** Separate clearly in log-file, before and after writing the parameter file. */
-  log::info_to_log_file(std::ostringstream{} << '\n'
-                                             << "=============== start of ParameterFile: "
-                                             << this->GetParameterFileName() << " ===============\n"
-                                             << params << '\n'
-                                             << "=============== end of ParameterFile: " << this->GetParameterFileName()
-                                             << " ===============\n");
+  log::info_to_log_file(std::ostringstream{}
+                        << '\n'
+                        << "=============== start of ParameterFile: " << m_ParameterFileName << " ===============\n"
+                        << params << '\n'
+                        << "=============== end of ParameterFile: " << m_ParameterFileName << " ===============\n");
 
 } // end PrintParameterFile()
 
 
+/**
+ * ******************** PrintParameterMap ***************************
+ */
+
+void
+Configuration::PrintParameterMap() const
+{
+  // Separate clearly in log-file, before and after writing the parameter map.
+  log::info_to_log_file(std::ostringstream{}
+                        << "\n=============== start of ParameterMap ===============\n"
+                        << Conversion::ParameterMapToString(m_ParameterMapInterface->GetParameterMap())
+                        << "\n=============== end of ParameterMap ===============\n");
+
+} // end PrintParameterMap()
 /**
  * ************************ BeforeAll ***************************
  */
@@ -107,7 +120,11 @@ Configuration::PrintParameterFile() const
 int
 Configuration::BeforeAll()
 {
-  if (!BaseComponent::IsElastixLibrary())
+  if (m_ParameterFileName.empty())
+  {
+    this->PrintParameterMap();
+  }
+  else
   {
     this->PrintParameterFile();
   }
@@ -160,12 +177,12 @@ Configuration::Initialize(const CommandLineArgumentMapType & _arg)
   if (!p.empty() && tp.empty())
   {
     /** elastix called Initialize(). */
-    this->SetParameterFileName(p);
+    m_ParameterFileName = p;
   }
   else if (p.empty() && !tp.empty())
   {
     /** transformix called Initialize(). */
-    this->SetParameterFileName(tp);
+    m_ParameterFileName = tp;
   }
   else if (p.empty() && tp.empty())
   {
@@ -181,12 +198,14 @@ Configuration::Initialize(const CommandLineArgumentMapType & _arg)
     return 1;
   }
 
+  const auto parameterFileParser = itk::ParameterFileParser::New();
+
   /** Read the ParameterFile. */
-  m_ParameterFileParser->SetParameterFileName(m_ParameterFileName);
+  parameterFileParser->SetParameterFileName(m_ParameterFileName);
   try
   {
     log::info("Reading the elastix parameters from file ...\n");
-    m_ParameterFileParser->ReadParameterFile();
+    parameterFileParser->ReadParameterFile();
   }
   catch (const itk::ExceptionObject & excp)
   {
@@ -196,7 +215,7 @@ Configuration::Initialize(const CommandLineArgumentMapType & _arg)
 
   /** Connect the parameter file reader to the interface. */
   m_ParameterMapInterface->SetParameterMap(
-    AddDataFromExternalTransformFile(m_ParameterFileName, m_ParameterFileParser->GetParameterMap()));
+    AddDataFromExternalTransformFile(m_ParameterFileName, parameterFileParser->GetParameterMap()));
 
   /** Silently check in the parameter file if error messages should be printed. */
   m_ParameterMapInterface->SetPrintErrorMessages(false);

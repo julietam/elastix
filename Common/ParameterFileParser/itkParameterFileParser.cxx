@@ -322,7 +322,7 @@ ParameterFileParser ::~ParameterFileParser() = default;
 const ParameterFileParser::ParameterMapType &
 ParameterFileParser::GetParameterMap() const
 {
-  return this->m_ParameterMap;
+  return m_ParameterMap;
 
 } // end GetParameterMap()
 
@@ -338,12 +338,12 @@ ParameterFileParser::ReadParameterFile()
   BasicFileChecking(m_ParameterFileName);
 
   /** Open the parameter file for reading. */
-  std::ifstream parameterFile(this->m_ParameterFileName);
+  std::ifstream parameterFile(m_ParameterFileName);
 
   /** Check if it opened. */
   if (!parameterFile.is_open())
   {
-    itkExceptionMacro("ERROR: could not open " << this->m_ParameterFileName << " for reading.");
+    itkExceptionMacro("ERROR: could not open " << m_ParameterFileName << " for reading.");
   }
 
   ReadParameterMapFromInputStream(m_ParameterMap, parameterFile);
@@ -356,18 +356,18 @@ ParameterFileParser::ReadParameterFile()
  */
 
 std::string
-ParameterFileParser::ReturnParameterFileAsString()
+ParameterFileParser::ReturnParameterFileAsString(const std::string & fileName)
 {
   /** Perform some basic checks. */
-  BasicFileChecking(m_ParameterFileName);
+  BasicFileChecking(fileName);
 
   /** Open the parameter file for reading. */
-  std::ifstream parameterFile(this->m_ParameterFileName);
+  std::ifstream parameterFile(fileName);
 
   /** Check if it opened. */
   if (!parameterFile.is_open())
   {
-    itkExceptionMacro("ERROR: could not open " << this->m_ParameterFileName << " for reading.");
+    itkGenericExceptionMacro("ERROR: could not open " << fileName << " for reading.");
   }
 
   /** Loop over the parameter file, line by line. */

@@ -768,12 +768,6 @@ AdaptiveStochasticVarianceReducedGradient<TElastix>::AutomaticParameterEstimatio
   /** Get the user input. */
   const double delta = this->GetMaximumStepLength();
 
-  /** Compute the Jacobian terms. */
-  double TrC = 0.0;
-  double TrCC = 0.0;
-  double maxJJ = 0.0;
-  double maxJCJ = 0.0;
-
   /** Get current position to start the parameter estimation. */
   this->GetRegistration()->GetAsITKBaseType()->GetModifiableTransform()->SetParameters(this->GetCurrentPosition());
 
@@ -787,7 +781,7 @@ AdaptiveStochasticVarianceReducedGradient<TElastix>::AutomaticParameterEstimatio
   }
 
   /** Construct computeJacobianTerms to initialize the parameter estimation. */
-  auto computeJacobianTerms = ComputeJacobianTermsType::New();
+  const auto computeJacobianTerms = itk::ComputeJacobianTerms<FixedImageType, TransformType>::New();
   computeJacobianTerms->SetFixedImage(testPtr->GetFixedImage());
   computeJacobianTerms->SetFixedImageRegion(testPtr->GetFixedImageRegion());
   computeJacobianTerms->SetFixedImageMask(testPtr->GetFixedImageMask());
@@ -811,7 +805,7 @@ AdaptiveStochasticVarianceReducedGradient<TElastix>::AutomaticParameterEstimatio
   /** Compute the Jacobian terms. */
   log::info("  Computing JacobianTerms ...");
   timer2.Start();
-  computeJacobianTerms->Compute(TrC, TrCC, maxJJ, maxJCJ);
+  const auto [TrC, TrCC, maxJJ, maxJCJ] = computeJacobianTerms->Compute();
   timer2.Stop();
   log::info(std::ostringstream{} << "  Computing the Jacobian terms took "
                                  << Conversion::SecondsToDHMS(timer2.GetMean(), 6));

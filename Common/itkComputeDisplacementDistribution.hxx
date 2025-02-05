@@ -44,19 +44,8 @@ namespace itk
 template <typename TFixedImage, typename TTransform>
 ComputeDisplacementDistribution<TFixedImage, TTransform>::ComputeDisplacementDistribution()
 {
-  this->m_FixedImage = nullptr;
-  this->m_FixedImageMask = nullptr;
-  this->m_Transform = nullptr;
-  this->m_FixedImageMask = nullptr;
-  this->m_NumberOfJacobianMeasurements = 0;
-  this->m_SampleContainer = nullptr;
-
-  /** Threading related variables. */
-  this->m_UseMultiThread = true;
-  this->m_Threader = MultiThreaderBase::New();
-
   /** Initialize the m_ThreaderParameters. */
-  this->m_ThreaderParameters.st_Self = this;
+  m_ThreaderParameters.st_Self = this;
 
 } // end Constructor
 
@@ -78,7 +67,7 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::InitializeThreadingPar
    * each iteration, in the accumulate functions, in a multi-threaded fashion.
    * This has performance benefits for larger vector sizes.
    */
-  const ThreadIdType numberOfThreads = this->m_Threader->GetNumberOfWorkUnits();
+  const ThreadIdType numberOfThreads = m_Threader->GetNumberOfWorkUnits();
 
   // For each thread, assign a struct of zero-initialized values.
   m_ComputePerThreadVariables.assign(numberOfThreads, AlignedComputePerThreadStruct());
@@ -107,36 +96,30 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::ComputeSingleThreaded(
   maxJJ = jacg = 0.0;
 
   /** Get samples. */
-  ImageSampleContainerPointer sampleContainer; // default-constructed (null)
-  this->SampleFixedImageForJacobianTerms(sampleContainer);
-  const SizeValueType nrofsamples = sampleContainer->Size();
+  const std::vector<ImageSampleType> samples = this->SampleFixedImageForJacobianTerms();
+  const SizeValueType                nrofsamples = samples.size();
 
   /** Get the number of parameters. */
-  const auto numberOfParameters = static_cast<unsigned int>(this->m_Transform->GetNumberOfParameters());
+  const auto numberOfParameters = static_cast<unsigned int>(m_Transform->GetNumberOfParameters());
 
   /** Get scales vector */
   const ScalesType & scales = this->GetScales();
-  this->m_ScaledCostFunction->SetScales(scales);
+  Superclass::m_ScaledCostFunction->SetScales(scales);
 
   /** Get the exact gradient. */
-  this->m_ExactGradient.set_size(numberOfParameters);
-  this->m_ExactGradient.Fill(0.0);
-  this->GetScaledDerivative(mu, this->m_ExactGradient);
+  m_ExactGradient.set_size(numberOfParameters);
+  m_ExactGradient.Fill(0.0);
+  this->GetScaledDerivative(mu, m_ExactGradient);
 
-  /** Get transform and set current position. */
-  const unsigned int outdim = this->m_Transform->GetOutputSpaceDimension();
+  static constexpr unsigned int outdim{ TTransform::OutputSpaceDimension };
 
   unsigned int samplenr = 0;
 
   /** Variables for nonzerojacobian indices and the Jacobian. */
-  const SizeValueType        sizejacind = this->m_Transform->GetNumberOfNonZeroJacobianIndices();
+  const SizeValueType        sizejacind = m_Transform->GetNumberOfNonZeroJacobianIndices();
   JacobianType               jacj(outdim, sizejacind, 0.0);
   NonZeroJacobianIndicesType jacind(sizejacind);
-  jacind[0] = 0;
-  if (sizejacind > 1)
-  {
-    jacind[1] = 0;
-  }
+  assert((sizejacind > 0) && (jacind.front() == 0));
 
   /**
    * Compute maxJJ and jac*gradient
@@ -151,11 +134,11 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::ComputeSingleThreaded(
   JacobianType jacjjacj(outdim, outdim);
 
   samplenr = 0;
-  for (const auto & sample : *sampleContainer)
+  for (const auto & sample : samples)
   {
     /** Read fixed coordinates and get Jacobian. */
     const FixedImagePointType & point = sample.m_ImageCoordinates;
-    this->m_Transform->GetJacobian(point, jacj, jacind);
+    m_Transform->GetJacobian(point, jacj, jacind);
 
     /** Apply scales, if necessary. */
     if (this->GetUseScales())
@@ -184,7 +167,7 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::ComputeSingleThreaded(
       for (unsigned int j = 0; j < sizejacind; ++j)
       {
         int pj = jacind[j];
-        temp += jacj(i, j) * this->m_ExactGradient(pj);
+        temp += jacj(i, j) * m_ExactGradient(pj);
       }
       Jgg(i) = temp;
     }
@@ -230,7 +213,7 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::Compute(const Paramete
                                                                   std::string            methods)
 {
   /** Option for now to still use the single threaded code. */
-  if (!this->m_UseMultiThread)
+  if (!m_UseMultiThread)
   {
     return this->ComputeSingleThreaded(mu, jacg, maxJJ, methods);
   }
@@ -260,20 +243,20 @@ void
 ComputeDisplacementDistribution<TFixedImage, TTransform>::BeforeThreadedCompute(const ParametersType & mu)
 {
   /** Get the number of parameters. */
-  this->m_NumberOfParameters =
-    static_cast<unsigned int>(this->m_Transform->GetNumberOfParameters()); // why is this parameter needed?
+  m_NumberOfParameters =
+    static_cast<unsigned int>(m_Transform->GetNumberOfParameters()); // why is this parameter needed?
 
   /** Get scales vector */
   const ScalesType & scales = this->GetScales();
-  this->m_ScaledCostFunction->SetScales(scales);
+  Superclass::m_ScaledCostFunction->SetScales(scales);
 
   /** Get the exact gradient. */
-  this->m_ExactGradient.set_size(this->m_NumberOfParameters);
-  this->m_ExactGradient.Fill(0.0);
-  this->GetScaledDerivative(mu, this->m_ExactGradient);
+  m_ExactGradient.set_size(m_NumberOfParameters);
+  m_ExactGradient.Fill(0.0);
+  this->GetScaledDerivative(mu, m_ExactGradient);
 
   /** Get samples. */
-  this->SampleFixedImageForJacobianTerms(this->m_SampleContainer);
+  m_Samples = this->SampleFixedImageForJacobianTerms();
 
 } // end BeforeThreadedCompute()
 
@@ -287,7 +270,7 @@ void
 ComputeDisplacementDistribution<TFixedImage, TTransform>::LaunchComputeThreaderCallback() const
 {
   /** Setup threader and launch. */
-  this->m_Threader->SetSingleMethodAndExecute(this->ComputeThreaderCallback, &m_ThreaderParameters);
+  m_Threader->SetSingleMethodAndExecute(this->ComputeThreaderCallback, &m_ThreaderParameters);
 
 } // end LaunchComputeThreaderCallback()
 
@@ -325,9 +308,9 @@ void
 ComputeDisplacementDistribution<TFixedImage, TTransform>::ThreadedCompute(ThreadIdType threadId)
 {
   /** Get sample container size, number of threads, and output space dimension. */
-  const SizeValueType sampleContainerSize = this->m_SampleContainer->Size();
-  const ThreadIdType  numberOfThreads = this->m_Threader->GetNumberOfWorkUnits();
-  const unsigned int  outdim = this->m_Transform->GetOutputSpaceDimension();
+  const SizeValueType           sampleContainerSize = m_Samples.size();
+  const ThreadIdType            numberOfThreads = m_Threader->GetNumberOfWorkUnits();
+  static constexpr unsigned int outdim{ TTransform::OutputSpaceDimension };
 
   /** Get a handle to the scales vector */
   const ScalesType & scales = this->GetScales();
@@ -340,14 +323,10 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::ThreadedCompute(Thread
   const auto pos_end = std::min<size_t>(nrOfSamplesPerThreads * (threadId + 1), sampleContainerSize);
 
   /** Variables for nonzerojacobian indices and the Jacobian. */
-  const SizeValueType        sizejacind = this->m_Transform->GetNumberOfNonZeroJacobianIndices();
+  const SizeValueType        sizejacind = m_Transform->GetNumberOfNonZeroJacobianIndices();
   JacobianType               jacj(outdim, sizejacind, 0.0);
   NonZeroJacobianIndicesType jacind(sizejacind);
-  jacind[0] = 0;
-  if (sizejacind > 1)
-  {
-    jacind[1] = 0;
-  }
+  assert((sizejacind > 0) && (jacind.front() == 0));
 
   /** Temporaries. */
   // std::vector< double > JGG_k; not here so only mean + 2 sigma is supported
@@ -361,7 +340,7 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::ThreadedCompute(Thread
   unsigned long  numberOfPixelsCounted = 0;
 
   /** Create iterator over the sample container. */
-  const auto beginOfSampleContainer = this->m_SampleContainer->cbegin();
+  const auto beginOfSampleContainer = m_Samples.cbegin();
   const auto threader_fbegin = beginOfSampleContainer + pos_begin;
   const auto threader_fend = beginOfSampleContainer + pos_end;
 
@@ -370,7 +349,7 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::ThreadedCompute(Thread
   {
     /** Read fixed coordinates and get Jacobian. */
     const FixedImagePointType & point = threader_fiter->m_ImageCoordinates;
-    this->m_Transform->GetJacobian(point, jacj, jacind);
+    m_Transform->GetJacobian(point, jacj, jacind);
 
     /** Apply scales, if necessary. */
     if (this->GetUseScales())
@@ -399,7 +378,7 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::ThreadedCompute(Thread
       for (unsigned int j = 0; j < sizejacind; ++j)
       {
         int pj = jacind[j];
-        temp += jacj(i, j) * this->m_ExactGradient(pj);
+        temp += jacj(i, j) * m_ExactGradient(pj);
       }
       Jgg(i) = temp;
     }
@@ -433,7 +412,7 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::AfterThreadedCompute(d
   maxJJ = 0.0;
   double displacement = 0.0;
   double displacementSquared = 0.0;
-  this->m_NumberOfPixelsCounted = 0.0;
+  m_NumberOfPixelsCounted = 0.0;
 
   /** Accumulate thread results. */
   for (const auto & computePerThreadStruct : m_ComputePerThreadVariables)
@@ -441,14 +420,14 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::AfterThreadedCompute(d
     maxJJ = std::max(maxJJ, computePerThreadStruct.st_MaxJJ);
     displacement += computePerThreadStruct.st_Displacement;
     displacementSquared += computePerThreadStruct.st_DisplacementSquared;
-    this->m_NumberOfPixelsCounted += computePerThreadStruct.st_NumberOfPixelsCounted;
+    m_NumberOfPixelsCounted += computePerThreadStruct.st_NumberOfPixelsCounted;
   }
   // Reset all variables for the next resolution.
   std::fill_n(m_ComputePerThreadVariables.begin(), m_ComputePerThreadVariables.size(), AlignedComputePerThreadStruct());
 
   /** Compute the sigma of the distribution of the displacements. */
-  const double meanDisplacement = displacement / this->m_NumberOfPixelsCounted;
-  const double sigma = displacementSquared / this->m_NumberOfPixelsCounted - vnl_math::sqr(meanDisplacement);
+  const double meanDisplacement = displacement / m_NumberOfPixelsCounted;
+  const double sigma = displacementSquared / m_NumberOfPixelsCounted - vnl_math::sqr(meanDisplacement);
 
   jacg = meanDisplacement + 2.0 * std::sqrt(sigma);
 
@@ -476,36 +455,29 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::ComputeUsingSearchDire
   maxJJ = jacg = 0.0;
 
   /** Get samples. */
-  ImageSampleContainerPointer sampleContainer; // default-constructed (null)
-  this->SampleFixedImageForJacobianTerms(sampleContainer);
-  const SizeValueType nrofsamples = sampleContainer->Size();
+  const std::vector<ImageSampleType> samples = this->SampleFixedImageForJacobianTerms();
+  const SizeValueType                nrofsamples = samples.size();
 
   /** Get the number of parameters. */
-  const auto numberOfParameters = static_cast<unsigned int>(this->m_Transform->GetNumberOfParameters());
+  const auto numberOfParameters = static_cast<unsigned int>(m_Transform->GetNumberOfParameters());
 
   /** Get scales vector */
   const ScalesType & scales = this->GetScales();
-  this->m_ScaledCostFunction->SetScales(scales);
+  Superclass::m_ScaledCostFunction->SetScales(scales);
 
   /** Get the exact gradient. */
   DerivativeType exactgradient(numberOfParameters);
   exactgradient = mu;
 
-  /** Get transform and set current position. */
-  typename TransformType::Pointer transform = this->m_Transform;
-  const unsigned int              outdim = this->m_Transform->GetOutputSpaceDimension();
+  static constexpr unsigned int outdim{ TTransform::OutputSpaceDimension };
 
   unsigned int samplenr = 0;
 
   /** Variables for nonzerojacobian indices and the Jacobian. */
-  const SizeValueType        sizejacind = this->m_Transform->GetNumberOfNonZeroJacobianIndices();
+  const SizeValueType        sizejacind = m_Transform->GetNumberOfNonZeroJacobianIndices();
   JacobianType               jacj(outdim, sizejacind, 0.0);
   NonZeroJacobianIndicesType jacind(sizejacind);
-  jacind[0] = 0;
-  if (sizejacind > 1)
-  {
-    jacind[1] = 0;
-  }
+  assert((sizejacind > 0) && (jacind.front() == 0));
 
   /**
    * Compute maxJJ and jac*gradient
@@ -518,11 +490,11 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::ComputeUsingSearchDire
   double globalDeformation = 0.0;
 
   samplenr = 0;
-  for (const auto & sample : *sampleContainer)
+  for (const auto & sample : samples)
   {
     /** Read fixed coordinates and get Jacobian. */
     const FixedImagePointType & point = sample.m_ImageCoordinates;
-    this->m_Transform->GetJacobian(point, jacj, jacind);
+    m_Transform->GetJacobian(point, jacj, jacind);
 
     /** Apply scales, if necessary. */
     if (this->GetUseScales())
@@ -579,35 +551,34 @@ ComputeDisplacementDistribution<TFixedImage, TTransform>::ComputeUsingSearchDire
  */
 
 template <typename TFixedImage, typename TTransform>
-void
-ComputeDisplacementDistribution<TFixedImage, TTransform>::SampleFixedImageForJacobianTerms(
-  ImageSampleContainerPointer & sampleContainer)
+auto
+ComputeDisplacementDistribution<TFixedImage, TTransform>::SampleFixedImageForJacobianTerms() const
+  -> std::vector<ImageSampleType>
 {
   /** Set up grid sampler. */
-  ImageGridSamplerPointer sampler = ImageGridSamplerType::New();
-  //  ImageFullSamplerPointer sampler = ImageFullSamplerType::New();
-  sampler->SetInput(this->m_FixedImage);
-  sampler->SetInputImageRegion(this->GetFixedImageRegion());
-  sampler->SetMask(this->m_FixedImageMask);
+  const auto sampler = ImageGridSampler<TFixedImage>::New();
+  sampler->SetInput(m_FixedImage);
+  sampler->SetInputImageRegion(m_FixedImageRegion);
+  sampler->SetMask(m_FixedImageMask);
 
   /** Determine grid spacing of sampler such that the desired
    * NumberOfJacobianMeasurements is achieved approximately.
    * Note that the actually obtained number of samples may be lower, due to masks.
    * This is taken into account at the end of this function.
    */
-  SizeValueType nrofsamples = this->m_NumberOfJacobianMeasurements;
-  sampler->SetNumberOfSamples(nrofsamples);
+  sampler->SetNumberOfSamples(m_NumberOfJacobianMeasurements);
 
   /** Get samples and check the actually obtained number of samples. */
   sampler->Update();
-  sampleContainer = sampler->GetOutput();
-  nrofsamples = sampleContainer->Size();
+  std::vector<ImageSampleType> & samples = Deref(sampler->GetOutput()).CastToSTLContainer();
 
-  if (nrofsamples == 0)
+  if (samples.empty())
   {
-    itkExceptionMacro("No valid voxels (0/" << this->m_NumberOfJacobianMeasurements
+    itkExceptionMacro("No valid voxels (0/" << m_NumberOfJacobianMeasurements
                                             << ") found to estimate the AdaptiveStochasticGradientDescent parameters.");
   }
+  return std::move(samples);
+
 } // end SampleFixedImageForJacobianTerms()
 
 

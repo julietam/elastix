@@ -1,5 +1,5 @@
 variables:
-  ITKv5_VERSION: v5.4.0
+  ITKv5_VERSION: v5.4.1
   ITK_GIT_URL: https://github.com/InsightSoftwareConsortium/ITK
   ITK_SOURCE_DIR: $(Agent.BuildDirectory)/ITK-source
   ITK_BINARY_DIR: $(Agent.BuildDirectory)/ITK-build
@@ -135,7 +135,7 @@ jobs:
 - job: macOS
   timeoutInMinutes: 0
   pool:
-    vmImage: 'macOS-12'
+    vmImage: 'macOS-13'
   strategy:
     matrix:
       ITKv5:

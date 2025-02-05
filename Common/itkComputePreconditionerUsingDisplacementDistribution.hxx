@@ -70,9 +70,10 @@ ComputePreconditionerUsingDisplacementDistribution<TFixedImage, TTransform>::Com
 
 template <typename TFixedImage, typename TTransform>
 void
-ComputePreconditionerUsingDisplacementDistribution<TFixedImage, TTransform>::Compute(const ParametersType & mu,
-                                                                                     double &               maxJJ,
-                                                                                     ParametersType & preconditioner)
+ComputePreconditionerUsingDisplacementDistribution<TFixedImage, TTransform>::Compute(
+  const ParametersType & mu,
+  double &               maxJJ,
+  ParametersType &       preconditioner) const
 {
   /** Initialize. */
   maxJJ = 0.0;
@@ -92,12 +93,9 @@ ComputePreconditionerUsingDisplacementDistribution<TFixedImage, TTransform>::Com
   this->GetScaledDerivative(mu, exactgradient);
 
   /** Get samples. Uses a grid sampler with m_NumberOfJacobianMeasurements samples. */
-  ImageSampleContainerPointer sampleContainer;
-  this->SampleFixedImageForJacobianTerms(sampleContainer);
+  const std::vector<ImageSampleType> samples = this->SampleFixedImageForJacobianTerms();
 
-  /** Get transform and set current position. */
-  typename TransformType::Pointer transform = this->m_Transform;
-  const unsigned int              outdim = this->m_Transform->GetOutputSpaceDimension();
+  static constexpr unsigned int outdim{ TTransform::OutputSpaceDimension };
 
   /** Variables for nonzerojacobian indices and the Jacobian. */
   const SizeValueType        sizejacind = this->m_Transform->GetNumberOfNonZeroJacobianIndices();
@@ -112,7 +110,7 @@ ComputePreconditionerUsingDisplacementDistribution<TFixedImage, TTransform>::Com
   ParametersType      binCount(numberOfParameters, 0.0);
 
   /** Loop over all voxels in the sample container. */
-  for (const auto & sample : *sampleContainer)
+  for (const auto & sample : samples)
   {
     /** Read fixed coordinates and get Jacobian. */
     const FixedImagePointType & point = sample.m_ImageCoordinates;
@@ -312,12 +310,9 @@ ComputePreconditionerUsingDisplacementDistribution<TFixedImage, TTransform>::Com
     transformIsBSpline = true; // assume B-spline
 
   /** Get samples. Uses a grid sampler with m_NumberOfJacobianMeasurements samples. */
-  ImageSampleContainerPointer sampleContainer;
-  this->SampleFixedImageForJacobianTerms(sampleContainer);
+  const std::vector<ImageSampleType> samples = this->SampleFixedImageForJacobianTerms();
 
-  /** Get transform and set current position. */
-  typename TransformType::Pointer transform = this->m_Transform;
-  const unsigned int              outdim = this->m_Transform->GetOutputSpaceDimension();
+  static constexpr unsigned int outdim{ TTransform::OutputSpaceDimension };
 
   /** Variables for nonzerojacobian indices and the Jacobian. */
   const SizeValueType sizejacind = this->m_Transform->GetNumberOfNonZeroJacobianIndices();
@@ -329,7 +324,7 @@ ComputePreconditionerUsingDisplacementDistribution<TFixedImage, TTransform>::Com
   ParametersType             binCount(numberOfParameters, 0.0);
 
   /** Loop over all voxels in the sample container. */
-  for (const auto & sample : *sampleContainer)
+  for (const auto & sample : samples)
   {
     /** Read fixed coordinates and get Jacobian. */
     const FixedImagePointType & point = sample.m_ImageCoordinates;

@@ -25,6 +25,8 @@
 #include <vnl/vnl_diag_matrix.h>
 #include <vnl/vnl_sparse_matrix.h>
 
+#include <cassert>
+
 namespace itk
 {
 
@@ -33,8 +35,8 @@ namespace itk
  */
 
 template <typename TFixedImage, typename TTransform>
-void
-ComputeJacobianTerms<TFixedImage, TTransform>::Compute(double & TrC, double & TrCC, double & maxJJ, double & maxJCJ)
+auto
+ComputeJacobianTerms<TFixedImage, TTransform>::Compute() const -> Terms
 {
   /** This function computes four terms needed for the automatic parameter
    * estimation. The equation number refers to the IJCV paper.
@@ -52,50 +54,39 @@ ComputeJacobianTerms<TFixedImage, TTransform>::Compute(double & TrC, double & Tr
    * Term 4: maxJCJ, see (54)
    */
 
-  /** Initialize. */
-  TrC = TrCC = maxJJ = maxJCJ = 0.0;
+  using FixedImagePointType = typename TFixedImage::PointType;
+  using JacobianType = typename TTransform::JacobianType;
+  using NumberOfParametersType = typename TTransform::NumberOfParametersType;
+  using NonZeroJacobianIndicesType = typename TTransform::NonZeroJacobianIndicesType;
 
   /** Get samples. */
-  ImageSampleContainerPointer sampleContainer; // default-constructed (null)
-  SampleFixedImageForJacobianTerms(sampleContainer);
-  const SizeValueType nrofsamples = sampleContainer->Size();
-  const auto          n = static_cast<double>(nrofsamples);
+  const std::vector<ImageSampleType> samples = SampleFixedImageForJacobianTerms();
+  const SizeValueType                nrofsamples = samples.size();
+  const auto                         n = static_cast<double>(nrofsamples);
 
   /** Get the number of parameters. */
-  const auto numberOfParameters = static_cast<unsigned int>(this->m_Transform->GetNumberOfParameters());
+  const auto numberOfParameters = static_cast<unsigned int>(m_Transform->GetNumberOfParameters());
 
-  /** Get transform and set current position. */
-  typename TransformType::Pointer transform = this->m_Transform;
-  const unsigned int              outdim = this->m_Transform->GetOutputSpaceDimension();
-
-  /** Get scales vector */
-  const ScalesType & scales = this->m_Scales;
+  static constexpr unsigned int outdim{ TTransform::OutputSpaceDimension };
 
   /** Variables for nonzerojacobian indices and the Jacobian. */
-  const NumberOfParametersType sizejacind = this->m_Transform->GetNumberOfNonZeroJacobianIndices();
+  const NumberOfParametersType sizejacind = m_Transform->GetNumberOfNonZeroJacobianIndices();
   JacobianType                 jacj(outdim, sizejacind, 0.0);
   NonZeroJacobianIndicesType   jacind(sizejacind);
-  jacind[0] = 0;
-  if (sizejacind > 1)
-  {
-    jacind[1] = 0;
-  }
-  NonZeroJacobianIndicesType prevjacind = jacind;
-
+  NonZeroJacobianIndicesType   prevjacind(sizejacind);
+  assert((sizejacind > 0) && (jacind.front() == 0) && (prevjacind.front() == 0));
 
   using FreqPairType = std::pair<unsigned int, unsigned int>;
-  using DifHist2Type = std::vector<FreqPairType>;
-  DifHist2Type difHist2;
+  std::vector<FreqPairType> difHist2;
 
   {
-    /** DifHist is a histogram of absolute parameterNrDifferences that
+    /** `difHist` is a histogram of absolute parameterNrDifferences that
      * occur in the nonzerojacobianindex vectors.
-     * DifHist2 is another way of storing the histogram, as a vector
+     * `difHist2` is another way of storing the histogram, as a vector
      * of pairs. pair.first = Frequency, pair.second = parameterNrDifference.
      * This is useful for sorting.
      */
-    using DifHistType = std::vector<unsigned int>;
-    DifHistType difHist(numberOfParameters);
+    std::vector<unsigned int> difHist(numberOfParameters);
 
     /** Try to guess the band structure of the covariance matrix.
      * A 'band' is a series of elements cov(p,q) with constant q-p.
@@ -112,23 +103,20 @@ ComputeJacobianTerms<TFixedImage, TTransform>::Compute(double & TrC, double & Tr
      * and the bandcov matrix is deleted.
      */
     unsigned int onezero = 0;
-    for (unsigned int s = 0; s < this->m_NumberOfBandStructureSamples; ++s)
+    for (unsigned int s = 0; s < m_NumberOfBandStructureSamples; ++s)
     {
       /** Semi-randomly get some samples from the sample container. */
-      const unsigned int samplenr = (s + 1) * nrofsamples / (this->m_NumberOfBandStructureSamples + 2 + onezero);
+      const unsigned int samplenr = (s + 1) * nrofsamples / (m_NumberOfBandStructureSamples + 2 + onezero);
       onezero = 1 - onezero; // introduces semi-randomness
 
       /** Read fixed coordinates and get Jacobian J_j. */
-      const FixedImagePointType & point = sampleContainer->GetElement(samplenr).m_ImageCoordinates;
-      this->m_Transform->GetJacobian(point, jacj, jacind);
+      const FixedImagePointType & point = samples[samplenr].m_ImageCoordinates;
+      m_Transform->GetJacobian(point, jacj, jacind);
 
       /** Skip invalid Jacobians in the beginning, if any. */
-      if (sizejacind > 1)
+      if (sizejacind > 1 && jacind[0] == jacind[1])
       {
-        if (jacind[0] == jacind[1])
-        {
-          continue;
-        }
+        continue;
       }
 
       /** Fill the histogram of parameter nr differences. */
@@ -155,7 +143,7 @@ ComputeJacobianTerms<TFixedImage, TTransform>::Compute(double & TrC, double & Tr
   } // End of scope of difHist.
 
   /** Compute the number of bands. */
-  const unsigned int bandcovsize = std::min(this->m_MaxBandCovSize, static_cast<unsigned int>(difHist2.size()));
+  const unsigned int bandcovsize = std::min(m_MaxBandCovSize, static_cast<unsigned int>(difHist2.size()));
 
   /** Maps parameterNrDifference (q-p) to colnr in bandcov. */
   std::vector<unsigned int> bandcovMap(numberOfParameters, bandcovsize);
@@ -182,158 +170,152 @@ ComputeJacobianTerms<TFixedImage, TTransform>::Compute(double & TrC, double & Tr
   vnl_sparse_matrix<CovarianceValueType> cov(numberOfParameters, numberOfParameters);
   DiagCovarianceMatrixType               diagcov(numberOfParameters, 0.0);
 
-  /** For temporary storage of J'J. */
-  CovarianceMatrixType jactjac(sizejacind, sizejacind, 0.0);
-
-  /** Initialize band matrix. */
-  CovarianceMatrixType bandcov(numberOfParameters, bandcovsize, 0.0);
-
-  /**
-   *    TERM 1
-   *
-   * Loop over image and compute Jacobian.
-   * Compute C = 1/n \sum_i J_i^T J_i
-   * Possibly apply scaling afterwards.
-   */
-  jacind[0] = 0;
-  if (sizejacind > 1)
   {
-    jacind[1] = 0;
-  }
-  for (const auto & sample : *sampleContainer)
-  {
-    /** Read fixed coordinates and get Jacobian J_j. */
-    const FixedImagePointType & point = sample.m_ImageCoordinates;
-    this->m_Transform->GetJacobian(point, jacj, jacind);
+    /** For temporary storage of J'J. */
+    CovarianceMatrixType jactjac(sizejacind, sizejacind, 0.0);
 
-    /** Skip invalid Jacobians in the beginning, if any. */
+    /** Initialize band matrix. */
+    CovarianceMatrixType bandcov(numberOfParameters, bandcovsize, 0.0);
+
+    /**
+     *    TERM 1
+     *
+     * Loop over image and compute Jacobian.
+     * Compute C = 1/n \sum_i J_i^T J_i
+     * Possibly apply scaling afterwards.
+     */
+    jacind[0] = 0;
     if (sizejacind > 1)
     {
-      if (jacind[0] == jacind[1])
+      jacind[1] = 0;
+    }
+    for (const auto & sample : samples)
+    {
+      /** Read fixed coordinates and get Jacobian J_j. */
+      const FixedImagePointType & point = sample.m_ImageCoordinates;
+      m_Transform->GetJacobian(point, jacj, jacind);
+
+      /** Skip invalid Jacobians in the beginning, if any. */
+      if (sizejacind > 1 && jacind[0] == jacind[1])
       {
         continue;
       }
-    }
 
-    if (jacind == prevjacind)
-    {
-      /** Update sum of J_j^T J_j. */
-      vnl_fastops::inc_X_by_AtA(jactjac, jacj);
-    }
-    else
-    {
-      /** The following should only be done after the first sample. */
-      if (&sample != &(sampleContainer->front()))
+      if (jacind == prevjacind)
       {
-        /** Update covariance matrix. */
-        for (unsigned int pi = 0; pi < sizejacind; ++pi)
+        /** Update sum of J_j^T J_j. */
+        vnl_fastops::inc_X_by_AtA(jactjac, jacj);
+      }
+      else
+      {
+        /** The following should only be done after the first sample. */
+        if (&sample != &(samples.front()))
         {
-          const unsigned int p = prevjacind[pi];
-          for (unsigned int qi = 0; qi < sizejacind; ++qi)
+          /** Update covariance matrix. */
+          for (unsigned int pi = 0; pi < sizejacind; ++pi)
           {
-            const unsigned int q = prevjacind[qi];
-            if (q >= p)
+            const unsigned int p = prevjacind[pi];
+            for (unsigned int qi = 0; qi < sizejacind; ++qi)
             {
-              const double tempval = jactjac(pi, qi) / n;
-              if (std::abs(tempval) > 1e-14)
+              const unsigned int q = prevjacind[qi];
+              if (q >= p)
               {
-                const unsigned int bandindex = bandcovMap[q - p];
-                if (bandindex < bandcovsize)
+                const double tempval = jactjac(pi, qi) / n;
+                if (std::abs(tempval) > 1e-14)
                 {
-                  bandcov(p, bandindex) += tempval;
-                }
-                else
-                {
-                  cov(p, q) += tempval;
+                  const unsigned int bandindex = bandcovMap[q - p];
+                  if (bandindex < bandcovsize)
+                  {
+                    bandcov(p, bandindex) += tempval;
+                  }
+                  else
+                  {
+                    cov(p, q) += tempval;
+                  }
                 }
               }
-            }
-          } // qi
-        }   // pi
-      }     // end if
+            } // qi
+          }   // pi
+        }     // end if
 
-      /** Initialize jactjac by J_j^T J_j. */
-      vnl_fastops::AtA(jactjac, jacj);
+        /** Initialize jactjac by J_j^T J_j. */
+        vnl_fastops::AtA(jactjac, jacj);
 
-      /** Remember nonzerojacobian indices. */
-      prevjacind = jacind;
-    } // end else
+        /** Remember nonzerojacobian indices. */
+        prevjacind = jacind;
+      } // end else
 
-  } // end iter loop: end computation of covariance matrix
+    } // end iter loop: end computation of covariance matrix
 
-  /** Update covariance matrix once again to include last jactjac updates
-   * \todo: a bit ugly that this loop is copied from above.
-   */
-  for (unsigned int pi = 0; pi < sizejacind; ++pi)
-  {
-    const unsigned int p = prevjacind[pi];
-    for (unsigned int qi = 0; qi < sizejacind; ++qi)
+    /** Update covariance matrix once again to include last jactjac updates
+     * \todo: a bit ugly that this loop is copied from above.
+     */
+    for (unsigned int pi = 0; pi < sizejacind; ++pi)
     {
-      const unsigned int q = prevjacind[qi];
-      if (q >= p)
+      const unsigned int p = prevjacind[pi];
+      for (unsigned int qi = 0; qi < sizejacind; ++qi)
       {
-        const double tempval = jactjac(pi, qi) / n;
-        if (std::abs(tempval) > 1e-14)
+        const unsigned int q = prevjacind[qi];
+        if (q >= p)
         {
-          const unsigned int bandindex = bandcovMap[q - p];
-          if (bandindex < bandcovsize)
+          const double tempval = jactjac(pi, qi) / n;
+          if (std::abs(tempval) > 1e-14)
           {
-            bandcov(p, bandindex) += tempval;
-          }
-          else
-          {
-            cov(p, q) += tempval;
+            const unsigned int bandindex = bandcovMap[q - p];
+            if (bandindex < bandcovsize)
+            {
+              bandcov(p, bandindex) += tempval;
+            }
+            else
+            {
+              cov(p, q) += tempval;
+            }
           }
         }
-      }
-    } // qi
-  }   // pi
+      } // qi
+    }   // pi
 
-  /** Copy the bandmatrix into the sparse matrix and empty the bandcov matrix.
-   * \todo: perhaps work further with this bandmatrix instead.
-   */
-  for (unsigned int p = 0; p < numberOfParameters; ++p)
-  {
-    for (unsigned int b = 0; b < bandcovsize; ++b)
+    /** Copy the bandmatrix into the sparse matrix and empty the bandcov matrix.
+     * \todo: perhaps work further with this bandmatrix instead.
+     */
+    for (unsigned int p = 0; p < numberOfParameters; ++p)
     {
-      const double tempval = bandcov(p, b);
-      if (std::abs(tempval) > 1e-14)
+      for (unsigned int b = 0; b < bandcovsize; ++b)
       {
-        const unsigned int q = p + bandcovMap2[b];
-        cov(p, q) = tempval;
+        const double tempval = bandcov(p, b);
+        if (std::abs(tempval) > 1e-14)
+        {
+          const unsigned int q = p + bandcovMap2[b];
+          cov(p, q) = tempval;
+        }
       }
     }
-  }
-  bandcov.set_size(0, 0);
+  } // End of scope of `bandcov` and `jactjac`.
 
   /** Apply scales. the use of m_Scales maybe something wrong. */
-  if (this->m_UseScales)
+  if (m_UseScales)
   {
     for (unsigned int p = 0; p < numberOfParameters; ++p)
     {
-      cov.scale_row(p, 1.0 / this->m_Scales[p]);
+      cov.scale_row(p, 1.0 / m_Scales[p]);
     }
     /**  \todo: this might be faster with get_row instead of the iterator */
     cov.reset();
-    bool notfinished = cov.next();
-    while (notfinished)
+    while (cov.next())
     {
       const int col = cov.getcolumn();
-      cov(cov.getrow(), col) /= scales[col];
-      notfinished = cov.next();
+      cov(cov.getrow(), col) /= m_Scales[col];
     }
   }
 
   /** Compute TrC = trace(C), and diagcov. */
+  double TrC = 0.0;
   for (unsigned int p = 0; p < numberOfParameters; ++p)
   {
-    if (!cov.empty_row(p))
-    {
-      // avoid creation of element if the row is empty
-      CovarianceValueType & covpp = cov(p, p);
-      TrC += covpp;
-      diagcov[p] = covpp;
-    }
+    // Do cov.get(p, p) instead of cov(p, p) to avoid creation of an entry that just has zero.
+    const CovarianceValueType covpp = cov.get(p, p);
+    TrC += covpp;
+    diagcov[p] = covpp;
   }
 
   /**
@@ -342,11 +324,10 @@ ComputeJacobianTerms<TFixedImage, TTransform>::Compute(double & TrC, double & Tr
    * Compute TrCC = ||C||_F^2.
    */
   cov.reset();
-  bool notfinished2 = cov.next();
-  while (notfinished2)
+  double TrCC = 0.0;
+  while (cov.next())
   {
     TrCC += vnl_math::sqr(cov.value());
-    notfinished2 = cov.next();
   }
 
   /** Symmetry: multiply by 2 and subtract sumsqr(diagcov). */
@@ -360,8 +341,8 @@ ComputeJacobianTerms<TFixedImage, TTransform>::Compute(double & TrC, double & Tr
    * \li maxJJ = max_j [ ||J_j||_F^2 + 2\sqrt{2} || J_j J_j^T ||_F ]
    * \li maxJCJ = max_j [ Tr( J_j C J_j^T ) + 2\sqrt{2} || J_j C J_j^T ||_F ]
    */
-  maxJJ = 0.0;
-  maxJCJ = 0.0;
+  double       maxJJ = 0.0;
+  double       maxJCJ = 0.0;
   const double sqrt2 = std::sqrt(static_cast<double>(2.0));
 
   JacobianType              jacjjacj(outdim, outdim);
@@ -372,19 +353,19 @@ ComputeJacobianTerms<TFixedImage, TTransform>::Compute(double & TrC, double & Tr
   JacobianType              jacjcovjacj(outdim, outdim);
   itk::Array<SizeValueType> jacindExpanded(numberOfParameters);
 
-  for (const auto & sample : *sampleContainer)
+  for (const auto & sample : samples)
   {
     /** Read fixed coordinates and get Jacobian. */
     const FixedImagePointType & point = sample.m_ImageCoordinates;
-    this->m_Transform->GetJacobian(point, jacj, jacind);
+    m_Transform->GetJacobian(point, jacj, jacind);
 
     /** Apply scales, if necessary. */
-    if (this->m_UseScales)
+    if (m_UseScales)
     {
       for (unsigned int pi = 0; pi < sizejacind; ++pi)
       {
         const unsigned int p = jacind[pi];
-        jacj.scale_column(pi, 1.0 / scales[p]);
+        jacj.scale_column(pi, 1.0 / m_Scales[p]);
       }
     }
 
@@ -468,6 +449,8 @@ ComputeJacobianTerms<TFixedImage, TTransform>::Compute(double & TrC, double & Tr
   /** Finalize progress information. */
   // progressObserver->PrintProgress( 1.0 );
 
+  return Terms{ TrC, TrCC, maxJJ, maxJCJ };
+
 } // end Compute()
 
 
@@ -476,34 +459,32 @@ ComputeJacobianTerms<TFixedImage, TTransform>::Compute(double & TrC, double & Tr
  */
 
 template <typename TFixedImage, typename TTransform>
-void
-ComputeJacobianTerms<TFixedImage, TTransform>::SampleFixedImageForJacobianTerms(
-  ImageSampleContainerPointer & sampleContainer)
+auto
+ComputeJacobianTerms<TFixedImage, TTransform>::SampleFixedImageForJacobianTerms() const -> std::vector<ImageSampleType>
 {
   /** Set up grid sampler. */
-  ImageGridSamplerPointer sampler = ImageGridSamplerType::New();
-  sampler->SetInput(this->m_FixedImage);
-  sampler->SetInputImageRegion(this->GetFixedImageRegion());
-  sampler->SetMask(this->m_FixedImageMask);
+  const auto sampler = ImageGridSampler<TFixedImage>::New();
+  sampler->SetInput(m_FixedImage);
+  sampler->SetInputImageRegion(m_FixedImageRegion);
+  sampler->SetMask(m_FixedImageMask);
 
   /** Determine grid spacing of sampler such that the desired
    * NumberOfJacobianMeasurements is achieved approximately.
    * Note that the actually obtained number of samples may be lower, due to masks.
    * This is taken into account at the end of this function.
    */
-  SizeValueType nrofsamples = this->m_NumberOfJacobianMeasurements;
-  sampler->SetNumberOfSamples(nrofsamples);
+  sampler->SetNumberOfSamples(m_NumberOfJacobianMeasurements);
 
   /** Get samples and check the actually obtained number of samples. */
   sampler->Update();
-  sampleContainer = sampler->GetOutput();
-  nrofsamples = sampleContainer->Size();
+  std::vector<ImageSampleType> & samples = Deref(sampler->GetOutput()).CastToSTLContainer();
 
-  if (nrofsamples == 0)
+  if (samples.empty())
   {
-    itkExceptionMacro("No valid voxels (0/" << this->m_NumberOfJacobianMeasurements
+    itkExceptionMacro("No valid voxels (0/" << m_NumberOfJacobianMeasurements
                                             << ") found to estimate the AdaptiveStochasticGradientDescent parameters.");
   }
+  return std::move(samples);
 
 } // end SampleFixedImageForJacobianTerms()
 
