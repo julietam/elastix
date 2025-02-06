@@ -36,6 +36,7 @@
 #include <itkObject.h>
 #include "itkAdvancedImageToImageMetric.h" // Include the header file where AdvancedImageToImageMetric is defined
 #include <iostream> // Include necessary header for logging
+#include <itkImageFileReader.h> // Include necessary header for reading images
 
 #include <sstream>
 
@@ -211,6 +212,10 @@ public:
   MovingMaskType *
   GetMovingMask(unsigned int idx = 0) const;
 
+  // Add a method to get the weighted fixed mask
+  FixedMaskType *
+  GetWeightedFixedMask(unsigned int idx = 0) const;
+
   /** Main functions:
    * Run() for registration, and ApplyTransform() for just
    * applying a transform to an image.
@@ -353,3 +358,44 @@ protected:
 #endif
 
 #endif // end #ifndef elxElastixTemplate_h
+
+// Example of parameter parsing code with logging
+void ParseCommandLineArguments(int argc, char** argv)
+{
+  for (int i = 1; i < argc; ++i)
+  {
+    if (std::string(argv[i]) == "-wfMask")
+    {
+      if (i + 1 < argc)
+      {
+        std::string wfMaskPath = argv[++i];
+        std::cout << "Weighted Fixed Mask Path: " << wfMaskPath << std::endl;
+        
+        // Load the mask
+        using MaskImageType = itk::Image<unsigned char, 3>; // Adjust the type as needed
+        auto reader = itk::ImageFileReader<MaskImageType>::New();
+        reader->SetFileName(wfMaskPath);
+        try
+        {
+          reader->Update();
+        }
+        catch (itk::ExceptionObject &err)
+        {
+          std::cerr << "Error loading mask: " << err << std::endl;
+          return;
+        }
+        
+        auto weightedFixedMask = reader->GetOutput();
+        std::cout << "Mask loaded successfully." << std::endl;
+
+        // Set the mask
+        // Assuming 'metric' is an instance of AdvancedMeanSquaresImageToImageMetric
+        metric->SetWeightedFixedMask(weightedFixedMask);
+      }
+      else
+      {
+        std::cerr << "Error: -wfMask option requires an argument." << std::endl;
+      }
+    }
+  }
+}

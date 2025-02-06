@@ -91,6 +91,23 @@ ElastixTemplate<TFixedImage, TMovingImage>::GetFixedMask(unsigned int idx) const
 } // end SetFixedMask()
 
 /**
+ * ********************** GetWeightedFixedMask *************************
+ */
+
+template <typename TFixedImage, typename TMovingImage>
+auto
+ElastixTemplate<TFixedImage, TMovingImage>::GetWeightedFixedMask(unsigned int idx) const -> FixedMaskType *
+{
+  if (idx < this->GetNumberOfWeightedFixedMasks())
+  {
+    return dynamic_cast<FixedMaskType *>(this->GetWeightedFixedMaskContainer()->ElementAt(idx).GetPointer());
+  }
+
+  return nullptr;
+
+} // end GetWeightedFixedMask()
+
+/**
  * ********************** GetMovingMask *************************
  */
 
@@ -187,6 +204,11 @@ ElastixTemplate<TFixedImage, TMovingImage>::Run()
   {
     this->SetMovingMaskContainer(MultipleImageLoader<MovingMaskType>::GenerateImageContainer(
       this->GetMovingMaskFileNameContainer(), "Moving Mask", useDirCos));
+  }
+  if (this->GetWeightedFixedMask() == nullptr)
+  {
+    this->SetWeightedFixedMaskContainer(MultipleImageLoader<FixedMaskType>::GenerateImageContainer(
+      this->GetWeightedFixedMaskFileNameContainer(), "Weighted Fixed Mask", useDirCos));
   }
 
   /** Print the time spent on reading images. */
