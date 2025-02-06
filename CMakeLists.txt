@@ -275,6 +275,9 @@ if(ELASTIX_USE_OPENCL)
   list(APPEND elxINCLUDE_DIRECTORIES ${elxCommon_OpenCL_INCLUDE_DIRECTORIES})
 endif()
 
+# Add include directories
+include_directories(${CMAKE_SOURCE_DIR}/Components/Metrics/AdvancedMeanSquares)
+
 #---------------------------------------------------------------------
 # Microsoft specific items
 
