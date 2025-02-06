@@ -61,6 +61,18 @@ AdvancedMeanSquaresMetric<TElastix>::BeforeEachResolution()
   configuration.ReadParameter(useNormalization, "UseNormalization", BaseComponent::GetComponentLabel(), level, 0);
   this->SetUseNormalization(useNormalization);
 
+  /** Set the weighted mask if provided. */
+  if (this->GetElastixBase()->GetWeightedFixedMaskContainer() && 
+      !this->GetElastixBase()->GetWeightedFixedMaskContainer()->empty())
+  {
+    this->m_WeightedMask = dynamic_cast<const FixedImageType *>(
+      this->GetElastixBase()->GetWeightedFixedMaskContainer()->ElementAt(0).GetPointer());
+  }
+  else
+  {
+    this->m_WeightedMask = nullptr;
+  }
+
 } // end BeforeEachResolution()
 
 

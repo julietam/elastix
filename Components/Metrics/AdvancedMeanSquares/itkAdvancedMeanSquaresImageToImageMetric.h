@@ -173,6 +173,10 @@ protected:
   using typename Superclass::MovingImageDerivativeType;
   using typename Superclass::NonZeroJacobianIndicesType;
 
+  /** Member variable for the weighted mask. */
+  typename FixedImageType::ConstPointer m_WeightedMask;
+  typename FixedImageType::ConstPointer wfMask;
+
   /** Compute a pixel's contribution to the measure and derivatives;
    * Called by GetValueAndDerivative(). */
   void

@@ -107,6 +107,23 @@ ElastixTemplate<TFixedImage, TMovingImage>::GetMovingMask(unsigned int idx) cons
 
 } // end SetMovingMask()
 
+/**
+ * ********************** GetWeightedFixedMask *************************
+ */
+
+template <typename TFixedImage, typename TMovingImage>
+auto
+ElastixTemplate<TFixedImage, TMovingImage>::GetWeightedFixedMask(unsigned int idx) const -> FixedMaskType *
+{
+  if (idx < this->GetNumberOfWeightedFixedMasks())
+  {
+    return dynamic_cast<FixedMaskType *>(this->GetWeightedFixedMaskContainer()->ElementAt(idx).GetPointer());
+  }
+
+  return nullptr;
+
+} // end GetWeightedFixedMask()
+
 
 /**
  * **************************** Run *****************************
@@ -187,6 +204,38 @@ ElastixTemplate<TFixedImage, TMovingImage>::Run()
   {
     this->SetMovingMaskContainer(MultipleImageLoader<MovingMaskType>::GenerateImageContainer(
       this->GetMovingMaskFileNameContainer(), "Moving Mask", useDirCos));
+  }
+
+  if (this->GetWeightedFixedMask() == nullptr)
+  {
+    this->SetWeightedFixedMaskContainer(MultipleImageLoader<FixedMaskType>::GenerateImageContainer(
+      this->GetWeightedFixedMaskFileNameContainer(), "Weighted Fixed Mask", useDirCos));
+  }
+
+  // Log the mask file name and size
+  if (this->GetWeightedFixedMaskFileNameContainer() && !this->GetWeightedFixedMaskFileNameContainer()->empty())
+  {
+    log::info(std::ostringstream{} << "Using weighted fixed mask: " << this->GetWeightedFixedMaskFileNameContainer()->ElementAt(0));
+    const auto mask = this->GetWeightedFixedMask();
+    if (mask)
+    {
+      const auto region = mask->GetLargestPossibleRegion();
+      const auto size = region.GetSize();
+      log::info(std::ostringstream{} << "Mask type: " << typeid(mask).name());
+      log::info(std::ostringstream{} << "Mask size: " << size);
+
+      // Log some intensity values
+      itk::ImageRegionConstIterator<FixedMaskType> maskIt(mask, region);
+      log::info("Mask intensity values:");
+      for (maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
+      {
+        log::info(std::to_string(maskIt.Get()) + " ");
+      }
+    }
+    else
+    {
+      log::info("Mask is not loaded correctly.");
+    }
   }
 
   /** Print the time spent on reading images. */
@@ -1123,7 +1172,7 @@ ElastixTemplate<TFixedImage, TMovingImage>::SetOriginalFixedImageDirection(const
   ElastixBase::m_OriginalFixedImageDirectionFlat.resize(FixedDimension * FixedDimension);
   for (unsigned int i = 0; i < FixedDimension; ++i)
   {
-    for (unsigned int j = 0; j < FixedDimension; ++j)
+    for (unsigned int j = 0; i < FixedDimension; ++j)
     {
       ElastixBase::m_OriginalFixedImageDirectionFlat[i * FixedDimension + j] = arg(j, i);
     }

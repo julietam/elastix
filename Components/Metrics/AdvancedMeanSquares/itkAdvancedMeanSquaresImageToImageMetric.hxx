@@ -101,6 +101,31 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
     this->m_NormalizationFactor = 1.0;
   }
 
+  // Ensure the weighted mask is considered in the calculations
+  if (this->GetWeightedMask())
+  {
+    this->m_WeightedMask = this->GetWeightedMask();
+
+    // Log the mask type and size
+    const auto region = this->m_WeightedMask->GetLargestPossibleRegion();
+    const auto size = region.GetSize();
+    std::cout << "Weighted mask type: " << typeid(this->m_WeightedMask).name() << std::endl;
+    std::cout << "Weighted mask size: " << size << std::endl;
+
+    // Log some intensity values
+    itk::ImageRegionConstIterator<FixedImageType> maskIt(this->m_WeightedMask, region);
+    std::cout << "Weighted mask intensity values:" << std::endl;
+    for (maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
+    {
+      std::cout << maskIt.Get() << " ";
+    }
+    std::cout << std::endl;
+  }
+  else
+  {
+    std::cout << "No weighted mask provided." << std::endl;
+  }
+
 } // end Initialize()
 
 
@@ -113,11 +138,9 @@ void
 AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
-
-  os << "UseNormalization: " << this->m_UseNormalization << std::endl;
-
-} // end PrintSelf()
-
+  os << indent << "UseNormalization: " << (this->m_UseNormalization ? "On" : "Off") << std::endl;
+  os << indent << "NormalizationFactor: " << this->m_NormalizationFactor << std::endl;
+}
 
 /**
  * ******************* GetValueSingleThreaded *******************
@@ -125,11 +148,9 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::PrintSelf(std:
 
 template <typename TFixedImage, typename TMovingImage>
 auto
-AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingleThreaded(
-  const ParametersType & parameters) const -> MeasureType
+AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingleThreaded(const ParametersType & parameters) const
+  -> MeasureType
 {
-  /** Initialize some variables. */
-  Superclass::m_NumberOfPixelsCounted = 0;
   MeasureType measure{};
 
   /** Call non-thread-safe stuff, such as:
@@ -148,7 +169,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
   this->BeforeThreadedGetValueAndDerivative(parameters);
 
   /** Get a handle to the sample container. */
-  ImageSampleContainerPointer sampleContainer = this->GetImageSampler()->GetOutput();
+  auto sampleContainer = this->GetImageSampler()->GetOutput();
 
   /** Loop over the fixed image samples to calculate the mean squares. */
   for (const auto & fixedImageSample : *sampleContainer)
@@ -180,7 +201,14 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
 
       /** The difference squared. */
       const RealType diff = movingImageValue - fixedImageValue;
-      measure += diff * diff;
+      double weight = 1.0;
+      if (m_WeightedMask)
+      {
+        // Apply the weighted mask as an attention map
+        const auto index = fixedImageSample.m_ImageIndex;
+        weight = m_WeightedMask->GetPixel(index);
+      }
+      measure += weight * diff * diff;
 
     } // end if sampleOk
 
@@ -253,8 +281,8 @@ void
 AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetValue(ThreadIdType threadId) const
 {
   /** Get a handle to the sample container. */
-  ImageSampleContainerPointer sampleContainer = this->GetImageSampler()->GetOutput();
-  const unsigned long         sampleContainerSize = sampleContainer->Size();
+  auto sampleContainer = this->GetImageSampler()->GetOutput();
+  const unsigned long sampleContainerSize = sampleContainer->Size();
 
   /** Get the samples for this thread. */
   const auto nrOfSamplesPerThreads = static_cast<unsigned long>(
@@ -302,7 +330,14 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
 
       /** The difference squared. */
       const RealType diff = movingImageValue - fixedImageValue;
-      measure += diff * diff;
+      double weight = 1.0;
+      if (m_WeightedMask)
+      {
+        // Apply the weighted mask as an attention map
+        const auto index = threader_fiter->m_ImageIndex;
+        weight = m_WeightedMask->GetPixel(index);
+      }
+      measure += weight * diff * diff;
 
     } // end if sampleOk
 
@@ -335,7 +370,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::AfterThreadedG
   }
 
   /** Check if enough samples were valid. */
-  ImageSampleContainerPointer sampleContainer = this->GetImageSampler()->GetOutput();
+  auto sampleContainer = this->GetImageSampler()->GetOutput();
   this->CheckNumberOfSamples(sampleContainer->Size(), Superclass::m_NumberOfPixelsCounted);
 
   /** The normalization factor. */
@@ -416,7 +451,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueAndDer
   this->BeforeThreadedGetValueAndDerivative(parameters);
 
   /** Get a handle to the sample container. */
-  ImageSampleContainerPointer sampleContainer = this->GetImageSampler()->GetOutput();
+  auto sampleContainer = this->GetImageSampler()->GetOutput();
 
   /** Loop over the fixed image to calculate the mean squares. */
   for (const auto & fixedImageSample : *sampleContainer)
@@ -549,8 +584,8 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
   DerivativeType & derivative = Superclass::m_GetValueAndDerivativePerThreadVariables[threadId].st_Derivative;
 
   /** Get a handle to the sample container. */
-  ImageSampleContainerPointer sampleContainer = this->GetImageSampler()->GetOutput();
-  const unsigned long         sampleContainerSize = sampleContainer->Size();
+  auto sampleContainer = this->GetImageSampler()->GetOutput();
+  const unsigned long sampleContainerSize = sampleContainer->Size();
 
   /** Get the samples for this thread. */
   const auto nrOfSamplesPerThreads = static_cast<unsigned long>(
@@ -647,7 +682,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::AfterThreadedG
   }
 
   /** Check if enough samples were valid. */
-  ImageSampleContainerPointer sampleContainer = this->GetImageSampler()->GetOutput();
+  auto sampleContainer = this->GetImageSampler()->GetOutput();
   this->CheckNumberOfSamples(sampleContainer->Size(), Superclass::m_NumberOfPixelsCounted);
 
   /** The normalization factor. */
