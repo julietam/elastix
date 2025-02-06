@@ -392,6 +392,10 @@ public:
   elxSetObjectMacro(WeightedFixedMaskContainer, DataObjectContainerType);
   elxGetObjectMacro(WeightedFixedMaskContainer, DataObjectContainerType);
 
+  /** Generate a DataObjectContainer from a single DataObject. */
+  static DataObjectContainerPointer
+  GenerateDataObjectContainer(DataObjectPointer dataObject);
+
 protected:
   ElastixBase();
   ~ElastixBase() override = default;

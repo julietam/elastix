@@ -137,6 +137,9 @@ main(int argc, char ** argv)
     std::string             outFolder;
     auto                    level = elx::log::level::info;
 
+    /** Create an instance of ElastixMain. */
+    const auto elastixMain = ElastixMainType::New();
+
     /** Put command line parameters into parameterFileList. */
     for (unsigned int i = 1; static_cast<long>(i) < (argc - 1); i += 2)
     {
@@ -184,7 +187,7 @@ main(int argc, char ** argv)
           std::cout << "Weighted Fixed Mask loaded successfully." << std::endl;
 
           // Set the mask in the ElastixMain instance
-          elastixMain->SetWeightedFixedMaskContainer(elastix::ElastixBase::GenerateDataObjectContainer(weightedFixedMask));
+          elastixMain->SetWeightedFixedMaskContainer(elastixMain->GenerateDataObjectContainer(weightedFixedMask));
         }
         else
         {

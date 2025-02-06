@@ -88,7 +88,7 @@ ElastixTemplate<TFixedImage, TMovingImage>::GetFixedMask(unsigned int idx) const
 
   return nullptr;
 
-} // end SetFixedMask()
+} // end GetFixedMask()
 
 /**
  * ********************** GetWeightedFixedMask *************************
