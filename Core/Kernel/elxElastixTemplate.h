@@ -35,6 +35,7 @@
 #include <itkImage.h>
 #include <itkObject.h>
 #include "itkAdvancedImageToImageMetric.h" // Include the header file where AdvancedImageToImageMetric is defined
+#include <iostream> // Include necessary header for logging
 
 #include <sstream>
 
@@ -316,11 +317,30 @@ public:
   // Other typedefs and methods...
 
   /** Set/Get the weighted fixed mask. */
-  void SetWeightedFixedMask(const TFixedImage *mask) { m_WeightedFixedMask = mask; }
+  void SetWeightedFixedMask(const TFixedImage *mask) 
+  { 
+    m_WeightedFixedMask = mask; 
+    LogWeightedFixedMaskInfo(); // Log the mask info when it is set
+  }
   const TFixedImage *GetWeightedFixedMask() const { return m_WeightedFixedMask; }
 
 protected:
   typename TFixedImage::ConstPointer m_WeightedFixedMask;
+
+  /** Log the size and type of the weighted fixed mask */
+  void LogWeightedFixedMaskInfo() const
+  {
+    if (m_WeightedFixedMask)
+    {
+      std::cout << "Weighted Fixed Mask Info:" << std::endl;
+      std::cout << "Size: " << m_WeightedFixedMask->GetLargestPossibleRegion().GetSize() << std::endl;
+      std::cout << "Pixel Type: " << typeid(typename TFixedImage::PixelType).name() << std::endl;
+    }
+    else
+    {
+      std::cout << "Weighted Fixed Mask is not set." << std::endl;
+    }
+  }
 };
 
 } // end namespace elastix
