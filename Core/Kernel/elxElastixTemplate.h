@@ -318,11 +318,11 @@ public:
   // Other typedefs and methods...
 
   /** Set/Get the weighted fixed mask. */
-  void SetWeightedFixedMask(const FixedImageType *mask) { m_WeightedFixedMask = mask; }
-  const FixedImageType *GetWeightedFixedMask() const { return m_WeightedFixedMask; }
+  void SetWeightedFixedMask(const TFixedImage *mask) { m_WeightedFixedMask = mask; }
+  const TFixedImage *GetWeightedFixedMask() const { return m_WeightedFixedMask; }
 
 protected:
-  typename FixedImageType::ConstPointer m_WeightedFixedMask;
+  typename TFixedImage::ConstPointer m_WeightedFixedMask;
 };
 } // namespace itk
 
