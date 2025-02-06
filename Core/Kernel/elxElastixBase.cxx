@@ -213,6 +213,11 @@ ElastixBase::BeforeAllBase()
     {
       log::info("-wfMask    unspecified, so no weighted fixed mask used");
     }
+    else
+    {
+      log::info(std::ostringstream{} << "-wfMask    size: " << m_WeightedFixedMaskFileNameContainer->Size() 
+                                     << ", type: " << typeid(m_WeightedFixedMaskFileNameContainer).name());
+    }
   }
 
   /** Check for appearance of "-out". */
