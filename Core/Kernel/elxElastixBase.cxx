@@ -246,7 +246,11 @@ ElastixBase::BeforeAllBase()
           log::info(std::ostringstream{} << "Weighted fixed mask image size: " << mask->GetLargestPossibleRegion().GetSize()
                                          << ", type: " << mask->GetNameOfClass());
           // Set the weighted mask in the metric
-          dynamic_cast<AdvancedMeanSquaresMetric<ElastixType>*>(this->GetMetric())->SetWeightedMask(mask);
+          auto metric = dynamic_cast<AdvancedMeanSquaresMetric<ElastixBase>*>(this->GetElastix()->GetMetric());
+          if (metric)
+          {
+            metric->SetWeightedMask(mask);
+          }
         }
       }
     }
