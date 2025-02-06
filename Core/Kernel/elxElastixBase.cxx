@@ -217,6 +217,18 @@ ElastixBase::BeforeAllBase()
     {
       log::info(std::ostringstream{} << "-wfMask    size: " << m_WeightedFixedMaskFileNameContainer->Size() 
                                      << ", type: " << typeid(m_WeightedFixedMaskFileNameContainer).name());
+      // Populate m_WeightedFixedMaskContainer with the actual mask images
+      for (const auto & fileName : *m_WeightedFixedMaskFileNameContainer)
+      {
+        // Assuming LoadImage is a function that loads an image from a file name
+        auto mask = LoadImage(fileName);
+        if (mask)
+        {
+          m_WeightedFixedMaskContainer->push_back(mask);
+          log::info(std::ostringstream{} << "Weighted fixed mask image size: " << mask->GetLargestPossibleRegion().GetSize()
+                                         << ", type: " << mask->GetNameOfClass());
+        }
+      }
     }
   }
 
