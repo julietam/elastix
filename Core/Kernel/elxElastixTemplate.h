@@ -34,6 +34,7 @@
 #include <itkCommand.h>
 #include <itkImage.h>
 #include <itkObject.h>
+#include "itkAdvancedImageToImageMetric.h" // Include the header file where AdvancedImageToImageMetric is defined
 
 #include <sstream>
 
@@ -306,13 +307,10 @@ private:
   SetOriginalFixedImageDirection(const FixedImageDirectionType & arg);
 };
 
-} // end namespace elastix
-
-namespace itk
-{
+// Define the AdvancedMeanSquaresImageToImageMetric class within the elastix namespace
 template <typename TFixedImage, typename TMovingImage>
 class ITK_TEMPLATE_EXPORT AdvancedMeanSquaresImageToImageMetric
-  : public AdvancedImageToImageMetric<TFixedImage, TMovingImage>
+  : public itk::AdvancedImageToImageMetric<TFixedImage, TMovingImage>
 {
 public:
   // Other typedefs and methods...
@@ -324,7 +322,8 @@ public:
 protected:
   typename TFixedImage::ConstPointer m_WeightedFixedMask;
 };
-} // namespace itk
+
+} // end namespace elastix
 
 #undef elxGetBaseMacro
 
