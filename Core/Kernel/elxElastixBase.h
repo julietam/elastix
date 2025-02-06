@@ -392,6 +392,12 @@ public:
   elxSetObjectMacro(WeightedFixedMaskContainer, DataObjectContainerType);
   elxGetObjectMacro(WeightedFixedMaskContainer, DataObjectContainerType);
 
+  /** Get the ElastixBase instance. */
+  ElastixBase * GetElastixBase() { return this; }
+
+  /** Get the metric. */
+  itk::Object * GetMetric() const;
+
 protected:
   ElastixBase();
   ~ElastixBase() override = default;
