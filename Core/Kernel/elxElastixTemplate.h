@@ -319,6 +319,7 @@ public:
   /** Set/Get the weighted fixed mask. */
   void SetWeightedFixedMask(const TFixedImage *mask) 
   { 
+    std::cout << "SetWeightedFixedMask called." << std::endl; // Log when the method is called
     m_WeightedFixedMask = mask; 
     LogWeightedFixedMaskInfo(); // Log the mask info when it is set
   }
