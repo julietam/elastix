@@ -36,7 +36,6 @@
 #include <itkObject.h>
 #include "itkAdvancedImageToImageMetric.h" // Include the header file where AdvancedImageToImageMetric is defined
 #include <iostream> // Include necessary header for logging
-#include <itkImageFileReader.h> // Include necessary header for reading images
 
 #include <sstream>
 
@@ -211,10 +210,6 @@ public:
 
   MovingMaskType *
   GetMovingMask(unsigned int idx = 0) const;
-
-  // Add a method to get the weighted fixed mask
-  FixedMaskType *
-  GetWeightedFixedMask(unsigned int idx = 0) const;
 
   /** Main functions:
    * Run() for registration, and ApplyTransform() for just

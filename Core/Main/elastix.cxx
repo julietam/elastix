@@ -137,9 +137,6 @@ main(int argc, char ** argv)
     std::string             outFolder;
     auto                    level = elx::log::level::info;
 
-    /** Create an instance of ElastixMain. */
-    const auto elastixMain = ElastixMainType::New();
-
     /** Put command line parameters into parameterFileList. */
     for (unsigned int i = 1; static_cast<long>(i) < (argc - 1); i += 2)
     {
@@ -166,28 +163,6 @@ main(int argc, char ** argv)
             // Unsupported log level value.
             return EXIT_FAILURE;
           }
-        }
-        else if (key == "-wfMask")
-        {
-          // Load the mask
-          using MaskImageType = itk::Image<unsigned char, 3>; // Adjust the type as needed
-          auto reader = itk::ImageFileReader<MaskImageType>::New();
-          reader->SetFileName(value);
-          try
-          {
-            reader->Update();
-          }
-          catch (itk::ExceptionObject &err)
-          {
-            std::cerr << "Error loading mask: " << err << std::endl;
-            return EXIT_FAILURE;
-          }
-          
-          auto weightedFixedMask = reader->GetOutput();
-          std::cout << "Weighted Fixed Mask loaded successfully." << std::endl;
-
-          // Set the mask in the ElastixMain instance
-          elastixMain->SetWeightedFixedMaskContainer(elastixMain->GenerateDataObjectContainer(weightedFixedMask));
         }
         else
         {
