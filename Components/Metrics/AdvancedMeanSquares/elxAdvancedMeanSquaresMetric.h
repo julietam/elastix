@@ -139,6 +139,12 @@ protected:
   /** The destructor. */
   ~AdvancedMeanSquaresMetric() override = default;
 
+  /** Set the weighted mask. */
+  void SetWeightedMask(const typename FixedImageType::Pointer & mask)
+  {
+    this->GetMetric()->SetWeightedMask(mask);
+  }
+
 private:
   elxOverrideGetSelfMacro;
 };
