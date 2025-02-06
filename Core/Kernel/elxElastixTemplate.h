@@ -308,6 +308,24 @@ private:
 
 } // end namespace elastix
 
+namespace itk
+{
+template <typename TFixedImage, typename TMovingImage>
+class ITK_TEMPLATE_EXPORT AdvancedMeanSquaresImageToImageMetric
+  : public AdvancedImageToImageMetric<TFixedImage, TMovingImage>
+{
+public:
+  // Other typedefs and methods...
+
+  /** Set/Get the weighted fixed mask. */
+  void SetWeightedFixedMask(const FixedImageType *mask) { m_WeightedFixedMask = mask; }
+  const FixedImageType *GetWeightedFixedMask() const { return m_WeightedFixedMask; }
+
+protected:
+  typename FixedImageType::ConstPointer m_WeightedFixedMask;
+};
+} // namespace itk
+
 #undef elxGetBaseMacro
 
 #ifndef ITK_MANUAL_INSTANTIATION
