@@ -20,6 +20,7 @@
 #include "elxConversion.h"
 #include <sstream>
 #include "itkMersenneTwisterRandomVariateGenerator.h"
+#include "itkImageFileReader.h"
 
 namespace elastix
 {
@@ -122,6 +123,24 @@ GenerateFileNameContainer(const Configuration & configuration,
 
 } // end GenerateFileNameContainer()
 
+template <typename TImage>
+typename TImage::Pointer LoadImage(const std::string & fileName)
+{
+  using ReaderType = itk::ImageFileReader<TImage>;
+  typename ReaderType::Pointer reader = ReaderType::New();
+  reader->SetFileName(fileName);
+  try
+  {
+    reader->Update();
+  }
+  catch (itk::ExceptionObject & err)
+  {
+    log::error(std::ostringstream{} << "Error loading image: " << err);
+    return nullptr;
+  }
+  return reader->GetOutput();
+}
+
 } // end unnamed namespace
 
 
@@ -220,8 +239,7 @@ ElastixBase::BeforeAllBase()
       // Populate m_WeightedFixedMaskContainer with the actual mask images
       for (const auto & fileName : *m_WeightedFixedMaskFileNameContainer)
       {
-        // Assuming LoadImage is a function that loads an image from a file name
-        auto mask = LoadImage(fileName);
+        auto mask = LoadImage<itk::Image<unsigned char, 3>>(fileName); // Adjust the image type as needed
         if (mask)
         {
           m_WeightedFixedMaskContainer->push_back(mask);
