@@ -24,23 +24,6 @@
 namespace elastix
 {
 
-/**
- * \class AdvancedMeanSquaresMetric
- * \brief An metric based on the itk::AdvancedMeanSquaresImageToImageMetric.
- *
- * The parameters used in this class are:
- * \parameter Metric: Select this metric as follows:\n
- *    <tt>(Metric "AdvancedMeanSquares")</tt>
- * \parameter UseNormalization: Bool to use normalization or not.\n
- *    If true, the MeanSquares is divided by a factor (range/10)^2,
- *    where range represents the maximum gray value range of the images.\n
- *    <tt>(UseNormalization "true")</tt>\n
- *    The default value is false.
- *
- * \ingroup Metrics
- *
- */
-
 template <typename TElastix>
 class ITK_TEMPLATE_EXPORT AdvancedMeanSquaresMetric
   : public itk::AdvancedMeanSquaresImageToImageMetric<typename MetricBase<TElastix>::FixedImageType,
