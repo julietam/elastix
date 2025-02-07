@@ -31,7 +31,7 @@ namespace elastix
 
 template <typename TElastix>
 void
-AdvancedMeanSquaresMetric<TElastix>::Initialize()
+AdvancedMeanSquaresMetric<TElastix>::Initialize() override
 {
   itk::TimeProbe timer;
   timer.Start();
@@ -49,7 +49,7 @@ AdvancedMeanSquaresMetric<TElastix>::Initialize()
 
 template <typename TElastix>
 void
-AdvancedMeanSquaresMetric<TElastix>::BeforeEachResolution()
+AdvancedMeanSquaresMetric<TElastix>::BeforeEachResolution() override
 {
   const Configuration & configuration = itk::Deref(Superclass2::GetConfiguration());
 
@@ -63,6 +63,17 @@ AdvancedMeanSquaresMetric<TElastix>::BeforeEachResolution()
 
 } // end BeforeEachResolution()
 
+
+/**
+ * ***************** SetWeightedMask ***********************
+ */
+
+template <typename TElastix>
+void
+AdvancedMeanSquaresMetric<TElastix>::SetWeightedMask(const typename FixedImageType::Pointer & mask)
+{
+  this->Superclass1::SetWeightedMask(mask);
+}
 
 } // end namespace elastix
 

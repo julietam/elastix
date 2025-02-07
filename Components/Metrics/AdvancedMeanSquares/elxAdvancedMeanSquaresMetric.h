@@ -45,7 +45,7 @@ public:
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkOverrideGetNameOfClassMacro(AdvancedMeanSquaresMetric);
+  itkTypeMacro(AdvancedMeanSquaresMetric, itk::AdvancedMeanSquaresImageToImageMetric);
 
   /** Name of this class.
    * Use this name in the parameter file to select this specific metric. \n
@@ -105,16 +105,14 @@ public:
   /** Sets up a timer to measure the initialization time and
    * calls the Superclass' implementation.
    */
-  void
-  Initialize() override;
+  void Initialize() override;
 
   /**
    * Do some things before each resolution:
    * \li Set CheckNumberOfSamples setting
    * \li Set UseNormalization setting
    */
-  void
-  BeforeEachResolution() override;
+  void BeforeEachResolution() override;
 
 protected:
   /** The constructor. */
@@ -125,7 +123,7 @@ protected:
   /** Set the weighted mask. */
   void SetWeightedMask(const typename FixedImageType::Pointer & mask)
   {
-    this->GetMetric()->SetWeightedMask(mask);
+    this->Superclass1::SetWeightedMask(mask);
   }
 
 private:

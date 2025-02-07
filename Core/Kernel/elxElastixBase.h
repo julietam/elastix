@@ -175,6 +175,13 @@ public:
   /** Typedef that is used in the elastix dll version. */
   using ParameterMapType = itk::ParameterMapInterface::ParameterMapType;
 
+  /** Typedefs for the fixed and moving image types. */
+  using FixedImageType = itk::Image<float, 3>; // Adjust the pixel type and dimension as needed
+  using MovingImageType = itk::Image<float, 3>; // Adjust the pixel type and dimension as needed
+
+  /** Typedef for the registration base type. */
+  using RegistrationBaseType = itk::Object; // Adjust the base type as needed
+
   /** Set/Get the Configuration Object. */
   elxGetObjectMacro(Configuration, Configuration);
   elxSetObjectMacro(Configuration, Configuration);
