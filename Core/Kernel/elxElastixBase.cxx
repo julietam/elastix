@@ -21,7 +21,7 @@
 #include <sstream>
 #include "itkMersenneTwisterRandomVariateGenerator.h"
 #include "itkImageFileReader.h"
-#include <Components/Metrics/AdvancedMeanSquares/elxAdvancedMeanSquaresMetric.h> // Ensure this path is correct
+#include "Components/Metrics/AdvancedMeanSquares/elxAdvancedMeanSquaresMetric.h" // Ensure this path is correct
 
 namespace elastix
 {
@@ -149,7 +149,11 @@ typename TImage::Pointer LoadImage(const std::string & fileName)
  * ********************* Constructor ****************************
  */
 
-ElastixBase::ElastixBase() : m_WeightedFixedMaskContainer(DataObjectContainerType::New()) {}
+ElastixBase::ElastixBase() 
+  : m_WeightedFixedMaskContainer(DataObjectContainerType::New()), 
+    m_Metric(nullptr) // Initialize m_Metric
+{
+}
 
 /**
  * ********************* GenerateDataObjectContainer ***********************
@@ -561,7 +565,6 @@ ElastixBase::GetNumberOfTransformConfigurations() const
 itk::Object *
 ElastixBase::GetMetric() const
 {
-  // Assuming m_Metric is a member variable of type itk::Object::Pointer
   return m_Metric.GetPointer();
 }
 

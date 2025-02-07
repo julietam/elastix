@@ -552,6 +552,8 @@ private:
 
   DataObjectContainerPointer m_WeightedFixedMaskContainer{ DataObjectContainerType::New() };
   FileNameContainerPointer m_WeightedFixedMaskFileNameContainer{ FileNameContainerType::New() };
+
+  itk::Object::Pointer m_Metric; // Declare the m_Metric member variable
 };
 
 } // end namespace elastix
