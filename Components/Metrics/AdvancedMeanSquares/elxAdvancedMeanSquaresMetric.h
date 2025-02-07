@@ -114,17 +114,17 @@ public:
    */
   void BeforeEachResolution() override;
 
-protected:
-  /** The constructor. */
-  AdvancedMeanSquaresMetric() = default;
-  /** The destructor. */
-  ~AdvancedMeanSquaresMetric() override = default;
-
   /** Set the weighted mask. */
   void SetWeightedMask(const typename FixedImageType::Pointer & mask)
   {
     this->Superclass1::SetWeightedMask(mask);
   }
+
+protected:
+  /** The constructor. */
+  AdvancedMeanSquaresMetric() = default;
+  /** The destructor. */
+  ~AdvancedMeanSquaresMetric() override = default;
 
 private:
   elxOverrideGetSelfMacro;
