@@ -698,9 +698,9 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
     using FixedImagePointType = typename TFixedImage::PointType;
     FixedImagePointType fixedImagePoint;
     fixedImagePoint.Fill(fixedImageValue); // Fill the point with the fixedImageValue
-    
+
     // Assuming fixedImageValue is a physical point, we need to get the corresponding index
-    const FixedImageIndexType fixedIndex = this->GetFixedImage()->TransformPhysicalPointToIndex(fixedImageValue);
+    const FixedImageIndexType fixedIndex = this->GetFixedImage()->TransformPhysicalPointToIndex(fixedImagePoint);
     weight = m_WeightedMask->GetPixel(fixedIndex);
   }
 
