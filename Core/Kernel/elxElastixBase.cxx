@@ -21,6 +21,8 @@
 #include <sstream>
 #include "itkMersenneTwisterRandomVariateGenerator.h"
 #include "itkImageFileReader.h"
+#include "elxAdvancedMeanSquaresMetric.h" // Ensure this path is correct
+
 namespace elastix
 {
 
