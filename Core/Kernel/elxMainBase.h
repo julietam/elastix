@@ -19,7 +19,6 @@
 #define elxMainBase_h
 
 #include "elxComponentDatabase.h"
-
 #include "elxElastixBase.h"
 #include "itkParameterMapInterface.h"
 
@@ -29,7 +28,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-
 
 namespace elastix
 {

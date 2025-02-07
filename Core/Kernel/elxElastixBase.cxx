@@ -255,6 +255,7 @@ ElastixBase::BeforeAllBase()
           if (metric)
           {
             metric->SetWeightedMask(mask);
+            log::info("Weighted mask set in the metric.");
           }
         }
       }
