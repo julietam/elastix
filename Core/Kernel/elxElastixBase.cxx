@@ -21,6 +21,8 @@
 #include <sstream>
 #include "itkMersenneTwisterRandomVariateGenerator.h"
 #include "itkImageFileReader.h"
+#include <Components/Metrics/AdvancedMeanSquares/elxAdvancedMeanSquaresMetric.h> // Ensure this path is correct
+
 namespace elastix
 {
 
@@ -245,7 +247,7 @@ ElastixBase::BeforeAllBase()
           log::info(std::ostringstream{} << "Weighted fixed mask image size: " << mask->GetLargestPossibleRegion().GetSize()
                                          << ", type: " << mask->GetNameOfClass());
           // Set the weighted mask in the metric
-          auto metric = dynamic_cast<AdvancedMeanSquaresMetric<ElastixBase>*>(this->GetMetric());
+          auto metric = dynamic_cast<elastix::AdvancedMeanSquaresMetric<ElastixBase>*>(this->GetMetric());
           if (metric)
           {
             metric->SetWeightedMask(mask);
