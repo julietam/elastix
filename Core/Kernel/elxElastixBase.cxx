@@ -244,7 +244,7 @@ ElastixBase::BeforeAllBase()
       // Populate m_WeightedFixedMaskContainer with the actual mask images
       for (const auto & fileName : *m_WeightedFixedMaskFileNameContainer)
       {
-        auto mask = LoadImage<itk::Image<unsigned char, 3>>(fileName); // Adjust the image type as needed
+        auto mask = LoadImage<itk::Image<float, 3>>(fileName); // Adjust the image type as needed
         if (mask)
         {
           m_WeightedFixedMaskContainer->push_back(mask);
