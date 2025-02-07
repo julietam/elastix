@@ -694,7 +694,8 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   RealType weight = 1.0;
   if (m_WeightedMask)
   {
-    const auto fixedIndex = this->GetFixedImage()->TransformPhysicalPointToIndex(fixedImageValue);
+    const FixedImagePointType fixedPoint = this->GetFixedImage()->TransformIndexToPhysicalPoint(fixedImageValue);
+    const auto fixedIndex = this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint);
     weight = m_WeightedMask->GetPixel(fixedIndex);
   }
 
