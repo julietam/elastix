@@ -245,7 +245,7 @@ ElastixBase::BeforeAllBase()
       for (const auto & fileName : *m_WeightedFixedMaskFileNameContainer)
       {
         log::info(std::ostringstream{} << "Reading weighted fixed mask from file: " << fileName);
-        using MaskImageType = itk::Image<float, 3>;
+        using MaskImageType = itk::Image<unsigned char, 3>; // Assuming the image is 8-bit
         using ReaderType = itk::ImageFileReader<MaskImageType>;
         ReaderType::Pointer reader = ReaderType::New();
         reader->SetFileName(fileName);
@@ -256,14 +256,19 @@ ElastixBase::BeforeAllBase()
           m_WeightedFixedMaskContainer->push_back(maskImage);
           log::info(std::ostringstream{} << "Weighted fixed mask image size: " << maskImage->GetLargestPossibleRegion().GetSize()
                                          << ", type: " << maskImage->GetNameOfClass());
+          // Print detailed information about the image
+          log::info(std::ostringstream{} << "Image spacing: " << maskImage->GetSpacing());
+          log::info(std::ostringstream{} << "Image origin: " << maskImage->GetOrigin());
+          log::info(std::ostringstream{} << "Image direction: " << maskImage->GetDirection());
+
           // Calculate and print the mean intensity value of the voxels greater than 0
           itk::ImageRegionConstIterator<MaskImageType> it(maskImage, maskImage->GetLargestPossibleRegion());
           it.GoToBegin();
           double sum = 0.0;
           unsigned int count = 0;
           unsigned int countGreaterThanOne = 0;
-          float minValue = std::numeric_limits<float>::max();
-          float maxValue = std::numeric_limits<float>::lowest();
+          unsigned char minValue = std::numeric_limits<unsigned char>::max();
+          unsigned char maxValue = std::numeric_limits<unsigned char>::lowest();
           while (!it.IsAtEnd())
           {
             if (it.Get() > 0)
@@ -285,7 +290,7 @@ ElastixBase::BeforeAllBase()
               // Print some of the mask values for debugging
               if (count <= 10) // Adjust the number of values to print as needed
               {
-                log::info(std::ostringstream{} << "Mask value at index " << it.GetIndex() << ": " << it.Get());
+                log::info(std::ostringstream{} << "Mask value at index " << it.GetIndex() << ": " << static_cast<int>(it.Get()));
               }
             }
             ++it;
@@ -295,8 +300,8 @@ ElastixBase::BeforeAllBase()
             double mean = sum / count;
             log::info(std::ostringstream{} << "Mean intensity value of voxels greater than 0: " << mean);
             log::info(std::ostringstream{} << "Total number of voxels with intensity greater than 1: " << countGreaterThanOne);
-            log::info(std::ostringstream{} << "Minimum intensity value: " << minValue);
-            log::info(std::ostringstream{} << "Maximum intensity value: " << maxValue);
+            log::info(std::ostringstream{} << "Minimum intensity value: " << static_cast<int>(minValue));
+            log::info(std::ostringstream{} << "Maximum intensity value: " << static_cast<int>(maxValue));
           }
           else
           {
