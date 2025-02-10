@@ -133,7 +133,7 @@ ElastixMain::Run()
   if (elastixBase.GetMetricContainer()->Size() > 0)
   {
     elastixBase.SetMetric(elastixBase.GetMetricContainer()->ElementAt(0));
-    log::info("Metric set in ElastixBase.");
+    log::info("Metric set in ElastixBase. Metric type: " << typeid(*elastixBase.GetMetric()).name());
   }
   else
   {
