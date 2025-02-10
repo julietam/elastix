@@ -250,6 +250,29 @@ ElastixBase::BeforeAllBase()
           m_WeightedFixedMaskContainer->push_back(mask);
           log::info(std::ostringstream{} << "Weighted fixed mask image size: " << mask->GetLargestPossibleRegion().GetSize()
                                          << ", type: " << mask->GetNameOfClass());
+          // Calculate and print the mean intensity value of the voxels greater than 0
+          itk::ImageRegionConstIterator<itk::Image<float, 3>> it(mask, mask->GetLargestPossibleRegion());
+          it.GoToBegin();
+          double sum = 0.0;
+          unsigned int count = 0;
+          while (!it.IsAtEnd())
+          {
+            if (it.Get() > 0)
+            {
+              sum += it.Get();
+              ++count;
+            }
+            ++it;
+          }
+          if (count > 0)
+          {
+            double mean = sum / count;
+            log::info(std::ostringstream{} << "Mean intensity value of voxels greater than 0: " << mean);
+          }
+          else
+          {
+            log::info("No voxels with intensity greater than 0 found.");
+          }
           // Set the weighted mask in the metric
           auto metric = dynamic_cast<elastix::AdvancedMeanSquaresMetric<elastix::ElastixTemplate<itk::Image<float, 3>, itk::Image<float, 3>>>*>(this->GetMetric());
           if (metric)
