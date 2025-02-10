@@ -272,6 +272,16 @@ ElastixBase::BeforeAllBase()
     }
   }
 
+  // Check if the weighted mask is set
+  if (this->GetWeightedFixedMaskContainer()->Size() > 0)
+  {
+    log::info("Weighted fixed mask is set.");
+  }
+  else
+  {
+    log::warn("Weighted fixed mask is not set.");
+  }
+
   /** Check for appearance of "-out". */
   if (const std::string commandLineArgument = m_Configuration->GetCommandLineArgument("-out");
       !commandLineArgument.empty())

@@ -40,6 +40,16 @@ AdvancedMeanSquaresMetric<TElastix>::Initialize()
   log::info(std::ostringstream{} << "Initialization of AdvancedMeanSquares metric took: "
                                  << static_cast<long>(timer.GetMean() * 1000) << " ms.");
 
+  // Check if the weighted mask is not null
+  if (this->GetWeightedMask())
+  {
+    log::info("Weighted mask is set.");
+  }
+  else
+  {
+    log::warn("Weighted mask is not set.");
+  }
+
 } // end Initialize()
 
 

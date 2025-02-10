@@ -101,6 +101,16 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
     this->m_NormalizationFactor = 1.0;
   }
 
+  // Check if the weighted mask is not null
+  if (this->GetWeightedMask())
+  {
+    std::cout << "Weighted mask is set." << std::endl;
+  }
+  else
+  {
+    std::cout << "Weighted mask is not set." << std::endl;
+  }
+
 } // end Initialize()
 
 
