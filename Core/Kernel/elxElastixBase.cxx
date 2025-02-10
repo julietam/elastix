@@ -308,7 +308,8 @@ ElastixBase::BeforeAllBase()
             log::info("No voxels with intensity greater than 0 found.");
           }
           // Set the weighted mask in the metric
-          auto metric = dynamic_cast<elastix::AdvancedMeanSquaresMetric<elastix::ElastixTemplate<MaskImageType, MaskImageType>>*>(this->GetMetric());
+          using MetricType = elastix::AdvancedMeanSquaresMetric<elastix::ElastixTemplate<itk::Image<float, 3>, itk::Image<float, 3>>>;
+          auto metric = dynamic_cast<MetricType*>(this->GetMetric());
           if (metric)
           {
             log::info(std::ostringstream{} << "Metric type: " << typeid(*metric).name());
@@ -325,6 +326,22 @@ ElastixBase::BeforeAllBase()
         catch (itk::ExceptionObject & err)
         {
           log::error(std::ostringstream{} << "ERROR: Failed to load weighted fixed mask from file: " << fileName << ". " << err);
+        }
+      }
+
+      // Verify the contents of m_WeightedFixedMaskContainer
+      log::info(std::ostringstream{} << "Number of weighted fixed masks loaded: " << m_WeightedFixedMaskContainer->Size());
+      for (unsigned int i = 0; i < m_WeightedFixedMaskContainer->Size(); ++i)
+      {
+        auto maskImage = dynamic_cast<MaskImageType*>(m_WeightedFixedMaskContainer->ElementAt(i).GetPointer());
+        if (maskImage)
+        {
+          log::info(std::ostringstream{} << "Weighted fixed mask " << i << " size: " << maskImage->GetLargestPossibleRegion().GetSize()
+                                         << ", type: " << maskImage->GetNameOfClass());
+        }
+        else
+        {
+          log::warn(std::ostringstream{} << "Weighted fixed mask " << i << " is not of type MaskImageType.");
         }
       }
     }
