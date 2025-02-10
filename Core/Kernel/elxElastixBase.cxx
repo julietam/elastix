@@ -328,22 +328,6 @@ ElastixBase::BeforeAllBase()
           log::error(std::ostringstream{} << "ERROR: Failed to load weighted fixed mask from file: " << fileName << ". " << err);
         }
       }
-
-      // Verify the contents of m_WeightedFixedMaskContainer
-      log::info(std::ostringstream{} << "Number of weighted fixed masks loaded: " << m_WeightedFixedMaskContainer->Size());
-      for (unsigned int i = 0; i < m_WeightedFixedMaskContainer->Size(); ++i)
-      {
-        auto maskImage = dynamic_cast<MaskImageType*>(m_WeightedFixedMaskContainer->ElementAt(i).GetPointer());
-        if (maskImage)
-        {
-          log::info(std::ostringstream{} << "Weighted fixed mask " << i << " size: " << maskImage->GetLargestPossibleRegion().GetSize()
-                                         << ", type: " << maskImage->GetNameOfClass());
-        }
-        else
-        {
-          log::warn(std::ostringstream{} << "Weighted fixed mask " << i << " is not of type MaskImageType.");
-        }
-      }
     }
   }
 
