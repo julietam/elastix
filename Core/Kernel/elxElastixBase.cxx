@@ -257,6 +257,14 @@ ElastixBase::BeforeAllBase()
             metric->SetWeightedMask(mask);
             log::info("Weighted mask set in the metric.");
           }
+          else
+          {
+            log::error("ERROR: Metric is not of type AdvancedMeanSquaresMetric.");
+          }
+        }
+        else
+        {
+          log::error(std::ostringstream{} << "ERROR: Failed to load weighted fixed mask from file: " << fileName);
         }
       }
     }
