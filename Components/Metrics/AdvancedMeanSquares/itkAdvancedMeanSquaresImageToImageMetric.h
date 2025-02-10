@@ -153,6 +153,10 @@ public:
   itkSetMacro(UseNormalization, bool);
   itkGetConstMacro(UseNormalization, bool);
 
+  /** Set/Get the weighted mask. */
+  void SetWeightedMask(const typename FixedImageType::Pointer & mask) { m_WeightedMask = mask; }
+  typename FixedImageType::Pointer GetWeightedMask() const { return m_WeightedMask; }
+
 protected:
   AdvancedMeanSquaresImageToImageMetric();
   ~AdvancedMeanSquaresImageToImageMetric() override = default;
@@ -198,10 +202,6 @@ protected:
   /** Gather the values and derivatives from all threads. */
   void
   AfterThreadedGetValueAndDerivative(MeasureType & value, DerivativeType & derivative) const override;
-
-  /** Set/Get the weighted mask. */
-  void SetWeightedMask(const typename FixedImageType::Pointer & mask) { m_WeightedMask = mask; }
-  typename FixedImageType::Pointer GetWeightedMask() const { return m_WeightedMask; }
 
 private:
   double m_NormalizationFactor{ 1.0 };
