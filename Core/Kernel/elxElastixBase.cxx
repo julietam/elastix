@@ -261,6 +261,8 @@ ElastixBase::BeforeAllBase()
             double sum = 0.0;
             unsigned int count = 0;
             unsigned int countGreaterThanOne = 0;
+            float minValue = std::numeric_limits<float>::max();
+            float maxValue = std::numeric_limits<float>::lowest();
             while (!it.IsAtEnd())
             {
               if (it.Get() > 0)
@@ -270,6 +272,14 @@ ElastixBase::BeforeAllBase()
                 if (it.Get() > 1)
                 {
                   ++countGreaterThanOne;
+                }
+                if (it.Get() < minValue)
+                {
+                  minValue = it.Get();
+                }
+                if (it.Get() > maxValue)
+                {
+                  maxValue = it.Get();
                 }
                 // Print some of the mask values for debugging
                 if (count <= 10) // Adjust the number of values to print as needed
@@ -284,6 +294,8 @@ ElastixBase::BeforeAllBase()
               double mean = sum / count;
               log::info(std::ostringstream{} << "Mean intensity value of voxels greater than 0: " << mean);
               log::info(std::ostringstream{} << "Total number of voxels with intensity greater than 1: " << countGreaterThanOne);
+              log::info(std::ostringstream{} << "Minimum intensity value: " << minValue);
+              log::info(std::ostringstream{} << "Maximum intensity value: " << maxValue);
             }
             else
             {
