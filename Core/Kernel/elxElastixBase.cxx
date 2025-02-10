@@ -259,7 +259,9 @@ ElastixBase::BeforeAllBase()
           }
           else
           {
-            log::error("ERROR: Metric is not of type AdvancedMeanSquaresMetric. Actual type: " << typeid(*this->GetMetric()).name());
+            std::ostringstream errorMsg;
+            errorMsg << "ERROR: Metric is not of type AdvancedMeanSquaresMetric. Actual type: " << typeid(*this->GetMetric()).name();
+            log::error(errorMsg.str());
           }
         }
         else
