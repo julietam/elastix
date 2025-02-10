@@ -311,6 +311,7 @@ ElastixBase::BeforeAllBase()
           auto metric = dynamic_cast<elastix::AdvancedMeanSquaresMetric<elastix::ElastixTemplate<MaskImageType, MaskImageType>>*>(this->GetMetric());
           if (metric)
           {
+            log::info(std::ostringstream{} << "Metric type: " << typeid(*metric).name());
             metric->SetWeightedMask(maskImage);
             log::info("Weighted mask set in the metric.");
           }
