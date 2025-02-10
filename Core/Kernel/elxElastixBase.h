@@ -405,6 +405,12 @@ public:
   /** Get the metric. */
   itk::Object * GetMetric() const;
 
+  /** Set the metric. */
+  void SetMetric(itk::Object::Pointer metric)
+  {
+    m_Metric = metric;
+  }
+
 protected:
   ElastixBase();
   ~ElastixBase() override = default;
