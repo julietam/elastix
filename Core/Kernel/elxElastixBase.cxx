@@ -242,61 +242,72 @@ ElastixBase::BeforeAllBase()
       log::info(std::ostringstream{} << "-wfMask    size: " << m_WeightedFixedMaskFileNameContainer->Size() 
                                      << ", type: " << typeid(m_WeightedFixedMaskFileNameContainer).name());
       // Populate m_WeightedFixedMaskContainer with the actual mask images
-      for (const auto & fileName : *m_WeightedFixedMaskFileNameContainer)
+      try
       {
-        auto mask = LoadImage<itk::Image<float, 3>>(fileName); // Adjust the image type as needed
-        if (mask)
+        m_WeightedFixedMaskContainer = MultipleImageLoader<itk::Image<float, 3>>::GenerateImageContainer(
+          m_WeightedFixedMaskFileNameContainer, "weighted fixed mask", true);
+        log::info(std::ostringstream{} << "Loaded " << m_WeightedFixedMaskContainer->Size() << " weighted fixed mask images.");
+        
+        for (const auto & mask : *m_WeightedFixedMaskContainer)
         {
-          m_WeightedFixedMaskContainer->push_back(mask);
-          log::info(std::ostringstream{} << "Weighted fixed mask image size: " << mask->GetLargestPossibleRegion().GetSize()
-                                         << ", type: " << mask->GetNameOfClass());
-          // Calculate and print the mean intensity value of the voxels greater than 0
-          itk::ImageRegionConstIterator<itk::Image<float, 3>> it(mask, mask->GetLargestPossibleRegion());
-          it.GoToBegin();
-          double sum = 0.0;
-          unsigned int count = 0;
-          unsigned int countGreaterThanOne = 0;
-          while (!it.IsAtEnd())
+          auto maskImage = dynamic_cast<itk::Image<float, 3> *>(mask.GetPointer());
+          if (maskImage)
           {
-            if (it.Get() > 0)
+            log::info(std::ostringstream{} << "Weighted fixed mask image size: " << maskImage->GetLargestPossibleRegion().GetSize()
+                                           << ", type: " << maskImage->GetNameOfClass());
+            // Calculate and print the mean intensity value of the voxels greater than 0
+            itk::ImageRegionConstIterator<itk::Image<float, 3>> it(maskImage, maskImage->GetLargestPossibleRegion());
+            it.GoToBegin();
+            double sum = 0.0;
+            unsigned int count = 0;
+            unsigned int countGreaterThanOne = 0;
+            while (!it.IsAtEnd())
             {
-              sum += it.Get();
-              ++count;
-              if (it.Get() > 1)
+              if (it.Get() > 0)
               {
-                ++countGreaterThanOne;
+                sum += it.Get();
+                ++count;
+                if (it.Get() > 1)
+                {
+                  ++countGreaterThanOne;
+                }
+                // Print some of the mask values for debugging
+                if (count <= 10) // Adjust the number of values to print as needed
+                {
+                  log::info(std::ostringstream{} << "Mask value at index " << it.GetIndex() << ": " << it.Get());
+                }
               }
+              ++it;
             }
-            ++it;
-          }
-          if (count > 0)
-          {
-            double mean = sum / count;
-            log::info(std::ostringstream{} << "Mean intensity value of voxels greater than 0: " << mean);
-            log::info(std::ostringstream{} << "Total number of voxels with intensity greater than 1: " << countGreaterThanOne);
-          }
-          else
-          {
-            log::info("No voxels with intensity greater than 0 found.");
-          }
-          // Set the weighted mask in the metric
-          auto metric = dynamic_cast<elastix::AdvancedMeanSquaresMetric<elastix::ElastixTemplate<itk::Image<float, 3>, itk::Image<float, 3>>>*>(this->GetMetric());
-          if (metric)
-          {
-            metric->SetWeightedMask(mask);
-            log::info("Weighted mask set in the metric.");
-          }
-          else
-          {
-            std::ostringstream errorMsg;
-            errorMsg << "ERROR: Metric is not of type AdvancedMeanSquaresMetric. Actual type: " << typeid(*this->GetMetric()).name();
-            log::error(errorMsg.str());
+            if (count > 0)
+            {
+              double mean = sum / count;
+              log::info(std::ostringstream{} << "Mean intensity value of voxels greater than 0: " << mean);
+              log::info(std::ostringstream{} << "Total number of voxels with intensity greater than 1: " << countGreaterThanOne);
+            }
+            else
+            {
+              log::info("No voxels with intensity greater than 0 found.");
+            }
+            // Set the weighted mask in the metric
+            auto metric = dynamic_cast<elastix::AdvancedMeanSquaresMetric<elastix::ElastixTemplate<itk::Image<float, 3>, itk::Image<float, 3>>>*>(this->GetMetric());
+            if (metric)
+            {
+              metric->SetWeightedMask(maskImage);
+              log::info("Weighted mask set in the metric.");
+            }
+            else
+            {
+              std::ostringstream errorMsg;
+              errorMsg << "ERROR: Metric is not of type AdvancedMeanSquaresMetric. Actual type: " << typeid(*this->GetMetric()).name();
+              log::error(errorMsg.str());
+            }
           }
         }
-        else
-        {
-          log::error(std::ostringstream{} << "ERROR: Failed to load weighted fixed mask from file: " << fileName);
-        }
+      }
+      catch (itk::ExceptionObject & err)
+      {
+        log::error(std::ostringstream{} << "ERROR: Failed to load weighted fixed mask images. " << err);
       }
     }
   }
