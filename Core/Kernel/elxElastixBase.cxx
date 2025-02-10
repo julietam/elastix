@@ -255,12 +255,17 @@ ElastixBase::BeforeAllBase()
           it.GoToBegin();
           double sum = 0.0;
           unsigned int count = 0;
+          unsigned int countGreaterThanOne = 0;
           while (!it.IsAtEnd())
           {
             if (it.Get() > 0)
             {
               sum += it.Get();
               ++count;
+              if (it.Get() > 1)
+              {
+                ++countGreaterThanOne;
+              }
             }
             ++it;
           }
@@ -268,6 +273,7 @@ ElastixBase::BeforeAllBase()
           {
             double mean = sum / count;
             log::info(std::ostringstream{} << "Mean intensity value of voxels greater than 0: " << mean);
+            log::info(std::ostringstream{} << "Total number of voxels with intensity greater than 1: " << countGreaterThanOne);
           }
           else
           {
