@@ -129,6 +129,18 @@ ElastixMain::Run()
 
   elastixBase.SetMetricContainer(this->CreateComponents("Metric", "", errorCode));
 
+  // Ensure the metric is set correctly
+  if (elastixBase.GetMetricContainer()->Size() > 0)
+  {
+    elastixBase.SetMetric(elastixBase.GetMetricContainer()->ElementAt(0));
+    log::info("Metric set in ElastixBase.");
+  }
+  else
+  {
+    log::error("ERROR: No metric found in MetricContainer.");
+    return 1;
+  }
+
   elastixBase.SetOptimizerContainer(this->CreateComponents("Optimizer", "", errorCode));
 
   elastixBase.SetResampleInterpolatorContainer(
