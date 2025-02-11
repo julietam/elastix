@@ -185,7 +185,8 @@ protected:
                                 const DerivativeType &             imageJacobian,
                                 const NonZeroJacobianIndicesType & nzji,
                                 MeasureType &                      measure,
-                                DerivativeType &                   deriv) const;
+                                DerivativeType &                   deriv,
+                                const FixedImagePointType &        fixedPoint) const;
 
   /** Get value for each thread. */
   void

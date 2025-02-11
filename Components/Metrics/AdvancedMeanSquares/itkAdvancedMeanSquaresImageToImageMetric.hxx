@@ -498,7 +498,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueAndDer
 #endif
 
       /** Compute this pixel's contribution to the measure and derivatives. */
-      this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative);
+      this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative, fixedPoint);
 
     } // end if sampleOk
 
@@ -648,7 +648,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
 #endif
 
       /** Compute this pixel's contribution to the measure and derivatives. */
-      this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative);
+      this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative, fixedPoint);
 
     } // end if sampleOk
 
@@ -724,13 +724,13 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   const DerivativeType &             imageJacobian,
   const NonZeroJacobianIndicesType & nzji,
   MeasureType &                      measure,
-  DerivativeType &                   deriv) const
+  DerivativeType &                   deriv,
+  const FixedImagePointType &        fixedPoint) const // Add fixedPoint as a parameter
 {
   // Get the weight from the weighted mask
   RealType weight = 1.0;
   if (m_WeightedMask)
   {
-    // Assuming fixedImageValue is a pixel value, we need to get the corresponding physical point
     FixedImageIndexType fixedIndex;
     this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
     weight = m_WeightedMask->GetPixel(fixedIndex);
