@@ -107,6 +107,11 @@ public:
   using typename Superclass::MovingImageLimiterOutputType;
   using typename Superclass::MovingImageDerivativeScalesType;
   using typename Superclass::ThreadInfoType;
+  
+  // Add this to the public typedefs section
+  using WeightImageType = itk::Image<float, FixedImageDimension>;  // or double if needed
+  // Add this to the public typedefs section WeightImagePointer 
+  using WeightImagePointer = typename WeightImageType::Pointer;
 
   /** The fixed image dimension. */
   itkStaticConstMacro(FixedImageDimension, unsigned int, FixedImageType::ImageDimension);
@@ -155,7 +160,8 @@ public:
 
   /** Set/Get the weighted mask. */
   void SetWeightedMask(const typename FixedImageType::Pointer & mask) { m_WeightedMask = mask; }
-  typename FixedImageType::Pointer GetWeightedMask() const { return m_WeightedMask; }
+  /** ADded WeightImagePointer as a new type */
+  WeightImagePointer  GetWeightedMask() const { return m_WeightedMask; }
 
 protected:
   AdvancedMeanSquaresImageToImageMetric();
@@ -207,7 +213,8 @@ protected:
 private:
   double m_NormalizationFactor{ 1.0 };
   bool   m_UseNormalization{ false };
-  typename FixedImageType::Pointer m_WeightedMask;
+  // Add this member variable WeightImagePointer m_WeightedMask
+  WeightImagePointer  m_WeightedMask;
 };
 
 } // end namespace itk
