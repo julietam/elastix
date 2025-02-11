@@ -245,7 +245,7 @@ ElastixBase::BeforeAllBase()
       for (const auto & fileName : *m_WeightedFixedMaskFileNameContainer)
       {
         log::info(std::ostringstream{} << "Reading weighted fixed mask from file: " << fileName);
-        using MaskImageType = itk::Image<float, 3>; // Ensure the mask image is read as float
+        using MaskImageType = itk::Image<unsigned char, 3>; // Assuming the image is 8-bit
         using ReaderType = itk::ImageFileReader<MaskImageType>;
         ReaderType::Pointer reader = ReaderType::New();
         reader->SetFileName(fileName);
@@ -261,8 +261,16 @@ ElastixBase::BeforeAllBase()
           log::info(std::ostringstream{} << "Image origin: " << maskImage->GetOrigin());
           log::info(std::ostringstream{} << "Image direction: " << maskImage->GetDirection());
 
+          // Convert the mask image to float
+          using FloatMaskImageType = itk::Image<float, 3>;
+          using CastFilterType = itk::CastImageFilter<MaskImageType, FloatMaskImageType>;
+          CastFilterType::Pointer castFilter = CastFilterType::New();
+          castFilter->SetInput(maskImage);
+          castFilter->Update();
+          FloatMaskImageType::Pointer floatMaskImage = castFilter->GetOutput();
+
           // Calculate and print the mean intensity value of the voxels greater than 0
-          itk::ImageRegionConstIterator<MaskImageType> it(maskImage, maskImage->GetLargestPossibleRegion());
+          itk::ImageRegionConstIterator<FloatMaskImageType> it(floatMaskImage, floatMaskImage->GetLargestPossibleRegion());
           it.GoToBegin();
           double sum = 0.0;
           unsigned int count = 0;
@@ -308,12 +316,12 @@ ElastixBase::BeforeAllBase()
             log::info("No voxels with intensity greater than 0 found.");
           }
           // Set the weighted mask in the metric
-          using MetricType = elastix::AdvancedMeanSquaresMetric<elastix::ElastixTemplate<MaskImageType, MaskImageType>>;
+          using MetricType = elastix::AdvancedMeanSquaresMetric<elastix::ElastixTemplate<FloatMaskImageType, FloatMaskImageType>>;
           auto metric = dynamic_cast<MetricType*>(this->GetMetric());
           if (metric)
           {
             log::info(std::ostringstream{} << "Metric type: " << typeid(*metric).name());
-            metric->SetWeightedMask(maskImage);
+            metric->SetWeightedMask(floatMaskImage);
             log::info("Weighted mask set in the metric.");
           }
           else

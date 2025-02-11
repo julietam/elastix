@@ -738,9 +738,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   {
     FixedImageIndexType fixedIndex;
     this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
-    if (this->GetWeightedMask()->GetLargestPossibleRegion().IsInside(fixedIndex)) {
-      weight = static_cast<RealType>(this->GetWeightedMask()->GetPixel(fixedIndex));
-    }
+    weight = m_WeightedMask->GetPixel(fixedIndex);
     std::cout << "Weight from mask at index " << fixedIndex << ": " << weight << std::endl;
   }
 
