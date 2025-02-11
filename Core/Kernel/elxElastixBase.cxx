@@ -261,14 +261,22 @@ ElastixBase::BeforeAllBase()
           log::info(std::ostringstream{} << "Image origin: " << maskImage->GetOrigin());
           log::info(std::ostringstream{} << "Image direction: " << maskImage->GetDirection());
 
+          // Convert the mask image to float
+          using FloatMaskImageType = itk::Image<float, 3>;
+          using CastFilterType = itk::CastImageFilter<MaskImageType, FloatMaskImageType>;
+          CastFilterType::Pointer castFilter = CastFilterType::New();
+          castFilter->SetInput(maskImage);
+          castFilter->Update();
+          FloatMaskImageType::Pointer floatMaskImage = castFilter->GetOutput();
+
           // Calculate and print the mean intensity value of the voxels greater than 0
-          itk::ImageRegionConstIterator<MaskImageType> it(maskImage, maskImage->GetLargestPossibleRegion());
+          itk::ImageRegionConstIterator<FloatMaskImageType> it(floatMaskImage, floatMaskImage->GetLargestPossibleRegion());
           it.GoToBegin();
           double sum = 0.0;
           unsigned int count = 0;
           unsigned int countGreaterThanOne = 0;
-          unsigned char minValue = std::numeric_limits<unsigned char>::max();
-          unsigned char maxValue = std::numeric_limits<unsigned char>::lowest();
+          float minValue = std::numeric_limits<float>::max();
+          float maxValue = std::numeric_limits<float>::lowest();
           while (!it.IsAtEnd())
           {
             if (it.Get() > 0)
@@ -290,7 +298,7 @@ ElastixBase::BeforeAllBase()
               // Print some of the mask values for debugging
               if (count <= 10) // Adjust the number of values to print as needed
               {
-                log::info(std::ostringstream{} << "Mask value at index " << it.GetIndex() << ": " << static_cast<int>(it.Get()));
+                log::info(std::ostringstream{} << "Mask value at index " << it.GetIndex() << ": " << it.Get());
               }
             }
             ++it;
@@ -300,20 +308,20 @@ ElastixBase::BeforeAllBase()
             double mean = sum / count;
             log::info(std::ostringstream{} << "Mean intensity value of voxels greater than 0: " << mean);
             log::info(std::ostringstream{} << "Total number of voxels with intensity greater than 1: " << countGreaterThanOne);
-            log::info(std::ostringstream{} << "Minimum intensity value: " << static_cast<int>(minValue));
-            log::info(std::ostringstream{} << "Maximum intensity value: " << static_cast<int>(maxValue));
+            log::info(std::ostringstream{} << "Minimum intensity value: " << minValue);
+            log::info(std::ostringstream{} << "Maximum intensity value: " << maxValue);
           }
           else
           {
             log::info("No voxels with intensity greater than 0 found.");
           }
           // Set the weighted mask in the metric
-          using MetricType = elastix::AdvancedMeanSquaresMetric<elastix::ElastixTemplate<itk::Image<float, 3>, itk::Image<float, 3>>>;
+          using MetricType = elastix::AdvancedMeanSquaresMetric<elastix::ElastixTemplate<FloatMaskImageType, FloatMaskImageType>>;
           auto metric = dynamic_cast<MetricType*>(this->GetMetric());
           if (metric)
           {
             log::info(std::ostringstream{} << "Metric type: " << typeid(*metric).name());
-            metric->SetWeightedMask(maskImage);
+            metric->SetWeightedMask(floatMaskImage);
             log::info("Weighted mask set in the metric.");
           }
           else
