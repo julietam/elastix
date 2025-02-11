@@ -195,7 +195,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
         FixedImageIndexType fixedIndex;
         this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
         weight = this->GetWeightedMask()->GetPixel(fixedIndex);
-        log::info(std::ostringstream{} << "Weight from mask at index " << fixedIndex << ": " << weight);
+        std::cout << "Weight from mask at index " << fixedIndex << ": " << weight << std::endl;
       }
 
       /** The difference squared. */
@@ -203,7 +203,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
       measure += weight * diff * diff;
 
       // Log the equation used
-      log::info(std::ostringstream{} << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2");
+      std::cout << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2" << std::endl;
     } // end if sampleOk
 
   } // end for loop over the image sample container
@@ -735,7 +735,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
     // Get the corresponding index from the physical point
     const FixedImageIndexType fixedIndexFromPoint = this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint);
     weight = m_WeightedMask->GetPixel(fixedIndexFromPoint);
-    log::info(std::ostringstream{} << "Weight from mask at index " << fixedIndexFromPoint << ": " << weight);
+    std::cout << "Weight from mask at index " << fixedIndexFromPoint << ": " << weight << std::endl;
   }
 
   /** The difference squared. */
@@ -743,7 +743,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   measure += weight * diff * diff;
 
   // Log the equation used
-  log::info(std::ostringstream{} << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2");
+  std::cout << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2" << std::endl;
 
   /** Calculate the contributions to the derivatives with respect to each parameter. */
   const RealType diff_2 = weight * diff * 2.0;
