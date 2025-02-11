@@ -634,20 +634,25 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
       /** Get the fixed image value. */
       const auto fixedImageValue = static_cast<RealType>(threader_fiter->m_ImageValue);
 
-#if 0
-      /** Get the TransformJacobian dT/dmu. */
-      this->EvaluateTransformJacobian( fixedPoint, jacobian, nzji );
+      // Get the weight from the weighted mask
+      RealType weight = 1.0;
+      if (this->GetWeightedMask())
+      {
+        FixedImageIndexType fixedIndex;
+        this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
+        weight = this->GetWeightedMask()->GetPixel(fixedIndex);
+        std::cout << "Weight from mask at index " << fixedIndex << ": " << weight << std::endl;
+      }
 
-      /** Compute the inner products (dM/dx)^T (dT/dmu). */
-      this->EvaluateTransformJacobianInnerProduct(
-        jacobian, movingImageDerivative, imageJacobian );
-#else
-      /** Compute the inner product of the transform Jacobian dT/dmu and the moving image gradient dM/dx. */
-      Superclass::m_AdvancedTransform->EvaluateJacobianWithImageGradientProduct(
-        fixedPoint, movingImageDerivative, imageJacobian, nzji);
-#endif
+      /** The difference squared. */
+      const RealType diff = movingImageValue - fixedImageValue;
+      measure += weight * diff * diff;
 
-      /** Compute this pixel's contribution to the measure and derivatives. */
+      // Log the equation used
+      std::cout << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2" << std::endl;
+      std::cout << "Fixed image value: " << fixedImageValue << ", Moving image value: " << movingImageValue << ", Weight: " << weight << std::endl;
+
+      /** Compute this pixel's contribution to the derivatives. */
       this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative, fixedPoint);
 
     } // end if sampleOk
