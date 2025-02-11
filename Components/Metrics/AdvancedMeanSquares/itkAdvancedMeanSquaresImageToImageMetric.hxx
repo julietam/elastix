@@ -188,9 +188,18 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
       /** Get the fixed image value. */
       const auto fixedImageValue = static_cast<RealType>(fixedImageSample.m_ImageValue);
 
+      // Get the weight from the weighted mask
+      RealType weight = 1.0;
+      if (this->GetWeightedMask())
+      {
+        FixedImageIndexType fixedIndex;
+        this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
+        weight = this->GetWeightedMask()->GetPixel(fixedIndex);
+      }
+
       /** The difference squared. */
       const RealType diff = movingImageValue - fixedImageValue;
-      measure += diff * diff;
+      measure += weight * diff * diff;
 
     } // end if sampleOk
 
@@ -310,9 +319,18 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
       /** Get the fixed image value. */
       const auto fixedImageValue = static_cast<RealType>(threader_fiter->m_ImageValue);
 
+      // Get the weight from the weighted mask
+      RealType weight = 1.0;
+      if (this->GetWeightedMask())
+      {
+        FixedImageIndexType fixedIndex;
+        this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
+        weight = this->GetWeightedMask()->GetPixel(fixedIndex);
+      }
+
       /** The difference squared. */
       const RealType diff = movingImageValue - fixedImageValue;
-      measure += diff * diff;
+      measure += weight * diff * diff;
 
     } // end if sampleOk
 
