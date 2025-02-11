@@ -204,6 +204,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
 
       // Log the equation used
       std::cout << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2" << std::endl;
+      std::cout << "Fixed image value: " << fixedImageValue << ", Moving image value: " << movingImageValue << ", Weight: " << weight << std::endl;
     } // end if sampleOk
 
   } // end for loop over the image sample container
@@ -338,6 +339,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
 
       // Log the equation used
       std::cout << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2" << std::endl;
+      std::cout << "Fixed image value: " << fixedImageValue << ", Moving image value: " << movingImageValue << ", Weight: " << weight << std::endl;
     } // end if sampleOk
 
   } // end for loop over the image sample container
@@ -747,6 +749,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
 
   // Log the equation used
   std::cout << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2" << std::endl;
+  std::cout << "Fixed image value: " << fixedImageValue << ", Moving image value: " << movingImageValue << ", Weight: " << weight << std::endl;
 
   /** Calculate the contributions to the derivatives with respect to each parameter. */
   const RealType diff_2 = weight * diff * 2.0;
