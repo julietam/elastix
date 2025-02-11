@@ -732,15 +732,9 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   {
     // Assuming fixedImageValue is a pixel value, we need to get the corresponding physical point
     FixedImageIndexType fixedIndex;
-    fixedIndex.Fill(static_cast<typename FixedImageIndexType::IndexValueType>(fixedImageValue));
-
-    FixedImagePointType fixedPoint;
-    this->GetFixedImage()->TransformIndexToPhysicalPoint(fixedIndex, fixedPoint);
-
-    // Get the corresponding index from the physical point
-    const FixedImageIndexType fixedIndexFromPoint = this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint);
-    weight = m_WeightedMask->GetPixel(fixedIndexFromPoint);
-    std::cout << "Weight from mask at index " << fixedIndexFromPoint << ": " << weight << std::endl;
+    this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
+    weight = m_WeightedMask->GetPixel(fixedIndex);
+    std::cout << "Weight from mask at index " << fixedIndex << ": " << weight << std::endl;
   }
 
   /** The difference squared. */
