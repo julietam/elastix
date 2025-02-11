@@ -105,6 +105,20 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
   if (this->GetWeightedMask())
   {
     std::cout << "Weighted mask is set." << std::endl;
+
+    // Print out min/max values of the mask
+    double minValue = std::numeric_limits<double>::max();
+    double maxValue = std::numeric_limits<double>::lowest();
+    itk::ImageRegionConstIterator<WeightImageType> it(this->GetWeightedMask(),
+                                                      this->GetWeightedMask()->GetLargestPossibleRegion());
+
+    while (!it.IsAtEnd())
+    {
+      if (it.Get() < minValue) minValue = it.Get();
+      if (it.Get() > maxValue) maxValue = it.Get();
+      ++it;
+    }
+    std::cout << "Mask Min: " << minValue << ", Mask Max: " << maxValue << std::endl;
   }
   else
   {
@@ -739,7 +753,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
     FixedImageIndexType fixedIndex;
     this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
     weight = m_WeightedMask->GetPixel(fixedIndex);
-    std::cout << "Weight from mask at index " << fixedIndex << ": " << weight << std::endl;
+    std::cout << "Retrieved Weight: " << weight << std::endl;
   }
 
   /** The difference squared. */
