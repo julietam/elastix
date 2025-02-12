@@ -128,6 +128,8 @@ auto
 AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingleThreaded(
   const ParametersType & parameters) const -> MeasureType
 {
+  // Log the function name
+  std::cout << "GetValueSingleThreaded" << std::endl;
   /** Initialize some variables. */
   Superclass::m_NumberOfPixelsCounted = 0;
   MeasureType measure{};
@@ -252,6 +254,8 @@ template <typename TFixedImage, typename TMovingImage>
 void
 AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetValue(ThreadIdType threadId) const
 {
+  // Log the function name
+  std::cout << "ThreadedGetValue" << std::endl;
   /** Get a handle to the sample container. */
   ImageSampleContainerPointer sampleContainer = this->GetImageSampler()->GetOutput();
   const unsigned long         sampleContainerSize = sampleContainer->Size();
@@ -690,6 +694,8 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   MeasureType &                      measure,
   DerivativeType &                   deriv) const
 {
+  //Output function name
+  std::cout << "UpdateValueAndDerivativeTerms" << std::endl;
   // Get the weight from the weighted mask
   RealType weight = 1.0;
   if (m_WeightedMask)
