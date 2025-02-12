@@ -692,7 +692,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   const FixedImagePointType &        fixedPoint) const
 {
   // Get the weight from the weighted mask
-  RealType weight = 1.0;
+  RealType weight = 0.5;
   if (m_WeightedMask)
   {
     FixedImageIndexType fixedIndex;
