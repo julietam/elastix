@@ -697,12 +697,16 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   {
     FixedImageIndexType fixedIndex;
     this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
-    weight = m_WeightedMask->GetPixel(fixedIndex);
+    const RealType maskValue = m_WeightedMask->GetPixel(fixedIndex);
+    if (maskValue != 0)
+    {
+      weight = maskValue;
+    }
     std::cout << "Retrieved Weight: " << weight << std::endl;
   }
   /** The difference squared. */
   const RealType diff = movingImageValue - fixedImageValue;
-  measure += diff * diff;
+  measure += weight * diff * diff;
 
   /** Calculate the contributions to the derivatives with respect to each parameter. */
   const RealType diff_2 = diff * 2.0;
