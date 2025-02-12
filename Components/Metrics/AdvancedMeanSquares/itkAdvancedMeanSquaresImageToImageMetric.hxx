@@ -700,7 +700,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
     const RealType maskValue = m_WeightedMask->GetPixel(fixedIndex);
     if (maskValue != 0)
     {
-      weight = maskValue;
+      weight = maskValue * 10000;
     }
     std::cout << "Retrieved Weight: " << weight << std::endl;
   }
