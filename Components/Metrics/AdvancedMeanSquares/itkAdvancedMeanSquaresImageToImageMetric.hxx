@@ -101,30 +101,6 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
     this->m_NormalizationFactor = 1.0;
   }
 
-  // Check if the weighted mask is not null
-  if (this->GetWeightedMask())
-  {
-    std::cout << "Weighted mask is set." << std::endl;
-
-    // Print out min/max values of the mask
-    double minValue = std::numeric_limits<double>::max();
-    double maxValue = std::numeric_limits<double>::lowest();
-    itk::ImageRegionConstIterator<WeightImageType> it(this->GetWeightedMask(),
-                                                      this->GetWeightedMask()->GetLargestPossibleRegion());
-
-    while (!it.IsAtEnd())
-    {
-      if (it.Get() < minValue) minValue = it.Get();
-      if (it.Get() > maxValue) maxValue = it.Get();
-      ++it;
-    }
-    std::cout << "Mask Min: " << minValue << ", Mask Max: " << maxValue << std::endl;
-  }
-  else
-  {
-    std::cout << "Weighted mask is not set." << std::endl;
-  }
-
 } // end Initialize()
 
 
@@ -202,23 +178,10 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
       /** Get the fixed image value. */
       const auto fixedImageValue = static_cast<RealType>(fixedImageSample.m_ImageValue);
 
-      // Get the weight from the weighted mask
-      RealType weight = 1.0;
-      if (this->GetWeightedMask())
-      {
-        FixedImageIndexType fixedIndex;
-        this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
-        weight = this->GetWeightedMask()->GetPixel(fixedIndex);
-        std::cout << "Weight from mask at index " << fixedIndex << ": " << weight << std::endl;
-      }
-
       /** The difference squared. */
       const RealType diff = movingImageValue - fixedImageValue;
-      measure += weight * diff * diff;
+      measure += diff * diff;
 
-      // Log the equation used
-      std::cout << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2" << std::endl;
-      std::cout << "Fixed image value: " << fixedImageValue << ", Moving image value: " << movingImageValue << ", Weight: " << weight << std::endl;
     } // end if sampleOk
 
   } // end for loop over the image sample container
@@ -337,23 +300,10 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
       /** Get the fixed image value. */
       const auto fixedImageValue = static_cast<RealType>(threader_fiter->m_ImageValue);
 
-      // Get the weight from the weighted mask
-      RealType weight = 1.0;
-      if (this->GetWeightedMask())
-      {
-        FixedImageIndexType fixedIndex;
-        this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
-        weight = this->GetWeightedMask()->GetPixel(fixedIndex);
-        std::cout << "Weight from mask at index " << fixedIndex << ": " << weight << std::endl;
-      }
-
       /** The difference squared. */
       const RealType diff = movingImageValue - fixedImageValue;
-      measure += weight * diff * diff;
+      measure += diff * diff;
 
-      // Log the equation used
-      std::cout << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2" << std::endl;
-      std::cout << "Fixed image value: " << fixedImageValue << ", Moving image value: " << movingImageValue << ", Weight: " << weight << std::endl;
     } // end if sampleOk
 
   } // end for loop over the image sample container
@@ -648,25 +598,20 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
       /** Get the fixed image value. */
       const auto fixedImageValue = static_cast<RealType>(threader_fiter->m_ImageValue);
 
-      // Get the weight from the weighted mask
-      RealType weight = 1.0;
-      if (this->GetWeightedMask())
-      {
-        FixedImageIndexType fixedIndex;
-        this->GetFixedImage()->TransformPhysicalPointToIndex(fixedPoint, fixedIndex);
-        weight = this->GetWeightedMask()->GetPixel(fixedIndex);
-        std::cout << "Retrieved Weight: " << weight << std::endl;
-      }
+#if 0
+      /** Get the TransformJacobian dT/dmu. */
+      this->EvaluateTransformJacobian( fixedPoint, jacobian, nzji );
 
-      /** The difference squared. */
-      const RealType diff = movingImageValue - fixedImageValue;
-      measure += weight * diff * diff;
+      /** Compute the inner products (dM/dx)^T (dT/dmu). */
+      this->EvaluateTransformJacobianInnerProduct(
+        jacobian, movingImageDerivative, imageJacobian );
+#else
+      /** Compute the inner product of the transform Jacobian dT/dmu and the moving image gradient dM/dx. */
+      Superclass::m_AdvancedTransform->EvaluateJacobianWithImageGradientProduct(
+        fixedPoint, movingImageDerivative, imageJacobian, nzji);
+#endif
 
-      // Log the equation used
-      std::cout << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2" << std::endl;
-      std::cout << "Fixed image value: " << fixedImageValue << ", Moving image value: " << movingImageValue << ", Weight: " << weight << std::endl;
-
-      /** Compute this pixel's contribution to the derivatives. */
+      /** Compute this pixel's contribution to the measure and derivatives. */
       this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative, fixedPoint);
 
     } // end if sampleOk
@@ -744,7 +689,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   const NonZeroJacobianIndicesType & nzji,
   MeasureType &                      measure,
   DerivativeType &                   deriv,
-  const FixedImagePointType &        fixedPoint) const // Add fixedPoint as a parameter
+  const FixedImagePointType &        fixedPoint) const
 {
   // Get the weight from the weighted mask
   RealType weight = 1.0;
@@ -755,17 +700,12 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
     weight = m_WeightedMask->GetPixel(fixedIndex);
     std::cout << "Retrieved Weight: " << weight << std::endl;
   }
-
   /** The difference squared. */
   const RealType diff = movingImageValue - fixedImageValue;
-  measure += weight * diff * diff;
-
-  // Log the equation used
-  std::cout << "Equation: measure += " << weight << " * (" << movingImageValue << " - " << fixedImageValue << ")^2" << std::endl;
-  std::cout << "Fixed image value: " << fixedImageValue << ", Moving image value: " << movingImageValue << ", Weight: " << weight << std::endl;
+  measure += diff * diff;
 
   /** Calculate the contributions to the derivatives with respect to each parameter. */
-  const RealType diff_2 = weight * diff * 2.0;
+  const RealType diff_2 = diff * 2.0;
 
   const auto numberOfParameters = this->GetNumberOfParameters();
 
