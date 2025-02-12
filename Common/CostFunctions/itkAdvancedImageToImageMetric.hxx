@@ -68,6 +68,9 @@ AdvancedImageToImageMetric<TFixedImage, TMovingImage>::Initialize()
   /** Connect the image sampler */
   this->InitializeImageSampler();
 
+  /** Initialize weight images if they are being used */
+  this->InitializeWeightImages();
+
   /** Check if the interpolator is a B-spline interpolator. */
   this->CheckForBSplineInterpolator();
 
@@ -810,6 +813,131 @@ AdvancedImageToImageMetric<TFixedImage, TMovingImage>::PrintSelf(std::ostream & 
 
 } // end PrintSelf()
 
+
+template <typename TFixedImage, typename TMovingImage>
+void
+AdvancedImageToImageMetric<TFixedImage, TMovingImage>::SetFixedImageWeights(WeightImageType * weights)
+{
+  if (this->m_FixedImageWeights != weights)
+  {
+    this->m_FixedImageWeights = weights;
+    this->m_UseWeightImages = (weights != nullptr || this->m_MovingImageWeights.IsNotNull());
+    this->Modified();
+  }
+}
+
+template <typename TFixedImage, typename TMovingImage>
+void
+AdvancedImageToImageMetric<TFixedImage, TMovingImage>::SetMovingImageWeights(WeightImageType * weights)
+{
+  if (this->m_MovingImageWeights != weights)
+  {
+    this->m_MovingImageWeights = weights;
+    this->m_UseWeightImages = (weights != nullptr || this->m_FixedImageWeights.IsNotNull());
+    this->Modified();
+  }
+}
+
+template <typename TFixedImage, typename TMovingImage>
+void
+AdvancedImageToImageMetric<TFixedImage, TMovingImage>::InitializeWeightImages()
+{
+  if (this->m_UseWeightImages)
+  {
+    this->ValidateWeightImages();
+  }
+}
+
+template <typename TFixedImage, typename TMovingImage>
+void
+AdvancedImageToImageMetric<TFixedImage, TMovingImage>::ValidateWeightImages() const
+{
+  if (this->m_FixedImageWeights.IsNotNull())
+  {
+    // Check dimensions match fixed image
+    if (this->m_FixedImageWeights->GetLargestPossibleRegion() != 
+        this->GetFixedImage()->GetLargestPossibleRegion())
+    {
+      itkExceptionMacro("Fixed image weight dimensions do not match fixed image dimensions");
+    }
+  }
+
+  if (this->m_MovingImageWeights.IsNotNull())
+  {
+    // Check dimensions match moving image
+    if (this->m_MovingImageWeights->GetLargestPossibleRegion() != 
+        this->GetMovingImage()->GetLargestPossibleRegion())
+    {
+      itkExceptionMacro("Moving image weight dimensions do not match moving image dimensions");
+    }
+  }
+}
+
+template <typename TFixedImage, typename TMovingImage>
+typename AdvancedImageToImageMetric<TFixedImage, TMovingImage>::RealType
+AdvancedImageToImageMetric<TFixedImage, TMovingImage>::ApplyWeights(
+  RealType value,
+  const FixedImagePointType & fixedPoint) const
+{
+  if (!this->m_UseWeightImages)
+  {
+    return value;
+  }
+
+  RealType weight = NumericTraits<RealType>::One;
+
+  if (this->m_FixedImageWeights.IsNotNull())
+  {
+    typename WeightImageType::IndexType index;
+    this->m_FixedImageWeights->TransformPhysicalPointToIndex(fixedPoint, index);
+    weight *= this->m_FixedImageWeights->GetPixel(index);
+  }
+
+  if (this->m_MovingImageWeights.IsNotNull())
+  {
+    MovingImagePointType mappedPoint;
+    mappedPoint = this->m_Transform->TransformPoint(fixedPoint);
+    
+    typename WeightImageType::IndexType index;
+    this->m_MovingImageWeights->TransformPhysicalPointToIndex(mappedPoint, index);
+    weight *= this->m_MovingImageWeights->GetPixel(index);
+  }
+
+  return value * weight;
+}
+
+template <typename TFixedImage, typename TMovingImage>
+void
+AdvancedImageToImageMetric<TFixedImage, TMovingImage>::ApplyWeightsToDerivatives(
+  DerivativeType & derivatives,
+  const FixedImagePointType & fixedPoint) const
+{
+  if (!this->m_UseWeightImages)
+  {
+    return;
+  }
+
+  RealType weight = NumericTraits<RealType>::One;
+
+  if (this->m_FixedImageWeights.IsNotNull())
+  {
+    typename WeightImageType::IndexType index;
+    this->m_FixedImageWeights->TransformPhysicalPointToIndex(fixedPoint, index);
+    weight *= this->m_FixedImageWeights->GetPixel(index);
+  }
+
+  if (this->m_MovingImageWeights.IsNotNull())
+  {
+    MovingImagePointType mappedPoint;
+    mappedPoint = this->m_Transform->TransformPoint(fixedPoint);
+    
+    typename WeightImageType::IndexType index;
+    this->m_MovingImageWeights->TransformPhysicalPointToIndex(mappedPoint, index);
+    weight *= this->m_MovingImageWeights->GetPixel(index);
+  }
+
+  derivatives *= weight;
+}
 
 } // end namespace itk
 
