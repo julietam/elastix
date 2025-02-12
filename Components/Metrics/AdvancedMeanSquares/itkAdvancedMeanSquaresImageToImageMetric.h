@@ -180,6 +180,7 @@ protected:
                                 const RealType                     movingImageValue,
                                 const DerivativeType &             imageJacobian,
                                 const NonZeroJacobianIndicesType & nzji,
+                                const FixedImagePointType &        fixedPoint,
                                 MeasureType &                      measure,
                                 DerivativeType &                   deriv) const;
 

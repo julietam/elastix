@@ -180,7 +180,10 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
 
       /** The difference squared. */
       const RealType diff = movingImageValue - fixedImageValue;
-      measure += diff * diff;
+      const RealType diffSquared = diff * diff;
+
+      /** Apply weights if using weight images */
+      measure += this->ApplyWeights(diffSquared, fixedPoint);
 
     } // end if sampleOk
 
@@ -302,7 +305,10 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
 
       /** The difference squared. */
       const RealType diff = movingImageValue - fixedImageValue;
-      measure += diff * diff;
+      const RealType diffSquared = diff * diff;
+
+      /** Apply weights if using weight images */
+      measure += this->ApplyWeights(diffSquared, fixedPoint);
 
     } // end if sampleOk
 
@@ -462,7 +468,8 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueAndDer
 #endif
 
       /** Compute this pixel's contribution to the measure and derivatives. */
-      this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative);
+      this->UpdateValueAndDerivativeTerms(
+        fixedImageValue, movingImageValue, imageJacobian, nzji, fixedPoint, measure, derivative);
 
     } // end if sampleOk
 
@@ -612,7 +619,8 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
 #endif
 
       /** Compute this pixel's contribution to the measure and derivatives. */
-      this->UpdateValueAndDerivativeTerms(fixedImageValue, movingImageValue, imageJacobian, nzji, measure, derivative);
+      this->UpdateValueAndDerivativeTerms(
+        fixedImageValue, movingImageValue, imageJacobian, nzji, fixedPoint, measure, derivative);
 
     } // end if sampleOk
 
@@ -687,12 +695,16 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
   const RealType                     movingImageValue,
   const DerivativeType &             imageJacobian,
   const NonZeroJacobianIndicesType & nzji,
+  const FixedImagePointType &        fixedPoint,
   MeasureType &                      measure,
   DerivativeType &                   deriv) const
 {
   /** The difference squared. */
   const RealType diff = movingImageValue - fixedImageValue;
-  measure += diff * diff;
+  const RealType diffSquared = diff * diff;
+
+  /** Apply weights if using weight images */
+  measure += this->ApplyWeights(diffSquared, fixedPoint);
 
   /** Calculate the contributions to the derivatives with respect to each parameter. */
   const RealType diff_2 = diff * 2.0;
@@ -720,6 +732,10 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::UpdateValueAnd
       deriv[index] += diff_2 * imageJacobian[i];
     }
   }
+
+  /** Apply weights to derivatives if using weight images */
+  this->ApplyWeightsToDerivatives(deriv, fixedPoint);
+
 } // end UpdateValueAndDerivativeTerms()
 
 
