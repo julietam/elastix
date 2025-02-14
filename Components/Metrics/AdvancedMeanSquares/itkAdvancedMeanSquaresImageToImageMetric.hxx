@@ -131,6 +131,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
   /** Initialize some variables. */
   Superclass::m_NumberOfPixelsCounted = 0;
   MeasureType measure{};
+  MeasureType measure2{};
 
   /** Call non-thread-safe stuff, such as:
    *   this->SetTransformParameters( parameters );
@@ -182,8 +183,11 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
         if (maskValue != 0)
         {
           weight = maskValue;
-    // Logging or debugging output removed
+        }
     }
+    // log weight for debugging
+    // Logging or debugging output removed
+    std::cout << "Weight: " << weight << std::endl;
       Superclass::m_NumberOfPixelsCounted++;
 
       /** Get the fixed image value. */
@@ -191,7 +195,8 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
 
       /** The difference squared. */
       const RealType diff = movingImageValue - fixedImageValue;
-      measure += weight*diff * diff;
+      measure += weight *diff * diff;
+      measure2 += diff * diff;
 
     } // end if sampleOk
 
@@ -209,6 +214,8 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
   measure *= normal_sum;
 
   /** Return the mean squares measure value. */
+  std::cout << "Measure: " << measure << std::endl;
+  std::cout << "Measure2: " << measure2 << std::endl;
   return measure;
 
 } // end GetValueSingleThreaded()
