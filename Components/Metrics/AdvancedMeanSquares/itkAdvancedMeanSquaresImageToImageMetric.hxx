@@ -174,7 +174,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueSingle
 
     if (sampleOk)
     {
-      RealType weight = 1.0;
+      RealType weight = 0.0;
       if (m_WeightedMask)
         {
         FixedImageIndexType fixedIndex;
@@ -313,7 +313,7 @@ AdvancedMeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::ThreadedGetVal
 
     if (sampleOk)
     {
-      RealType weight = 1;
+      RealType weight = 0;
     if (m_WeightedMask)
     {
       FixedImageIndexType fixedIndex;
